@@ -1,0 +1,202 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+
+    body{
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        margin:0;
+        background:#f4f6f9;
+    }
+
+    /* Hero Section */
+
+    .hero{
+        background:linear-gradient(135deg,#b30000,#ff4d4d);
+        color:white;
+        padding:80px 20px;
+        text-align:center;
+    }
+
+    .hero h1{
+        font-size:50px;
+        margin-bottom:10px;
+    }
+
+    .hero p{
+        font-size:20px;
+        margin-bottom:30px;
+    }
+
+    .hero-buttons a{
+        padding:12px 30px;
+        margin:10px;
+        border-radius:30px;
+        text-decoration:none;
+        font-weight:bold;
+    }
+
+    .btn-donate{
+        background:white;
+        color:#b30000;
+    }
+
+    .btn-request{
+        background:#222;
+        color:white;
+    }
+
+    /* Section */
+
+    .section{
+        padding:50px;
+        text-align:center;
+    }
+
+    /* Cards */
+
+    .card-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    /* Card */
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        width: 250px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        .card h3 {
+            color: #b30000;
+        }
+
+        /* Hover Effect */
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+            .card:hover h3 {
+                color: #ff3333;
+            }
+
+    /* Blood Table */
+
+    table{
+        margin:auto;
+        border-collapse:collapse;
+        width:60%;
+        background:white;
+        box-shadow:0 5px 10px rgba(0,0,0,0.1);
+    }
+
+    th,td{
+        padding:12px;
+        border-bottom:1px solid #ddd;
+    }
+
+    th{
+        background:#b30000;
+        color:white;
+    }
+
+    /* Footer */
+
+    
+    
+
+</style>
+
+
+<!-- HERO SECTION -->
+
+<div class="hero">
+
+    <h1>Blood Bank Management System</h1>
+
+    <p>Donate Blood, Save Lives</p>
+
+    <div class="hero-buttons">
+
+        <a href="/Home/Donate" class="btn-donate">Donate Blood</a>
+
+       <a href="/Home/Request" class="btn-request">Request Blood</a>
+
+    </div>
+
+</div>
+
+
+<!-- FEATURES -->
+
+<div class="section">
+
+    <h2>Our Services</h2>
+
+    <div class="card-container">
+
+        <div class="card">
+            <h3>Blood Donation</h3>
+            <p>Register as a donor and help save lives by donating blood.</p>
+        </div>
+
+        <div class="card">
+            <h3>Request Blood</h3>
+            <p>Hospitals and patients can request blood quickly and easily.</p>
+        </div>
+
+        <div class="card">
+            <h3>Track Requests</h3>
+            <p>Check the status of your blood request in real time.</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- BLOOD AVAILABILITY -->
+
+<div class="section">
+
+    <h2>Blood Availability</h2>
+
+    <table>
+
+        <tr>
+            <th>Blood Group</th>
+            <th>Available Units</th>
+        </tr>
+
+        <tr>
+            <td>A+</td>
+            <td>15</td>
+        </tr>
+
+        <tr>
+            <td>B+</td>
+            <td>10</td>
+        </tr>
+
+        <tr>
+            <td>O+</td>
+            <td>20</td>
+        </tr>
+
+        <tr>
+            <td>AB+</td>
+            <td>5</td>
+        </tr>
+
+    </table>
+
+</div>
+
+

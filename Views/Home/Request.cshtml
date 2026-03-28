@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Request Blood";
+}
+
+<style>
+
+    body {
+        font-family: 'Segoe UI',sans-serif;
+        background: #f4f6f9;
+    }
+
+    /* Container */
+
+    .request-container {
+        width: 400px;
+        margin: 60px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+        .request-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #b30000;
+        }
+
+    /* Form */
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    /* Button */
+
+    .btn-submit {
+        width: 100%;
+        background: #b30000;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        margin-top: 15px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .btn-submit:hover {
+            background: #ff3333;
+        }
+
+</style>
+
+
+<div class="request-container">
+
+    <h2>Request Blood</h2>
+
+    <form asp-action="Create" asp-controller="Request" method="post" enctype="multipart/form-data">
+
+        <div class="form-group">
+            <label>Receiver Name</label>
+            <input type="text" name="ReceiverName" required />
+        </div>
+
+        <div class="form-group">
+            <label>Blood Group</label>
+            <select name="BloodGroup" required>
+                <option value="">-- Select Blood Group --</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Quantity (Units)</label>
+            <input type="number" name="Quantity" min="1" required />
+        </div>
+
+        <div class="form-group">
+            <label>Hospital Name</label>
+            <input type="text" name="HospitalName" required />
+        </div>
+
+        <div class="form-group">
+            <label>Upload Medical Document</label>
+            <input type="file" name="MedicalFile" required />
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Request</button>
+
+    </form>
+
+</div>

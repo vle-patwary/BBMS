@@ -1,0 +1,149 @@
+﻿@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<style>
+
+    body {
+        font-family: 'Segoe UI',sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+    }
+
+    /* Container */
+    .admin-container {
+        width: 90%;
+        margin: auto;
+        margin-top: 40px;
+    }
+
+    /* Header */
+    .header {
+        background: #111;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+        .header h2 {
+            margin: 0;
+        }
+
+    /* Cards */
+    .card-container {
+        display: flex;
+        gap: 25px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        flex: 1;
+        min-width: 220px;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: 0.3s;
+    }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card a {
+            text-decoration: none;
+            color: #b30000;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+    /* Table */
+    .table-section {
+        margin-top: 40px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background: #b30000;
+        color: white;
+    }
+
+</style>
+
+<div class="admin-container">
+
+    <!-- Header -->
+    <div class="header">
+        <h2>Admin Panel</h2>
+    </div>
+
+    <!-- Actions -->
+    <div class="card-container">
+
+        <div class="card">
+            <a asp-controller="Donor" asp-action="Index">Manage Donors</a>
+        </div>
+
+        <div class="card">
+            <a asp-controller="BloodStock" asp-action="Index">Manage Blood Stock</a>
+        </div>
+
+        <div class="card">
+            <a asp-controller="Request" asp-action="Index">Validate Blood Request</a>
+        </div>
+
+        <div class="card">
+            <a asp-controller="Report" asp-action="Index">Generate Reports</a>
+        </div>
+
+    </div>
+
+    <!-- Blood Stock Table -->
+    <div class="table-section">
+
+        <h3>Blood Stock Summary</h3>
+
+        <table>
+
+            <tr>
+                <th>Blood Group</th>
+                <th>Units Available</th>
+            </tr>
+
+            <tr>
+                <td>A+</td>
+                <td>15</td>
+            </tr>
+
+            <tr>
+                <td>B+</td>
+                <td>12</td>
+            </tr>
+
+            <tr>
+                <td>O+</td>
+                <td>20</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
