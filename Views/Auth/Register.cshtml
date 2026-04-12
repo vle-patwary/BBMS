@@ -1,0 +1,162 @@
+﻿@model BBMS.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f2f4f8;
+    }
+
+    .register-container {
+        width: 420px;
+        margin: 60px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+        .register-container h2 {
+            text-align: center;
+            color: #b30000;
+            margin-bottom: 20px;
+        }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .role-select {
+        margin-top: 10px;
+    }
+
+        .role-select label {
+            margin-right: 10px;
+        }
+
+    .register-btn {
+        width: 100%;
+        background: #b30000;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        margin-top: 15px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .register-btn:hover {
+            background: #ff3333;
+        }
+
+    .text-danger {
+        color: red;
+        font-size: 13px;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+        .login-link a {
+            color: #b30000;
+            text-decoration: none;
+            font-weight: 600;
+        }
+</style>
+
+<div class="register-container">
+
+    <h2>Create Account</h2>
+
+    <form asp-action="Register" asp-controller="Auth" method="post">
+
+        <!-- Server-side validation summary -->
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <!-- Name -->
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+            <label asp-for="Phone"></label>
+            <input asp-for="Phone" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group">
+            <label asp-for="Address"></label>
+            <input asp-for="Address" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <!-- Blood Group -->
+        <div class="form-group">
+            <label asp-for="BloodGroup"></label>
+            <select asp-for="BloodGroup">
+                <option value="">-- Select Blood Group --</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+            </select>
+            <span asp-validation-for="BloodGroup" class="text-danger"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" type="password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" type="password" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="register-btn">Register</button>
+
+    </form>
+
+    <div class="login-link">
+        Already have an account?
+        <a asp-controller="Auth" asp-action="Login">Login</a>
+    </div>
+
+</div>

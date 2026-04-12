@@ -1,9 +1,10 @@
-﻿@{
+﻿@model BBMS.Models.LogInViewModel
+
+@{
     ViewData["Title"] = "Login";
 }
 
 <style>
-
     body {
         font-family: 'Segoe UI', Tahoma, sans-serif;
         background: #f2f4f8;
@@ -32,21 +33,13 @@
         font-weight: 600;
     }
 
-    input[type="text"], input[type="password"] {
+    input {
         width: 100%;
         padding: 10px;
         margin-top: 5px;
         border: 1px solid #ccc;
         border-radius: 6px;
     }
-
-    .role-select {
-        margin-top: 8px;
-    }
-
-        .role-select label {
-            margin-right: 15px;
-        }
 
     .login-btn {
         width: 100%;
@@ -64,6 +57,11 @@
             background: #ff3333;
         }
 
+    .text-danger {
+        color: red;
+        font-size: 13px;
+    }
+
     .register-link {
         text-align: center;
         margin-top: 15px;
@@ -74,27 +72,30 @@
             font-weight: 600;
             text-decoration: none;
         }
-
 </style>
-
 
 <div class="login-container">
 
     <h2>User Login</h2>
 
-    <form asp-action="Login" asp-controller="Account" method="post">
+    <form asp-action="LogIn" asp-controller="Auth" method="post">
 
+        <!-- Validation Summary -->
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <!-- Email -->
         <div class="form-group">
-            <label>Username / Email</label>
-            <input type="text" name="Email" required />
+            <label asp-for="Email"></label>
+            <input asp-for="Email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
+        <!-- Password -->
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="Password" required />
+            <label asp-for="Password"></label>
+            <input asp-for="Password" type="password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-
-      
 
         <button type="submit" class="login-btn">Login</button>
 

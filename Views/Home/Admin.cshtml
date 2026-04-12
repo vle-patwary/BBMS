@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Admin Panel";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
 <style>
@@ -7,33 +7,40 @@
     body {
         font-family: 'Segoe UI',sans-serif;
         background: #f4f6f9;
-        margin: 0;
     }
 
     /* Container */
-    .admin-container {
+
+    .dashboard {
         width: 90%;
         margin: auto;
         margin-top: 40px;
     }
 
     /* Header */
+
     .header {
-        background: #111;
+        background: linear-gradient(135deg,#b30000,#ff4d4d);
         color: white;
-        padding: 20px;
-        border-radius: 8px;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
 
-        .header h2 {
-            margin: 0;
-        }
+    /* Section Title */
+
+    .section-title {
+        margin-top: 35px;
+        margin-bottom: 15px;
+        color: #b30000;
+        font-weight: 600;
+    }
 
     /* Cards */
+
     .card-container {
         display: flex;
-        gap: 25px;
-        margin-top: 30px;
+        gap: 20px;
         flex-wrap: wrap;
     }
 
@@ -45,27 +52,34 @@
         border-radius: 12px;
         text-align: center;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        transition: 0.3s;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
 
+        /* Hover Effect */
+
         .card:hover {
-            transform: translateY(-10px) scale(1.03);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
+
+        /* Link style */
 
         .card a {
             text-decoration: none;
             color: #b30000;
-            font-size: 18px;
             font-weight: bold;
+            font-size: 18px;
+            display: block;
         }
 
     /* Table */
+
     .table-section {
-        margin-top: 40px;
+        margin-top: 30px;
         background: white;
-        padding: 20px;
-        border-radius: 10px;
+        padding: 25px;
+        border-radius: 12px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
@@ -75,9 +89,8 @@
     }
 
     th, td {
-        padding: 12px;
+        padding: 14px;
         border-bottom: 1px solid #ddd;
-        text-align: center;
     }
 
     th {
@@ -85,37 +98,64 @@
         color: white;
     }
 
+    tr:hover {
+        background: #f9f9f9;
+    }
+
 </style>
 
-<div class="admin-container">
 
-    <!-- Header -->
+<div class="dashboard">
+
+    <!-- HEADER -->
     <div class="header">
-        <h2>Admin Panel</h2>
+        <h2>Admin Dashboard</h2>
+        <p>Manage System, Blood Stock & Requests</p>
     </div>
 
-    <!-- Actions -->
+
+    <!-- MANAGEMENT SECTION -->
+    <h3 class="section-title">System Management</h3>
+
     <div class="card-container">
 
         <div class="card">
-            <a asp-controller="Donor" asp-action="Index">Manage Donors</a>
+            <a asp-controller="Donor" asp-action="List">👤 Manage Donors</a>
         </div>
 
         <div class="card">
-            <a asp-controller="BloodStock" asp-action="Index">Manage Blood Stock</a>
+            <a asp-controller="Staff" asp-action="List">👨‍⚕️ Manage Staff</a>
         </div>
 
         <div class="card">
-            <a asp-controller="Request" asp-action="Index">Validate Blood Request</a>
-        </div>
-
-        <div class="card">
-            <a asp-controller="Report" asp-action="Index">Generate Reports</a>
+            <a asp-controller="Hospital" asp-action="List">🏥 Manage Hospitals</a>
         </div>
 
     </div>
 
-    <!-- Blood Stock Table -->
+
+    <!-- BLOOD MANAGEMENT -->
+    <h3 class="section-title">Blood Management</h3>
+
+    <div class="card-container">
+
+        <div class="card">
+            <a asp-controller="Stock" asp-action="Index">🩸 Manage Blood Stock</a>
+        </div>
+
+        <div class="card">
+            <a asp-controller="Request" asp-action="List">📋 Blood Requests</a>
+        </div>
+
+        <div class="card">
+            <a asp-controller="Report" asp-action="Index">📊 Generate Reports</a>
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY TABLE -->
+
     <div class="table-section">
 
         <h3>Blood Stock Summary</h3>
@@ -124,7 +164,7 @@
 
             <tr>
                 <th>Blood Group</th>
-                <th>Units Available</th>
+                <th>Available Units</th>
             </tr>
 
             <tr>
@@ -140,6 +180,11 @@
             <tr>
                 <td>O+</td>
                 <td>20</td>
+            </tr>
+
+            <tr>
+                <td>AB+</td>
+                <td>5</td>
             </tr>
 
         </table>
