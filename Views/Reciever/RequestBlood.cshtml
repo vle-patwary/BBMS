@@ -1,0 +1,114 @@
+﻿@model YourProjectName.Models.RequestBlood
+
+<form asp-controller="Home" asp-action="RequestBlood" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label>Patient Name</label>
+        <input asp-for="PatientName" placeholder="Enter patient name">
+        <span asp-validation-for="PatientName" style="color:red; font-size:12px;"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Blood Group Needed</label>
+        <select asp-for="BloodGroupNeeded">
+            <option value="">Select</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+        </select>
+        <span asp-validation-for="BloodGroupNeeded" style="color:red; font-size:12px;"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Required Date</label>
+        <input asp-for="RequiredDate" type="date">
+        <span asp-validation-for="RequiredDate" style="color:red; font-size:12px;"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Hospital / Location</label>
+        <input asp-for="HospitalLocation" placeholder="Where needed">
+        <span asp-validation-for="HospitalLocation" style="color:red; font-size:12px;"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Contact Number</label>
+        <input asp-for="ContactNumber" placeholder="01XXXXXXXXX">
+        <span asp-validation-for="ContactNumber" style="color:red; font-size:12px;"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Additional Notes</label>
+        <textarea asp-for="Notes" placeholder="Optional details..."></textarea>
+    </div>
+
+    <hr class="section-divider">
+    <div class="section-title">Expense Breakdown</div>
+    <div class="expense-notice">
+        The following charges are fixed and managed by our staff.
+    </div>
+
+    <!-- Invoice table (read-only, no bindings needed) -->
+    <table class="invoice-table">
+        <tbody>
+            <tr><td>Needle</td><td>Tk 10</td></tr>
+            <tr><td>Blood collection bag</td><td>Tk 100</td></tr>
+            <tr><td>Gloves (pair)</td><td>Tk 30</td></tr>
+            <tr><td>Antiseptic wipe</td><td>Tk 10</td></tr>
+            <tr><td>Bandage</td><td>Tk 15</td></tr>
+        </tbody>
+        <tfoot>
+            <tr><td>Total</td><td>Tk 165</td></tr>
+        </tfoot>
+    </table>
+
+    <hr class="section-divider">
+    <div class="section-title">Payment</div>
+
+    <div class="form-group">
+        <label>Payment Method</label>
+        <select asp-for="PaymentMethod" onchange="toggleMobileField()">
+            <option value="">Select payment method</option>
+            <option value="BKash">bKash</option>
+            <option value="Nagad">Nagad</option>
+            <option value="Rocket">Rocket</option>
+            <option value="CashOnSite">Cash on site</option>
+            <option value="BankTransfer">Bank transfer</option>
+        </select>
+        <span asp-validation-for="PaymentMethod" style="color:red; font-size:12px;"></span>
+    </div>
+
+    <div class="form-group" id="mobile-number-group" style="display:none;">
+        <label id="mobile-number-label">Mobile Number</label>
+        <input asp-for="MobilePaymentNumber" placeholder="01XXXXXXXXX">
+    </div>
+
+    <button type="submit" class="btn">
+        <i class="fa-solid fa-paper-plane"></i> Submit Request
+    </button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function toggleMobileField() {
+            const val = document.getElementById('PaymentMethod').value;
+            const group = document.getElementById('mobile-number-group');
+            const label = document.getElementById('mobile-number-label');
+            if (['BKash', 'Nagad', 'Rocket'].includes(val)) {
+                group.style.display = 'block';
+                label.textContent = val + ' Number';
+            } else {
+                group.style.display = 'none';
+            }
+        }
+    </script>
+}

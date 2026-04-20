@@ -1,0 +1,213 @@
+﻿@{
+    ViewData["Title"] = "Blood Requests";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .container {
+        max-width: 950px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+        .header h2 {
+            margin: 0;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+    /* Table Center */
+    .table-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    table {
+        width: 100%;
+        max-width: 900px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    th {
+        background: #b30000;
+        color: white;
+    }
+
+    tr:hover {
+        background: #f9f9f9;
+    }
+
+    /* Status */
+    .pending {
+        color: orange;
+        font-weight: 600;
+    }
+
+    .approved {
+        color: green;
+        font-weight: 600;
+    }
+
+    .rejected {
+        color: red;
+        font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        margin: 2px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-approve {
+        background: #28a745;
+        color: white;
+    }
+
+        .btn-approve:hover {
+            background: #218838;
+        }
+
+    .btn-reject {
+        background: #dc3545;
+        color: white;
+    }
+
+        .btn-reject:hover {
+            background: #c82333;
+        }
+
+    .btn-view {
+        background: #007bff;
+        color: white;
+    }
+
+        .btn-view:hover {
+            background: #0056b3;
+        }
+
+    .btn-back {
+        background: #ccc;
+        color: #333;
+        margin-top: 25px;
+    }
+
+        .btn-back:hover {
+            background: #bbb;
+        }
+
+    .btn-group {
+        text-align: center;
+    }
+
+</style>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h2>Blood Requests</h2>
+        <p>Manage all incoming blood requests</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Patient Name</th>
+                    <th>Blood Group</th>
+                    <th>Units Needed</th>
+                    <th>Hospital</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>REQ-001</td>
+                    <td>Rahim Uddin</td>
+                    <td>O+</td>
+                    <td>2 Units</td>
+                    <td>Dhaka Medical</td>
+                    <td>017XXXXXXXX</td>
+                    <td class="pending">Pending</td>
+                    <td>
+                        <button class="btn btn-approve">Approve</button>
+                        <button class="btn btn-reject">Reject</button>
+                        <button class="btn btn-view">View</button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>REQ-002</td>
+                    <td>Karim Hasan</td>
+                    <td>A+</td>
+                    <td>1 Unit</td>
+                    <td>Square Hospital</td>
+                    <td>018XXXXXXXX</td>
+                    <td class="approved">Approved</td>
+                    <td>
+                        <button class="btn btn-view">View</button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>REQ-003</td>
+                    <td>Fatema Begum</td>
+                    <td>B-</td>
+                    <td>3 Units</td>
+                    <td>Popular Hospital</td>
+                    <td>019XXXXXXXX</td>
+                    <td class="rejected">Rejected</td>
+                    <td>
+                        <button class="btn btn-view">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Back Button -->
+    <div class="btn-group">
+        <a asp-controller="Home" asp-action="Admin" class="btn btn-back">Back</a>
+    </div>
+
+</div>

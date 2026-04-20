@@ -1,0 +1,298 @@
+﻿@{
+    ViewData["Title"] = "Record Donation";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .form-container {
+        width: 650px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+        .form-header h2 {
+            margin: 0 0 5px 0;
+            font-size: 22px;
+        }
+
+        .form-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+    label {
+        font-weight: 600;
+        font-size: 13px;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #b30000;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(179,0,0,0.1);
+        }
+
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .section-title {
+        grid-column: 1 / -1;
+        font-size: 13px;
+        font-weight: 700;
+        color: #b30000;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #f0d0d0;
+        padding-bottom: 6px;
+        margin-top: 8px;
+    }
+
+    .btn {
+        padding: 10px 22px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        font-family: inherit;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-submit {
+        background: #b30000;
+        color: white;
+    }
+
+        .btn-submit:hover {
+            background: #ff3333;
+        }
+
+    .btn-back {
+        background: #ccc;
+        color: #333;
+        margin-left: 10px;
+    }
+
+        .btn-back:hover {
+            background: #bbb;
+        }
+
+    .btn-group {
+        margin-top: 24px;
+        text-align: center;
+    }
+
+    .required-note {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 16px;
+        text-align: right;
+    }
+
+        .required-note span {
+            color: #b30000;
+        }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>Record Donation</h2>
+        <p>Log a new blood donation from a registered donor</p>
+    </div>
+
+    <p class="required-note"><span>*</span> Required fields</p>
+
+    <form asp-controller="Donation" asp-action="RecordDonation" method="post">
+        <div class="form-grid">
+
+            <!-- DONOR INFORMATION -->
+            <div class="section-title">Donor Information</div>
+
+            <div class="form-group">
+                <label>Donor ID <span style="color:#b30000">*</span></label>
+                <input type="text" name="DonorId" placeholder="e.g. DN-00123" required />
+            </div>
+
+            <div class="form-group">
+                <label>Donor Name <span style="color:#b30000">*</span></label>
+                <input type="text" name="DonorName" placeholder="Full name" required />
+            </div>
+
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" name="DateOfBirth" />
+            </div>
+
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="Gender">
+                    <option value="">-- Select --</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="tel" name="ContactNumber" placeholder="e.g. 01XXXXXXXXX" />
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="Email" placeholder="donor@email.com" />
+            </div>
+
+            <!-- DONATION DETAILS -->
+            <div class="section-title">Donation Details</div>
+
+            <div class="form-group">
+                <label>Blood Group <span style="color:#b30000">*</span></label>
+                <select name="BloodGroup" required>
+                    <option value="">-- Select Blood Group --</option>
+                    <option>A+</option>
+                    <option>A-</option>
+                    <option>B+</option>
+                    <option>B-</option>
+                    <option>O+</option>
+                    <option>O-</option>
+                    <option>AB+</option>
+                    <option>AB-</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Donation Type <span style="color:#b30000">*</span></label>
+                <select name="DonationType" required>
+                    <option value="">-- Select Type --</option>
+                    <option>Whole Blood</option>
+                    <option>Platelets</option>
+                    <option>Plasma</option>
+                    <option>Red Blood Cells</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity (ml) <span style="color:#b30000">*</span></label>
+                <input type="number" name="Quantity" placeholder="e.g. 450" min="100" max="600" required />
+            </div>
+
+            <div class="form-group">
+                <label>Donation Date <span style="color:#b30000">*</span></label>
+                <input type="date" name="DonationDate" required />
+            </div>
+
+            <div class="form-group">
+                <label>Donation Location <span style="color:#b30000">*</span></label>
+                <input type="text" name="Location" placeholder="Hospital / Camp" required />
+            </div>
+
+            <div class="form-group">
+                <label>Donation Number (This Visit)</label>
+                <input type="number" name="DonationNumber" placeholder="e.g. 3" min="1" />
+            </div>
+
+            <!-- HEALTH SCREENING -->
+            <div class="section-title">Health Screening</div>
+
+            <div class="form-group">
+                <label>Hemoglobin Level (g/dL)</label>
+                <input type="number" name="HemoglobinLevel" placeholder="e.g. 13.5" step="0.1" />
+            </div>
+
+            <div class="form-group">
+                <label>Blood Pressure</label>
+                <input type="text" name="BloodPressure" placeholder="e.g. 120/80" />
+            </div>
+
+            <div class="form-group">
+                <label>Weight (kg)</label>
+                <input type="number" name="Weight" placeholder="e.g. 65" min="45" />
+            </div>
+
+            <div class="form-group">
+                <label>Screening Result</label>
+                <select name="ScreeningResult">
+                    <option value="">-- Select --</option>
+                    <option>Passed</option>
+                    <option>Deferred - Temporary</option>
+                    <option>Deferred - Permanent</option>
+                </select>
+            </div>
+
+            <!-- PROCESSING -->
+            <div class="section-title">Processing</div>
+
+            <div class="form-group">
+                <label>Staff / Phlebotomist ID</label>
+                <input type="text" name="StaffId" placeholder="e.g. ST-045" />
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <select name="Status">
+                    <option>Collected</option>
+                    <option>Processing</option>
+                    <option>Tested</option>
+                    <option>Available</option>
+                    <option>Discarded</option>
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Remarks / Notes</label>
+                <textarea name="Remarks" placeholder="Any observations or special notes..."></textarea>
+            </div>
+
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-submit">Save Donation Record</button>
+            <a asp-controller="Home" asp-action="Staff" class="btn btn-back">Back</a>
+        </div>
+    </form>
+</div>

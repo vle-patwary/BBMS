@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewData["Title"] = "View Blood Collections";
+}
+
+<style>
+
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    /* Container */
+    .table-container {
+        width: 90%;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    .table-header {
+        background: linear-gradient(135deg,#b30000,#ff4d4d);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+        .table-header h2 {
+            margin: 0;
+        }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background: #b30000;
+        color: white;
+    }
+
+    tr:hover {
+        background: #f9f9f9;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-back {
+        background: #ccc;
+        margin-top: 20px;
+        display: inline-block;
+    }
+
+</style>
+
+<div class="table-container">
+
+    <div class="table-header">
+        <h2>Blood Collection Records</h2>
+        <p>All stored blood donation data</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Donor Name</th>
+                <th>Blood Group</th>
+                <th>Quantity (ml)</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.DonorName</td>
+                        <td>@item.BloodGroup</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.CollectionDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.Location</td>
+                        <td>@item.Status</td>
+                        <td>
+                            <a asp-controller="Collection" asp-action="EditCollection" asp-route-id="@item.Id" class="btn btn-edit">Edit</a>
+                            <a asp-controller="Collection" asp-action="DeleteCollection" asp-route-id="@item.Id" class="btn btn-delete">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7">No records found</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div style="text-align:center;">
+        <a asp-controller="Home" asp-action="Staff" class="btn btn-back">Back</a>
+    </div>
+
+</div>

@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = "Add Blood Collection";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    /* Container */
+    .form-container {
+        width: 600px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    .form-header {
+        background: linear-gradient(135deg,#b30000,#ff4d4d);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+        .form-header h2 {
+            margin: 0;
+        }
+
+    /* Inputs */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .btn-submit {
+        background: #b30000;
+        color: white;
+    }
+
+        .btn-submit:hover {
+            background: #ff3333;
+        }
+
+    .btn-back {
+        background: #ccc;
+        margin-left: 10px;
+    }
+
+    /* Button container */
+    .btn-group {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+</style>
+
+
+<div class="form-container">
+
+    <div class="form-header">
+        <h2>Add Blood Collection</h2>
+        <p>Add new donation details</p>
+    </div>
+
+    <form asp-controller="Donation" asp-action="SubmitDonation" method="post">
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="FullName" placeholder="Enter your name" required />
+        </div>
+
+        <div class="form-group">
+            <label>Blood Group</label>
+            <select name="BloodGroup" required>
+                <option value="">-- Select Blood Group --</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Last Donation Date</label>
+            <input type="date" name="LastDonationDate" />
+        </div>
+
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" name="Location" placeholder="Your area" required />
+        </div>
+
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" name="ContactNumber" placeholder="01XXXXXXXXX" required />
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-submit">Add Collection</button>
+
+            <a asp-controller="Home" asp-action="User" class="btn btn-back">Back</a>
+        </div>
+
+    </form>
+
+</div>

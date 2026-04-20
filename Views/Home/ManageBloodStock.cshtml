@@ -1,0 +1,183 @@
+﻿@{
+    ViewData["Title"] = "Manage Blood Stock";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    /* Main Container */
+    .container {
+        max-width: 850px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+        .header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+    /* Table Alignment Fix */
+    .table-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    table {
+        width: 100%;
+        max-width: 750px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    th {
+        background: #b30000;
+        color: white;
+    }
+
+    tr:hover {
+        background: #f9f9f9;
+    }
+
+    /* Status */
+    .good {
+        color: green;
+        font-weight: 600;
+    }
+
+    .low {
+        color: orange;
+        font-weight: 600;
+    }
+
+    .critical {
+        color: red;
+        font-weight: 700;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-update {
+        background: #b30000;
+        color: white;
+    }
+
+        .btn-update:hover {
+            background: #ff3333;
+        }
+
+    .btn-back {
+        background: #ccc;
+        color: #333;
+        margin-top: 25px;
+    }
+
+        .btn-back:hover {
+            background: #bbb;
+        }
+
+    .btn-group {
+        text-align: center;
+    }
+</style>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h2>Manage Blood Stock</h2>
+        <p>Monitor and manage available blood units</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Blood Group</th>
+                    <th>Available Units</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>A+</td>
+                    <td>50</td>
+                    <td class="good">Sufficient</td>
+                    <td>10 Apr 2026</td>
+                    <td><button class="btn btn-update">Update</button></td>
+                </tr>
+
+                <tr>
+                    <td>B+</td>
+                    <td>20</td>
+                    <td class="low">Low Stock</td>
+                    <td>09 Apr 2026</td>
+                    <td><button class="btn btn-update">Update</button></td>
+                </tr>
+
+                <tr>
+                    <td>O+</td>
+                    <td>70</td>
+                    <td class="good">Sufficient</td>
+                    <td>11 Apr 2026</td>
+                    <td><button class="btn btn-update">Update</button></td>
+                </tr>
+
+                <tr>
+                    <td>AB-</td>
+                    <td>10</td>
+                    <td class="critical">Critical</td>
+                    <td>08 Apr 2026</td>
+                    <td><button class="btn btn-update">Update</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Back Button -->
+    <div class="btn-group">
+        <a asp-controller="Home" asp-action="Admin" class="btn btn-back">Back</a>
+    </div>
+
+</div>

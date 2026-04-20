@@ -1,0 +1,590 @@
+﻿@{
+    ViewData["Title"] = "Manage Donors";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .page-container {
+        width: 1100px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        color: white;
+        padding: 20px 28px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .page-header h2 {
+            margin: 0 0 4px 0;
+            font-size: 22px;
+        }
+
+        .page-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+    .btn {
+        padding: 10px 22px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: inherit;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #b30000;
+        font-weight: 600;
+    }
+
+        .btn-primary:hover {
+            background: #ffe0e0;
+        }
+
+    .btn-back {
+        background: #ccc;
+        color: #333;
+    }
+
+        .btn-back:hover {
+            background: #bbb;
+        }
+
+    .btn-export {
+        background: #2e7d32;
+        color: white;
+        font-weight: 600;
+    }
+
+        .btn-export:hover {
+            background: #388e3c;
+        }
+
+    /* Stats Cards */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        border-left: 4px solid #b30000;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .stat-card.eligible {
+            border-left-color: #2e7d32;
+        }
+
+        .stat-card.deferred {
+            border-left-color: #f57c00;
+        }
+
+        .stat-card.inactive {
+            border-left-color: #888;
+        }
+
+    .stat-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #b30000;
+        line-height: 1;
+    }
+
+    .stat-card.eligible .stat-value {
+        color: #2e7d32;
+    }
+
+    .stat-card.deferred .stat-value {
+        color: #f57c00;
+    }
+
+    .stat-card.inactive .stat-value {
+        color: #888;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+            .filter-bar input:focus,
+            .filter-bar select:focus {
+                border-color: #b30000;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(179,0,0,0.1);
+            }
+
+        .filter-bar .btn-search {
+            background: #b30000;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+            .filter-bar .btn-search:hover {
+                background: #ff3333;
+            }
+
+    .filter-bar-right {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+    }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    thead tr {
+        background: linear-gradient(135deg, #b30000, #e53935);
+        color: white;
+    }
+
+    thead th {
+        padding: 13px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.15s;
+    }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #fff5f5;
+        }
+
+    td {
+        padding: 11px 14px;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    .donor-name {
+        font-weight: 600;
+        color: #222;
+    }
+
+    .donor-id {
+        font-size: 11px;
+        color: #b30000;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    /* Blood group badge */
+    .blood-badge {
+        display: inline-block;
+        background: #fde8e8;
+        color: #b30000;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid #f5c0c0;
+    }
+
+    /* Status badges */
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-active {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .badge-inactive {
+        background: #f5f5f5;
+        color: #616161;
+        border: 1px solid #e0e0e0;
+    }
+
+    .badge-eligible {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #bbdefb;
+    }
+
+    .badge-deferred {
+        background: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffe0b2;
+    }
+
+    /* Action buttons */
+    .action-group {
+        display: flex;
+        gap: 6px;
+    }
+
+    .action-btn {
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 500;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .action-view {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+        .action-view:hover {
+            background: #bbdefb;
+        }
+
+    .action-edit {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+        .action-edit:hover {
+            background: #ffe0b2;
+        }
+
+    .action-delete {
+        background: #fde8e8;
+        color: #b30000;
+    }
+
+        .action-delete:hover {
+            background: #ffcdd2;
+        }
+
+    /* Pagination */
+    .pagination-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-top: 1px solid #f0f0f0;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .pagination-btns {
+        display: flex;
+        gap: 6px;
+    }
+
+    .pg-btn {
+        padding: 5px 11px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        background: white;
+        color: #444;
+        font-family: inherit;
+    }
+
+        .pg-btn:hover {
+            background: #f4f6f9;
+        }
+
+        .pg-btn.active {
+            background: #b30000;
+            color: white;
+            border-color: #b30000;
+        }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #aaa;
+    }
+
+        .empty-state p {
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+    /* Top action row */
+    .top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+</style>
+
+<div class="page-container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2>Manage Donors</h2>
+            <p>View, register, and manage all blood donors in the system</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <a asp-controller="Home" asp-action="AddCollection" class="btn btn-primary">+ Add New Donor</a>
+            <a asp-controller="Home" asp-action="Admin" class="btn btn-back">&#8592; Back</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Total Donors</div>
+            <div class="stat-value">@ViewBag.TotalDonors</div>
+        </div>
+        <div class="stat-card eligible">
+            <div class="stat-label">Eligible to Donate</div>
+            <div class="stat-value">@ViewBag.EligibleDonors</div>
+        </div>
+        <div class="stat-card deferred">
+            <div class="stat-label">Deferred</div>
+            <div class="stat-value">@ViewBag.DeferredDonors</div>
+        </div>
+        <div class="stat-card inactive">
+            <div class="stat-label">Inactive</div>
+            <div class="stat-value">@ViewBag.InactiveDonors</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <form method="get" asp-controller="Donor" asp-action="ManageDonors" style="display:contents;">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by name, phone or donor ID..." />
+
+            <select name="bloodGroup">
+                <option value="">All Blood Groups</option>
+                @foreach (var bg in new[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" })
+                {
+                    <option value="@bg" selected="@(ViewBag.BloodGroup == bg ? "selected" : null)">@bg</option>
+                }
+            </select>
+
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="Active" selected="@(ViewBag.Status == "Active" ? "selected" : null)">Active</option>
+                <option value="Inactive" selected="@(ViewBag.Status == "Inactive" ? "selected" : null)">Inactive</option>
+            </select>
+
+            <select name="eligibility">
+                <option value="">All Eligibility</option>
+                <option value="Eligible" selected="@(ViewBag.Eligibility == "Eligible" ? "selected" : null)">Eligible</option>
+                <option value="Deferred" selected="@(ViewBag.Eligibility == "Deferred" ? "selected" : null)">Deferred</option>
+            </select>
+
+            <button type="submit" class="btn-search">Search</button>
+
+            <div class="filter-bar-right">
+                <a asp-controller="Donor" asp-action="ExportDonors" class="btn btn-export" style="padding:9px 16px; font-size:13px;">&#8595; Export CSV</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Donor</th>
+                    <th>Blood Group</th>
+                    <th>Contact</th>
+                    <th>Gender</th>
+                    <th>Last Donation</th>
+                    <th>Total Donations</th>
+                    <th>Status</th>
+                    <th>Eligibility</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int serial = 1;
+                    foreach (var donor in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+                            <td>
+                                <div class="donor-name">@donor.FullName</div>
+                                <div class="donor-id">@donor.DonorId</div>
+                            </td>
+                            <td><span class="blood-badge">@donor.BloodGroup</span></td>
+                            <td>@donor.ContactNumber</td>
+                            <td>@donor.Gender</td>
+                            <td>@(donor.LastDonationDate.HasValue? donor.LastDonationDate.Value.ToString("dd MMM yyyy") : "—")</td>
+                            <td style="text-align:center;">@donor.TotalDonations</td>
+                            <td>
+                                @if (donor.Status == "Active")
+                                {
+                                    <span class="badge badge-active">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-inactive">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                @if (donor.Eligibility == "Eligible")
+                                {
+                                    <span class="badge badge-eligible">Eligible</span>
+                                }
+                                else if (donor.Eligibility == "Deferred")
+                                {
+                                    <span class="badge badge-deferred">Deferred</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-inactive">N/A</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a asp-controller="Donor" asp-action="DonorDetails" asp-route-id="@donor.DonorId" class="action-btn action-view">View</a>
+                                    <a asp-controller="Donor" asp-action="EditDonor" asp-route-id="@donor.DonorId" class="action-btn action-edit">Edit</a>
+                                    <a asp-controller="Donor" asp-action="DeleteDonor" asp-route-id="@donor.DonorId" class="action-btn action-delete"
+                                       onclick="return confirm('Are you sure you want to delete this donor?')">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        serial++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10">
+                            <div class="empty-state">
+                                <p>No donors found. Try adjusting the filters or add a new donor.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination-bar">
+            <span>
+                Showing @ViewBag.From–@ViewBag.To of @ViewBag.TotalDonors donors
+            </span>
+            <div class="pagination-btns">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a asp-controller="Donor" asp-action="ManageDonors"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-bloodGroup="@ViewBag.BloodGroup"
+                       asp-route-status="@ViewBag.Status"
+                       class="pg-btn">&#8249; Prev</a>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <a asp-controller="Donor" asp-action="ManageDonors"
+                       asp-route-page="@i"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-bloodGroup="@ViewBag.BloodGroup"
+                       asp-route-status="@ViewBag.Status"
+                       class="pg-btn @(ViewBag.CurrentPage == i ? "active" : "")">@i</a>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a asp-controller="Donor" asp-action="ManageDonors"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-bloodGroup="@ViewBag.BloodGroup"
+                       asp-route-status="@ViewBag.Status"
+                       class="pg-btn">Next &#8250;</a>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>

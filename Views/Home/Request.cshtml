@@ -1,85 +1,143 @@
 ﻿@{
     ViewData["Title"] = "Request Blood";
 }
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-
     body {
-        font-family: 'Segoe UI',sans-serif;
+        font-family: 'Segoe UI', sans-serif;
         background: #f4f6f9;
     }
 
-    /* Container */
-
-    .request-container {
-        width: 400px;
-        margin: 60px auto;
+    .form-container {
+        width: 420px;
+        margin: 50px auto;
         background: white;
         padding: 30px;
-        border-radius: 10px;
+        border-radius: 12px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-        .request-container h2 {
+        .form-container h2 {
             text-align: center;
-            margin-bottom: 25px;
-            color: #b30000;
+            margin-bottom: 20px;
+            color: #27ae60;
         }
-
-    /* Form */
 
     .form-group {
         margin-bottom: 15px;
     }
 
     label {
-        font-weight: 600;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
     }
 
-    input, select {
+    input, select, textarea {
         width: 100%;
         padding: 10px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
         border-radius: 6px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
     }
 
-    /* Button */
+    textarea {
+        resize: none;
+        height: 80px;
+    }
 
-    .btn-submit {
+    .btn {
         width: 100%;
-        background: #b30000;
+        padding: 12px;
+        background: #27ae60;
         color: white;
-        padding: 10px;
         border: none;
         border-radius: 6px;
-        margin-top: 15px;
-        font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+        text-decoration: none;
     }
 
-        .btn-submit:hover {
-            background: #ff3333;
+        .btn:hover {
+            background: #1e8449;
         }
 
+    .section-divider {
+        border: none;
+        border-top: 1px solid #e0e0e0;
+        margin: 20px 0;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #27ae60;
+        margin-bottom: 10px;
+    }
+
+    .expense-notice {
+        font-size: 13px;
+        color: #555;
+        background: #f9f9f9;
+        border-left: 3px solid #27ae60;
+        padding: 9px 12px;
+        margin-bottom: 14px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 14px;
+        font-size: 14px;
+    }
+
+        .invoice-table td {
+            padding: 9px 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .invoice-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .invoice-table td:last-child {
+            text-align: right;
+            color: #555;
+        }
+
+        .invoice-table tfoot td {
+            font-weight: bold;
+            background: #f4f4f4;
+            border-top: 1px solid #ddd;
+        }
+
+            .invoice-table tfoot td:last-child {
+                color: #27ae60;
+                font-size: 15px;
+            }
+
+    #mobile-number-group {
+        display: none;
+    }
 </style>
 
-
-<div class="request-container">
-
-    <h2>Request Blood</h2>
-
-    <form asp-action="Create" asp-controller="Request" method="post" enctype="multipart/form-data">
-
+<div class="form-container">
+    <h2><i class="fa-solid fa-hand-holding-heart"></i> Request Blood</h2>
+    <form>
         <div class="form-group">
-            <label>Receiver Name</label>
-            <input type="text" name="ReceiverName" required />
+            <label>Patient Name</label>
+            <input type="text" placeholder="Enter patient name" required>
         </div>
-
         <div class="form-group">
-            <label>Blood Group</label>
-            <select name="BloodGroup" required>
-                <option value="">-- Select Blood Group --</option>
+            <label>Blood Group Needed</label>
+            <select required>
+                <option value="">Select</option>
                 <option>A+</option>
                 <option>A-</option>
                 <option>B+</option>
@@ -90,24 +148,82 @@
                 <option>AB-</option>
             </select>
         </div>
-
         <div class="form-group">
-            <label>Quantity (Units)</label>
-            <input type="number" name="Quantity" min="1" required />
+            <label>Required Date</label>
+            <input type="date" required>
+        </div>
+        <div class="form-group">
+            <label>Hospital / Location</label>
+            <input type="text" placeholder="Where needed">
+        </div>
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" placeholder="01XXXXXXXXX">
+        </div>
+        <div class="form-group">
+            <label>Additional Notes</label>
+            <textarea placeholder="Optional details..."></textarea>
+        </div>
+
+        <hr class="section-divider">
+        <div class="section-title">
+            <i class="fa-solid fa-file-invoice-dollar"></i> Expense Breakdown
+        </div>
+        <div class="expense-notice">
+            The following charges are fixed and managed by our staff. These expenses cover the materials required for the blood collection process.
+        </div>
+
+        <table class="invoice-table">
+            <tbody>
+                <tr><td>Needle</td><td>Tk 10</td></tr>
+                <tr><td>Blood collection bag</td><td>Tk 100</td></tr>
+                <tr><td>Gloves (pair)</td><td>Tk 30</td></tr>
+                <tr><td>Antiseptic wipe</td><td>Tk 10</td></tr>
+                <tr><td>Bandage</td><td>Tk 15</td></tr>
+            </tbody>
+            <tfoot>
+                <tr><td>Total</td><td>Tk 165</td></tr>
+            </tfoot>
+        </table>
+
+        <hr class="section-divider">
+        <div class="section-title">
+            <i class="fa-solid fa-credit-card"></i> Payment
         </div>
 
         <div class="form-group">
-            <label>Hospital Name</label>
-            <input type="text" name="HospitalName" required />
+            <label>Payment Method</label>
+            <select id="payment-method" onchange="toggleMobileField()">
+                <option value="">Select payment method</option>
+                <option>bKash</option>
+                <option>Nagad</option>
+                <option>Rocket</option>
+                <option>Cash on site</option>
+                <option>Bank transfer</option>
+            </select>
         </div>
 
-        <div class="form-group">
-            <label>Upload Medical Document</label>
-            <input type="file" name="MedicalFile" required />
+        <div class="form-group" id="mobile-number-group">
+            <label id="mobile-number-label">Mobile Number</label>
+            <input type="text" id="mobile-number" placeholder="01XXXXXXXXX">
         </div>
 
-        <button type="submit" class="btn-submit">Submit Request</button>
-
+        <a asp-controller="Home" asp-action="RequestSuccess" class="btn">
+            <i class="fa-solid fa-paper-plane"></i> Submit Request
+        </a>
     </form>
-
 </div>
+
+<script>
+    function toggleMobileField() {
+        const val = document.getElementById('payment-method').value;
+        const group = document.getElementById('mobile-number-group');
+        const label = document.getElementById('mobile-number-label');
+        if (['bKash', 'Nagad', 'Rocket'].includes(val)) {
+            group.style.display = 'block';
+            label.textContent = val + ' Number';
+        } else {
+            group.style.display = 'none';
+        }
+    }
+</script>

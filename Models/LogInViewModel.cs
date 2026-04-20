@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+
+using System.ComponentModel.DataAnnotations;
 
 namespace BBMS.Models
 {
     public class LogInViewModel
     {
-      
+
         [Required(ErrorMessage = "Email is Required")]
         [EmailAddress(ErrorMessage = "Check Email Format")]
         public string Email { get; set; }

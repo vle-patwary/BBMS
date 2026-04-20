@@ -1,198 +1,151 @@
 ﻿@{
     ViewData["Title"] = "Staff Dashboard";
 }
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-
-    body {
-        font-family: 'Segoe UI',sans-serif;
-        background: #f4f6f9;
-    }
-
-    /* Container */
-
-    .dashboard {
-        width: 90%;
-        margin: auto;
-        margin-top: 40px;
-    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; }
+    .dashboard { width: 92%; margin: 32px auto; }
 
     /* Header */
-
     .header {
-        background: linear-gradient(135deg,#b30000,#ff4d4d);
-        color: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        background: #8b0000; color: white;
+        padding: 28px 32px; border-radius: 12px;
+        display: flex; justify-content: space-between; align-items: center;
+        position: relative; overflow: hidden;
+    }
+    .header::before {
+        content: ''; position: absolute; right: -40px; top: -50px;
+        width: 200px; height: 200px; border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+    }
+    .header::after {
+        content: ''; position: absolute; right: 120px; bottom: -60px;
+        width: 140px; height: 140px; border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+    }
+    .header-left h2 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .header-left p { font-size: 13px; color: #ffb3b3; }
+    .header-right { display: flex; align-items: center; gap: 20px; z-index: 1; }
+    .header-stat { text-align: center; }
+    .header-stat .val { font-size: 20px; font-weight: 700; color: #fff; }
+    .header-stat .lbl { font-size: 11px; color: #ffb3b3; margin-top: 2px; }
+    .h-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
+    .staff-badge {
+        width: 52px; height: 52px; border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+        border: 2px solid rgba(255,255,255,0.3);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; color: #fff;
     }
 
     /* Section Title */
-
     .section-title {
-        margin-top: 35px;
-        margin-bottom: 15px;
-        color: #b30000;
-        font-weight: 600;
+        margin-top: 28px; margin-bottom: 14px;
+        font-size: 15px; font-weight: 700; color: #1a1a1a;
+        display: flex; align-items: center; gap: 8px;
     }
+    .section-title::before { content: ''; display: block; width: 4px; height: 16px; background: #8b0000; border-radius: 2px; }
 
     /* Cards */
-
-    .card-container {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
+    .card-container { display: flex; gap: 16px; flex-wrap: wrap; }
     .card {
-        flex: 1;
-        min-width: 220px;
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        cursor: pointer;
+        flex: 1; min-width: 180px; background: white;
+        padding: 24px 20px; border-radius: 10px; text-align: center;
+        border: 1px solid #f0e0e0; border-top: 4px solid #8b0000;
+        transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
     }
-
-        /* Hover Effect 🔥 */
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        /* Button style */
-
-        .card a {
-            text-decoration: none;
-            color: #b30000;
-            font-weight: bold;
-            font-size: 18px;
-            display: block;
-        }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 24px rgba(139,0,0,0.1); }
+    .card-icon {
+        width: 46px; height: 46px; border-radius: 50%;
+        background: #fff0f0; display: flex; align-items: center;
+        justify-content: center; margin: 0 auto 12px;
+    }
+    .card-icon i { color: #8b0000; font-size: 18px; }
+    .card a { text-decoration: none; color: #8b0000; font-weight: 700; font-size: 15px; display: block; }
+    .card p { font-size: 12px; color: #999; margin-top: 5px; }
 
     /* Table */
-
     .table-section {
-        margin-top: 30px;
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 24px; background: white;
+        padding: 24px; border-radius: 10px; border: 1px solid #f0e0e0;
     }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .table-section h3 {
+        font-size: 15px; font-weight: 700; color: #1a1a1a;
+        margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
     }
-
-    th, td {
-        padding: 14px;
-        border-bottom: 1px solid #ddd;
-    }
-
-    th {
-        background: #b30000;
-        color: white;
-    }
-
-    tr:hover {
-        background: #f9f9f9;
-    }
-
+    .table-section h3::before { content: ''; display: block; width: 4px; height: 16px; background: #8b0000; border-radius: 2px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #8b0000; color: white; padding: 12px 16px; font-size: 13px; font-weight: 600; text-align: left; }
+    td { padding: 12px 16px; border-bottom: 1px solid #f5eded; font-size: 13px; color: #333; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fff8f8; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .pill-green { background: #e8f5e9; color: #2e7d32; }
+    .pill-amber { background: #fff8e1; color: #b45000; }
 </style>
-
 
 <div class="dashboard">
 
     <!-- HEADER -->
     <div class="header">
-        <h2>Staff Dashboard</h2>
-        <p>Manage Blood Collection & Donation Efficiently</p>
+        <div class="header-left">
+            <h2>Staff Dashboard</h2>
+            <p>Manage Blood Collection &amp; Donation Efficiently</p>
+        </div>
+        <div class="header-right">
+            <div class="header-stat"><div class="val">24</div><div class="lbl">Collections</div></div>
+            <div class="h-divider"></div>
+            <div class="header-stat"><div class="val">18</div><div class="lbl">Donations</div></div>
+            <div class="h-divider"></div>
+            <div class="staff-badge"><i class="fa-solid fa-user-nurse"></i></div>
+        </div>
     </div>
 
-
-    <!-- COLLECTION -->
-    <h3 class="section-title">Blood Collection</h3>
-
+    <!-- BLOOD COLLECTION -->
+    <div class="section-title">Blood Collection</div>
     <div class="card-container">
-
         <div class="card">
-            <a asp-controller="Collection" asp-action="Create">➕ Add Collection</a>
+            <div class="card-icon"><i class="fa-solid fa-plus"></i></div>
+            <a asp-controller="Home" asp-action="AddCollection">Add Collection</a>
+            <p>Record a new blood collection</p>
         </div>
-
         <div class="card">
-            <a asp-controller="Collection" asp-action="List">📋 View Collections</a>
+            <div class="card-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+            <a asp-controller="Home" asp-action="ViewCollection">View Collections</a>
+            <p>Browse all collection records</p>
         </div>
-
     </div>
 
-
-    <!-- DONATION -->
-    <h3 class="section-title">Donation Management</h3>
-
+    <!-- DONATION MANAGEMENT -->
+    <div class="section-title">Donation Management</div>
     <div class="card-container">
-
         <div class="card">
-            <a asp-controller="Donation" asp-action="Create">🩸 Record Donation</a>
+            <div class="card-icon"><i class="fa-solid fa-droplet"></i></div>
+            <a asp-controller="Home" asp-action="RecordDonation">Record Donation</a>
+            <p>Log a new donation entry</p>
         </div>
-
         <div class="card">
-            <a asp-controller="Donation" asp-action="List">📊 View Donations</a>
+            <div class="card-icon"><i class="fa-solid fa-chart-bar"></i></div>
+            <a asp-controller="Home" asp-action="ViewDonation">View Donations</a>
+            <p>See all donation history</p>
         </div>
-
     </div>
-
-
-    <!-- TEST -->
-    <h3 class="section-title">Blood Testing</h3>
-
-    <div class="card-container">
-
-        <div class="card">
-            <a asp-controller="Test" asp-action="Create">🧪 Test Blood</a>
-        </div>
-
-        <div class="card">
-            <a asp-controller="Test" asp-action="List">📑 Test Results</a>
-        </div>
-
-    </div>
-
 
     <!-- TABLE -->
-
     <div class="table-section">
-
         <h3>Recent Blood Donations</h3>
-
         <table>
-
+            <tr><th>Donor Name</th><th>Blood Group</th><th>Date</th><th>Status</th></tr>
             <tr>
-                <th>Donor Name</th>
-                <th>Blood Group</th>
-                <th>Date</th>
-                <th>Status</th>
+                <td>Rahim</td><td>O+</td><td>12-03-2026</td>
+                <td><span class="pill pill-green">Tested</span></td>
             </tr>
-
             <tr>
-                <td>Rahim</td>
-                <td>O+</td>
-                <td>12-03-2026</td>
-                <td>Tested</td>
+                <td>Karim</td><td>B+</td><td>11-03-2026</td>
+                <td><span class="pill pill-amber">Pending</span></td>
             </tr>
-
-            <tr>
-                <td>Karim</td>
-                <td>B+</td>
-                <td>11-03-2026</td>
-                <td>Pending</td>
-            </tr>
-
         </table>
-
     </div>
 
 </div>

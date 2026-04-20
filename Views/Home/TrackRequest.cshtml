@@ -1,0 +1,178 @@
+﻿@{
+    ViewData["Title"] = "Track Request";
+    var status = "Pending";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    /* SAME STRUCTURE AS OTHER PAGES */
+    .dashboard {
+        width: 90%;
+        max-width: 600px;
+        margin: 50px auto;
+    }
+
+    .card-box {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #b30000;
+        margin-bottom: 25px;
+    }
+
+    /* STEPS FIXED */
+    .steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 5%;
+            width: 90%;
+            height: 4px;
+            background: #ddd;
+            z-index: 0;
+        }
+
+    .step {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ddd;
+        margin: auto;
+        line-height: 30px;
+        color: white;
+    }
+
+    .active {
+        background: #b30000 !important;
+    }
+
+    .label {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    /* STATUS */
+    .status-text {
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .pending {
+        color: orange;
+    }
+
+    .approved {
+        color: #007bff;
+    }
+
+    .completed {
+        color: green;
+    }
+
+    /* INFO */
+    .info-box {
+        background: #fff5f5;
+        border-left: 5px solid #b30000;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+        .info-box span {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+    /* BUTTON */
+    .btn {
+        display: block;
+        text-align: center;
+        background: #b30000;
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+</style>
+
+@{
+    int step = status == "Pending" ? 1 :
+               status == "Approved" ? 2 : 3;
+}
+
+<div class="dashboard">
+    <div class="card-box">
+
+        <h2><i class="fa-solid fa-location-dot"></i> Track Request</h2>
+
+        <!-- STEPS -->
+        <div class="steps">
+
+            <div class="step">
+                <div class="circle @(step >= 1 ? "active" : "")">1</div>
+                <div class="label">Pending</div>
+            </div>
+
+            <div class="step">
+                <div class="circle @(step >= 2 ? "active" : "")">2</div>
+                <div class="label">Approved</div>
+            </div>
+
+            <div class="step">
+                <div class="circle @(step >= 3 ? "active" : "")">3</div>
+                <div class="label">Completed</div>
+            </div>
+
+        </div>
+
+        <!-- STATUS -->
+        <div class="status-text @(status.ToLower())">
+            Current Status: @status
+        </div>
+
+        <!-- INFO -->
+        <div class="info-box">
+            <span><strong>Request ID:</strong> #REQ12345</span>
+            <span><strong>Blood Group:</strong> O+</span>
+            <span><strong>Location:</strong> Dhaka</span>
+            <span><strong>Date:</strong> 16-04-2026</span>
+        </div>
+
+        <!-- BUTTON -->
+        <a asp-controller="Home" asp-action="User" class="btn">
+            Back to Dashboard
+        </a>
+
+    </div>
+</div>

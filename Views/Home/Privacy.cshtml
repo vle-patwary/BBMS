@@ -1,6 +1,227 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-<p>Use this page to detail your site's privacy policy.</p>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .privacy-container {
+        width: 700px;
+        margin: 40px auto;
+    }
+
+    /* Header */
+    .header {
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 100px;
+            bottom: -50px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+        border: 2px solid rgba(255,255,255,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        z-index: 1;
+    }
+
+    /* Sections */
+    .sections-wrap {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #f0e0e0;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .privacy-section {
+        padding: 18px 24px;
+        border-bottom: 1px solid #f5eded;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+        .privacy-section:last-child {
+            border-bottom: none;
+        }
+
+    .sec-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #fff0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .sec-icon i {
+            color: #8b0000;
+            font-size: 16px;
+        }
+
+    .sec-body h4 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #8b0000;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .sec-body h4::before {
+            content: '';
+            display: block;
+            width: 3px;
+            height: 14px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
+
+    .sec-body p {
+        font-size: 13px;
+        color: #555;
+        line-height: 1.65;
+    }
+
+    /* Button */
+    .btn-group {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .btn-back {
+        padding: 11px 28px;
+        border-radius: 6px;
+        border: 2px solid #8b0000;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        color: #8b0000;
+        background: white;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .btn-back:hover {
+            background: #8b0000;
+            color: white;
+        }
+</style>
+
+<div class="privacy-container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h2>Privacy Policy</h2>
+            <p>Your data safety is our priority</p>
+        </div>
+        <div class="header-icon"><i class="fa-solid fa-lock"></i></div>
+    </div>
+
+    <!-- SECTIONS -->
+    <div class="sections-wrap">
+        <div class="privacy-section">
+            <div class="sec-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="sec-body">
+                <h4>1. Information We Collect</h4>
+                <p>We collect basic donor information such as name, blood group, contact number, and donation history to manage blood donations efficiently.</p>
+            </div>
+        </div>
+        <div class="privacy-section">
+            <div class="sec-icon"><i class="fa-solid fa-file-lines"></i></div>
+            <div class="sec-body">
+                <h4>2. How We Use Information</h4>
+                <p>The information is used only for blood donation management, donor tracking, and emergency contact purposes. We do not use your data for any unrelated activity.</p>
+            </div>
+        </div>
+        <div class="privacy-section">
+            <div class="sec-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="sec-body">
+                <h4>3. Data Protection</h4>
+                <p>We ensure your data is stored securely and protected from unauthorized access. Only authorized staff members can access donor information.</p>
+            </div>
+        </div>
+        <div class="privacy-section">
+            <div class="sec-icon"><i class="fa-solid fa-handshake"></i></div>
+            <div class="sec-body">
+                <h4>4. Data Sharing</h4>
+                <p>We do not share your personal information with third parties unless required for medical emergencies or legal obligations.</p>
+            </div>
+        </div>
+        <div class="privacy-section">
+            <div class="sec-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="sec-body">
+                <h4>5. Your Rights</h4>
+                <p>You have the right to update or request removal of your personal data at any time by contacting the system administrator.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="btn-group">
+        <a asp-controller="Home" asp-action="Index" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+</div>

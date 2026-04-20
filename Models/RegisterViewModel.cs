@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+
+using System.ComponentModel.DataAnnotations;
 
 namespace BBMS.Models
 {
@@ -33,3 +35,6 @@ namespace BBMS.Models
 
     }
 }
+
+
+

@@ -10,7 +10,7 @@ namespace BBMS.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        
+
         public AuthController(
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
@@ -21,7 +21,7 @@ namespace BBMS.Controllers
             _signInManager = signInManager;
         }
 
-        
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -104,7 +104,7 @@ namespace BBMS.Controllers
         }
         //logout
         [HttpGet]
-        public async Task <IActionResult> Logout()
+        public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
