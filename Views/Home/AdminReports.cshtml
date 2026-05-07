@@ -1,0 +1,1147 @@
+﻿@{
+    ViewData["Title"] = "Generate Reports";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    .reports-wrapper {
+        width: 92%;
+        margin: 32px auto;
+    }
+
+    /* ── HEADER ── */
+    .header {
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 28px;
+    }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 1;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: #fff;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+        .filter-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .filter-bar input[type="date"],
+        .filter-bar select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+        }
+
+            .filter-bar input[type="date"]:focus,
+            .filter-bar select:focus {
+                border-color: #8b0000;
+            }
+
+    .filter-sep {
+        color: #ccc;
+        font-size: 14px;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+        margin-top: 28px;
+        margin-bottom: 14px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
+
+    /* ── REPORT CARD ── */
+    .report-card {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        margin-bottom: 28px;
+        overflow: hidden;
+    }
+
+    .report-card-header {
+        background: #8b0000;
+        color: white;
+        padding: 14px 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .report-card-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .report-card-header h3 i {
+                font-size: 16px;
+            }
+
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.35);
+        color: white;
+        padding: 7px 16px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .download-btn:hover {
+            background: rgba(255,255,255,0.28);
+        }
+
+    /* ── TABLE ── */
+    .report-table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    thead th {
+        background: #fff5f5;
+        color: #8b0000;
+        padding: 11px 16px;
+        font-weight: 700;
+        text-align: left;
+        border-bottom: 2px solid #f0e0e0;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 11px 16px;
+        border-bottom: 1px solid #f5eded;
+        color: #333;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fff8f8;
+    }
+
+    /* ── BADGES ── */
+    .badge {
+        display: inline-block;
+        padding: 3px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-green {
+        background: #e6f9ef;
+        color: #1a8a4a;
+    }
+
+    .badge-red {
+        background: #fff0f0;
+        color: #8b0000;
+    }
+
+    .badge-yellow {
+        background: #fff8e1;
+        color: #b8860b;
+    }
+
+    .badge-blue {
+        background: #e8f4fd;
+        color: #1565c0;
+    }
+
+    .badge-gray {
+        background: #f0f0f0;
+        color: #555;
+    }
+
+    /* ── SUMMARY ROW ── */
+    .summary-row td {
+        background: #fff5f5 !important;
+        font-weight: 700;
+        color: #8b0000 !important;
+        border-top: 2px solid #f0e0e0;
+    }
+
+    /* ── STATS ROW (top of page) ── */
+    .stats-grid {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 140px;
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-top: 4px solid #8b0000;
+        border-radius: 10px;
+        padding: 18px 20px;
+        text-align: center;
+    }
+
+        .stat-card .s-val {
+            font-size: 26px;
+            font-weight: 800;
+            color: #8b0000;
+        }
+
+        .stat-card .s-lbl {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+    /* ── PRINT HIDDEN ── */
+    @@media print {
+        .download-btn, .filter-bar, .back-btn {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="reports-wrapper">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h2><i class="fa-solid fa-chart-bar" style="margin-right:10px"></i>Generate Reports</h2>
+            <p>View and download all system reports as PDF</p>
+        </div>
+        <div class="header-right">
+            <a asp-controller="Home" asp-action="Admin" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="section-title">Overview</div>
+    <div class="stats-grid">
+        <div class="stat-card"><div class="s-val">52</div><div class="s-lbl">Total Donors</div></div>
+        <div class="stat-card"><div class="s-val">12</div><div class="s-lbl">Pending Requests</div></div>
+        <div class="stat-card"><div class="s-val">80</div><div class="s-lbl">Blood Units in Stock</div></div>
+        <div class="stat-card"><div class="s-val">8</div><div class="s-lbl">Active Staff</div></div>
+        <div class="stat-card"><div class="s-val">5</div><div class="s-lbl">Partner Hospitals</div></div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <i class="fa-solid fa-filter" style="color:#8b0000"></i>
+        <label>From:</label>
+        <input type="date" id="filterFrom" value="2025-01-01">
+        <span class="filter-sep">—</span>
+        <label>To:</label>
+        <input type="date" id="filterTo" value="2025-12-31">
+        <label>Status:</label>
+        <select id="filterStatus">
+            <option value="all">All</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+        </select>
+        <label>Blood Group:</label>
+        <select id="filterBlood">
+            <option value="all">All Groups</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+        </select>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         1. DONORS REPORT
+    ═══════════════════════════════════════════════ -->
+    <div class="section-title">Donors Report</div>
+    <div class="report-card" id="section-donors">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-users"></i> Registered Donors</h3>
+            <button class="download-btn" onclick="downloadPDF('section-donors','Donors_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        <div class="report-table-wrap">
+            <table id="tbl-donors">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Donor Name</th>
+                        <th>Blood Group</th>
+                        <th>Age</th>
+                        <th>Contact</th>
+                        <th>Last Donation</th>
+                        <th>Total Donations</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Arif Hossain</td>
+                        <td>A+</td>
+                        <td>28</td>
+                        <td>01711-000001</td>
+                        <td>2025-03-12</td>
+                        <td>5</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Nusrat Jahan</td>
+                        <td>B+</td>
+                        <td>24</td>
+                        <td>01811-000002</td>
+                        <td>2025-01-08</td>
+                        <td>3</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Rakibul Islam</td>
+                        <td>O+</td>
+                        <td>32</td>
+                        <td>01911-000003</td>
+                        <td>2024-11-25</td>
+                        <td>7</td>
+                        <td><span class="badge badge-yellow">Inactive</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Tasnia Akter</td>
+                        <td>AB+</td>
+                        <td>26</td>
+                        <td>01611-000004</td>
+                        <td>2025-04-01</td>
+                        <td>2</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Mehedi Hasan</td>
+                        <td>O-</td>
+                        <td>30</td>
+                        <td>01711-000005</td>
+                        <td>2025-02-18</td>
+                        <td>4</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Sharmin Begum</td>
+                        <td>A-</td>
+                        <td>22</td>
+                        <td>01811-000006</td>
+                        <td>2024-12-30</td>
+                        <td>1</td>
+                        <td><span class="badge badge-red">Deferred</span></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td colspan="6">Total Registered Donors</td>
+                        <td colspan="2">52 donors</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         2. BLOOD STOCK REPORT
+    ═══════════════════════════════════════════════ -->
+    <div class="section-title">Blood Stock Report</div>
+    <div class="report-card" id="section-stock">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-syringe"></i> Blood Inventory Summary</h3>
+            <button class="download-btn" onclick="downloadPDF('section-stock','Blood_Stock_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        <div class="report-table-wrap">
+            <table id="tbl-stock">
+                <thead>
+                    <tr>
+                        <th>Blood Group</th>
+                        <th>Available Units</th>
+                        <th>Reserved Units</th>
+                        <th>Used This Month</th>
+                        <th>Expiring Soon (≤7 days)</th>
+                        <th>Last Updated</th>
+                        <th>Stock Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>A+</strong></td>
+                        <td>15</td>
+                        <td>3</td>
+                        <td>8</td>
+                        <td>2</td>
+                        <td>2025-04-30</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>A-</strong></td>
+                        <td>4</td>
+                        <td>1</td>
+                        <td>3</td>
+                        <td>1</td>
+                        <td>2025-04-29</td>
+                        <td><span class="badge badge-yellow">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>B+</strong></td>
+                        <td>12</td>
+                        <td>2</td>
+                        <td>6</td>
+                        <td>0</td>
+                        <td>2025-04-30</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>B-</strong></td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>2</td>
+                        <td>2</td>
+                        <td>2025-04-28</td>
+                        <td><span class="badge badge-red">Critical</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>O+</strong></td>
+                        <td>20</td>
+                        <td>5</td>
+                        <td>14</td>
+                        <td>3</td>
+                        <td>2025-04-30</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>O-</strong></td>
+                        <td>6</td>
+                        <td>2</td>
+                        <td>5</td>
+                        <td>1</td>
+                        <td>2025-04-30</td>
+                        <td><span class="badge badge-yellow">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>AB+</strong></td>
+                        <td>5</td>
+                        <td>1</td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td>2025-04-29</td>
+                        <td><span class="badge badge-yellow">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>AB-</strong></td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>2025-04-27</td>
+                        <td><span class="badge badge-yellow">Low</span></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong>67</strong></td>
+                        <td><strong>14</strong></td>
+                        <td><strong>42</strong></td>
+                        <td><strong>10</strong></td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         3. BLOOD REQUESTS REPORT
+    ═══════════════════════════════════════════════ -->
+    <div class="section-title">Blood Requests Report</div>
+    <div class="report-card" id="section-requests">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-file-medical"></i> Blood Request Log</h3>
+            <button class="download-btn" onclick="downloadPDF('section-requests','Blood_Requests_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        <div class="report-table-wrap">
+            <table id="tbl-requests">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Request ID</th>
+                        <th>Patient Name</th>
+                        <th>Blood Group</th>
+                        <th>Units Needed</th>
+                        <th>Hospital</th>
+                        <th>Request Date</th>
+                        <th>Required By</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>REQ-1001</td>
+                        <td>Kamal Uddin</td>
+                        <td>A+</td>
+                        <td>2</td>
+                        <td>Dhaka Medical</td>
+                        <td>2025-04-01</td>
+                        <td>2025-04-03</td>
+                        <td><span class="badge badge-green">Approved</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>REQ-1002</td>
+                        <td>Rina Khatun</td>
+                        <td>O+</td>
+                        <td>3</td>
+                        <td>BSMMU</td>
+                        <td>2025-04-05</td>
+                        <td>2025-04-06</td>
+                        <td><span class="badge badge-yellow">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>REQ-1003</td>
+                        <td>Farhan Ahmed</td>
+                        <td>B-</td>
+                        <td>1</td>
+                        <td>Square Hospital</td>
+                        <td>2025-04-08</td>
+                        <td>2025-04-09</td>
+                        <td><span class="badge badge-red">Rejected</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>REQ-1004</td>
+                        <td>Sumaiya Islam</td>
+                        <td>AB+</td>
+                        <td>2</td>
+                        <td>Apollo Hospital</td>
+                        <td>2025-04-10</td>
+                        <td>2025-04-12</td>
+                        <td><span class="badge badge-green">Approved</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>REQ-1005</td>
+                        <td>Jahir Raihan</td>
+                        <td>O-</td>
+                        <td>4</td>
+                        <td>Dhaka Medical</td>
+                        <td>2025-04-14</td>
+                        <td>2025-04-15</td>
+                        <td><span class="badge badge-yellow">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>REQ-1006</td>
+                        <td>Mitu Begum</td>
+                        <td>A-</td>
+                        <td>1</td>
+                        <td>Ibn Sina</td>
+                        <td>2025-04-18</td>
+                        <td>2025-04-20</td>
+                        <td><span class="badge badge-blue">Processing</span></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td colspan="4">Total Requests: 12</td>
+                        <td colspan="5">Approved: 5 &nbsp;|&nbsp; Pending: 4 &nbsp;|&nbsp; Rejected: 2 &nbsp;|&nbsp; Processing: 1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         4. STAFF REPORT
+    ═══════════════════════════════════════════════ -->
+    <div class="section-title">Staff Report</div>
+    <div class="report-card" id="section-staff">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-user-tie"></i> Staff Directory</h3>
+            <button class="download-btn" onclick="downloadPDF('section-staff','Staff_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        <div class="report-table-wrap">
+            <table id="tbl-staff">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Staff Name</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Join Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Dr. Mahbub Alam</td>
+                        <td>Chief Medical Officer</td>
+                        <td>mahbub@bloodbank.org</td>
+                        <td>01711-100001</td>
+                        <td>2020-01-15</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Fatema Tuz Zohra</td>
+                        <td>Lab Technician</td>
+                        <td>fatema@bloodbank.org</td>
+                        <td>01811-100002</td>
+                        <td>2021-06-01</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Sabbir Rahman</td>
+                        <td>Blood Bank Officer</td>
+                        <td>sabbir@bloodbank.org</td>
+                        <td>01911-100003</td>
+                        <td>2022-03-20</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Nasrin Sultana</td>
+                        <td>Nurse</td>
+                        <td>nasrin@bloodbank.org</td>
+                        <td>01611-100004</td>
+                        <td>2021-09-11</td>
+                        <td><span class="badge badge-yellow">On Leave</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Imran Hossain</td>
+                        <td>Data Entry Operator</td>
+                        <td>imran@bloodbank.org</td>
+                        <td>01711-100005</td>
+                        <td>2023-02-05</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td colspan="6">Total Staff</td>
+                        <td>8 members</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         5. HOSPITAL REPORT
+    ═══════════════════════════════════════════════ -->
+    <div class="section-title">Hospital Report</div>
+    <div class="report-card" id="section-hospitals">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-building"></i> Partner Hospitals</h3>
+            <button class="download-btn" onclick="downloadPDF('section-hospitals','Hospital_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        <div class="report-table-wrap">
+            <table id="tbl-hospitals">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hospital Name</th>
+                        <th>Location</th>
+                        <th>Contact Person</th>
+                        <th>Phone</th>
+                        <th>Total Requests</th>
+                        <th>Units Received</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Dhaka Medical College</td>
+                        <td>Dhaka</td>
+                        <td>Dr. Rahman</td>
+                        <td>02-1234567</td>
+                        <td>25</td>
+                        <td>48</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>BSMMU</td>
+                        <td>Dhaka</td>
+                        <td>Dr. Hossain</td>
+                        <td>02-7654321</td>
+                        <td>18</td>
+                        <td>32</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Square Hospital</td>
+                        <td>Dhaka</td>
+                        <td>Dr. Karim</td>
+                        <td>02-9988776</td>
+                        <td>10</td>
+                        <td>15</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Apollo Hospital</td>
+                        <td>Dhaka</td>
+                        <td>Dr. Nasim</td>
+                        <td>02-5566778</td>
+                        <td>7</td>
+                        <td>12</td>
+                        <td><span class="badge badge-green">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Ibn Sina Hospital</td>
+                        <td>Dhaka</td>
+                        <td>Dr. Akter</td>
+                        <td>02-3344556</td>
+                        <td>4</td>
+                        <td>6</td>
+                        <td><span class="badge badge-yellow">Pending Approval</span></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td colspan="5">Total</td>
+                        <td><strong>64</strong></td>
+                        <td><strong>113</strong></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         6. DONATION HISTORY REPORT
+    ═══════════════════════════════════════════════ -->
+    <div class="section-title">Donation History Report</div>
+    <div class="report-card" id="section-history">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-heart-pulse"></i> Donation History Log</h3>
+            <button class="download-btn" onclick="downloadPDF('section-history','Donation_History_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        <div class="report-table-wrap">
+            <table id="tbl-history">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Donation ID</th>
+                        <th>Donor Name</th>
+                        <th>Blood Group</th>
+                        <th>Units</th>
+                        <th>Donation Date</th>
+                        <th>Collected By</th>
+                        <th>Transferred To</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>DON-2001</td>
+                        <td>Arif Hossain</td>
+                        <td>A+</td>
+                        <td>1</td>
+                        <td>2025-03-12</td>
+                        <td>Fatema Tuz Zohra</td>
+                        <td>Stock</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>DON-2002</td>
+                        <td>Rakibul Islam</td>
+                        <td>O+</td>
+                        <td>1</td>
+                        <td>2025-03-18</td>
+                        <td>Sabbir Rahman</td>
+                        <td>Dhaka Medical</td>
+                        <td><span class="badge badge-blue">Urgent</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>DON-2003</td>
+                        <td>Mehedi Hasan</td>
+                        <td>O-</td>
+                        <td>1</td>
+                        <td>2025-04-02</td>
+                        <td>Fatema Tuz Zohra</td>
+                        <td>Stock</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>DON-2004</td>
+                        <td>Tasnia Akter</td>
+                        <td>AB+</td>
+                        <td>1</td>
+                        <td>2025-04-10</td>
+                        <td>Sabbir Rahman</td>
+                        <td>Apollo Hospital</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>DON-2005</td>
+                        <td>Nusrat Jahan</td>
+                        <td>B+</td>
+                        <td>1</td>
+                        <td>2025-04-22</td>
+                        <td>Fatema Tuz Zohra</td>
+                        <td>Stock</td>
+                        <td><span class="badge badge-green">Normal</span></td>
+                    </tr>
+                    <tr class="summary-row">
+                        <td colspan="8">Total Donations This Period</td>
+                        <td>42 units</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD ALL -->
+    <div style="text-align:center; margin: 30px 0 50px;">
+        <button onclick="downloadAllPDF()" style="
+            background: #8b0000; color: white; border: none;
+            padding: 14px 36px; border-radius: 9px; font-size: 15px;
+            font-weight: 700; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 10px; transition: background 0.2s;">
+            <i class="fa-solid fa-file-pdf"></i> Download Full Report (All Sections)
+        </button>
+    </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PDF GENERATION SCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+    const { jsPDF } = window.jspdf;
+
+    // Colour palette matching the dashboard
+    const DARK_RED   = [139, 0, 0];
+    const LIGHT_RED  = [255, 240, 240];
+    const HEADER_BG  = [255, 245, 245];
+    const TEXT_DARK  = [30,  30,  30];
+    const TEXT_GRAY  = [120, 120, 120];
+    const WHITE      = [255, 255, 255];
+
+    // Map a status badge text to an RGB colour
+    function statusColor(text) {
+        const t = text.toLowerCase();
+        if (t === 'active' || t === 'approved' || t === 'normal') return [26, 138, 74];
+        if (t === 'pending' || t === 'inactive' || t === 'low' || t === 'on leave') return [184, 134, 11];
+        if (t === 'rejected' || t === 'critical' || t === 'deferred') return [139, 0, 0];
+        if (t === 'processing' || t === 'urgent' || t === 'blue') return [21, 101, 192];
+        return [80, 80, 80];
+    }
+
+    // Build header + table content from a section DOM element
+    function buildDocContent(sectionId) {
+        const section = document.getElementById(sectionId);
+        const title   = section.querySelector('.report-card-header h3').innerText.trim();
+        const table   = section.querySelector('table');
+        const headers = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
+        const rows    = [];
+        const isSummary = [];
+
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            rows.push([...tr.querySelectorAll('td')].map(td => td.innerText.trim()));
+            isSummary.push(tr.classList.contains('summary-row'));
+        });
+        return { title, headers, rows, isSummary };
+    }
+
+    // Draw one table section into the PDF doc
+    function drawSection(doc, { title, headers, rows, isSummary }, startY) {
+        const pageW = doc.internal.pageSize.getWidth();
+        const margin = 14;
+        const usable = pageW - margin * 2;
+
+        // Section heading bar
+        doc.setFillColor(...DARK_RED);
+        doc.roundedRect(margin, startY, usable, 10, 2, 2, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(...WHITE);
+        doc.text(title, margin + 5, startY + 6.5);
+
+        const tableStartY = startY + 12;
+
+        doc.autoTable({
+            startY: tableStartY,
+            head: [headers],
+            body: rows,
+            margin: { left: margin, right: margin },
+            tableWidth: usable,
+            styles: {
+                fontSize: 7.5,
+                cellPadding: 3,
+                overflow: 'linebreak',
+                textColor: TEXT_DARK
+            },
+            headStyles: {
+                fillColor: HEADER_BG,
+                textColor: DARK_RED,
+                fontStyle: 'bold',
+                lineWidth: 0.1,
+                lineColor: [240, 224, 224]
+            },
+            bodyStyles: {
+                lineWidth: 0.1,
+                lineColor: [245, 237, 237]
+            },
+            alternateRowStyles: {
+                fillColor: [255, 252, 252]
+            },
+            didParseCell: function(data) {
+                if (data.section === 'body' && isSummary[data.row.index]) {
+                    data.cell.styles.fillColor = LIGHT_RED;
+                    data.cell.styles.fontStyle  = 'bold';
+                    data.cell.styles.textColor  = DARK_RED;
+                }
+            },
+            willDrawCell: function(data) {
+                // Colour badge cells
+                if (data.section === 'body') {
+                    const text = data.cell.raw ? data.cell.raw.toString().trim() : '';
+                    const keywords = ['Active','Inactive','Approved','Pending','Rejected',
+                                      'Processing','Normal','Low','Critical','Deferred',
+                                      'On Leave','Urgent','Pending Approval'];
+                    if (keywords.includes(text)) {
+                        const [r, g, b] = statusColor(text);
+                        doc.setTextColor(r, g, b);
+                    }
+                }
+            },
+            didDrawCell: function(data) {
+                doc.setTextColor(...TEXT_DARK); // reset
+            }
+        });
+
+        return doc.lastAutoTable.finalY + 10;
+    }
+
+    // Add a page header + footer
+    function addPageDecor(doc, reportTitle) {
+        const pageW  = doc.internal.pageSize.getWidth();
+        const pageH  = doc.internal.pageSize.getHeight();
+        const margin = 14;
+
+        // Top banner
+        doc.setFillColor(...DARK_RED);
+        doc.rect(0, 0, pageW, 20, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(...WHITE);
+        doc.text('Blood Bank Management System', margin, 13);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text(reportTitle, pageW - margin, 13, { align: 'right' });
+
+        // Footer
+        doc.setFillColor(245, 237, 237);
+        doc.rect(0, pageH - 12, pageW, 12, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(...TEXT_GRAY);
+        const now = new Date().toLocaleString();
+        doc.text(`Generated: ${now}`, margin, pageH - 4);
+        doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber}`, pageW - margin, pageH - 4, { align: 'right' });
+    }
+
+    // ── SINGLE SECTION ──────────────────────────────
+    function downloadPDF(sectionId, filename) {
+        const doc     = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const content = buildDocContent(sectionId);
+
+        addPageDecor(doc, content.title);
+        drawSection(doc, content, 26);
+
+        // Re-decorate all pages (autoTable may add pages)
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= totalPages; p++) {
+            doc.setPage(p);
+            addPageDecor(doc, content.title);
+        }
+
+        doc.save(`${filename}_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+
+    // ── ALL SECTIONS ────────────────────────────────
+    function downloadAllPDF() {
+        const sections = [
+            { id: 'section-donors',    name: 'Donors Report'          },
+            { id: 'section-stock',     name: 'Blood Stock Report'      },
+            { id: 'section-requests',  name: 'Blood Requests Report'   },
+            { id: 'section-staff',     name: 'Staff Report'            },
+            { id: 'section-hospitals', name: 'Hospital Report'         },
+            { id: 'section-history',   name: 'Donation History Report' }
+        ];
+
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        let y = 26;
+
+        sections.forEach((s, idx) => {
+            if (idx > 0) { doc.addPage(); y = 26; }
+            const content = buildDocContent(s.id);
+            addPageDecor(doc, s.name);
+            y = drawSection(doc, content, y);
+        });
+
+        // Footer on every page
+        const total = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= total; p++) {
+            doc.setPage(p);
+            const pageH = doc.internal.pageSize.getHeight();
+            const pageW = doc.internal.pageSize.getWidth();
+            doc.setFillColor(245, 237, 237);
+            doc.rect(0, pageH - 12, pageW, 12, 'F');
+            doc.setFontSize(7);
+            doc.setTextColor(...TEXT_GRAY);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, pageH - 4);
+            doc.text(`Page ${p} of ${total}`, pageW - 14, pageH - 4, { align: 'right' });
+        }
+
+        doc.save(`Full_Blood_Bank_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+</script>

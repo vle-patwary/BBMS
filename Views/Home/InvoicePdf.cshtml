@@ -1,0 +1,477 @@
+﻿@model YourApp.Models.BloodRequest
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+            color: #222;
+        }
+
+        .inv-wrap {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .inv-header {
+            background: #27ae60;
+            color: white;
+            padding: 24px 28px;
+            display: table;
+            width: 100%;
+        }
+
+        .inv-header-left {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .inv-header-right {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: right;
+        }
+
+        .inv-header h1 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .inv-header p {
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .inv-header-right strong {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .inv-header-right span {
+            font-size: 12px;
+            opacity: .9;
+            display: block;
+            line-height: 1.8;
+        }
+
+        .inv-ribbon {
+            background: #1e8449;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 6px 0;
+        }
+
+        .inv-body {
+            padding: 24px 28px;
+        }
+
+        .inv-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .inv-col {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            padding-right: 16px;
+        }
+
+            .inv-col:last-child {
+                padding-right: 0;
+                padding-left: 16px;
+            }
+
+        .inv-block h4 {
+            font-size: 11px;
+            font-weight: 700;
+            color: #27ae60;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e8f5ee;
+            padding-bottom: 5px;
+        }
+
+        .inv-block table {
+            width: 100%;
+            font-size: 12px;
+            border-collapse: collapse;
+        }
+
+        .inv-block td {
+            padding: 4px 0;
+            vertical-align: top;
+        }
+
+            .inv-block td:first-child {
+                color: #888;
+                width: 110px;
+            }
+
+            .inv-block td:last-child {
+                color: #222;
+                font-weight: 500;
+            }
+
+        .inv-badge {
+            background: #fdecea;
+            color: #c0392b;
+            border: 1px solid #f5b7b1;
+            border-radius: 4px;
+            font-weight: 700;
+            padding: 1px 8px;
+            font-size: 13px;
+        }
+
+        .status-pill {
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-approved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-rejected {
+            background: #fde8e8;
+            color: #b30000;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #27ae60;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e8f5ee;
+            padding-bottom: 5px;
+        }
+
+        .exp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+            .exp-table th {
+                background: #f4f4f4;
+                padding: 8px 12px;
+                font-size: 11px;
+                color: #666;
+                text-transform: uppercase;
+                border-bottom: 1px solid #e0e0e0;
+                text-align: left;
+            }
+
+                .exp-table th:last-child {
+                    text-align: right;
+                }
+
+            .exp-table td {
+                padding: 8px 12px;
+                border-bottom: 1px solid #f5f5f5;
+                color: #333;
+            }
+
+                .exp-table td:last-child {
+                    text-align: right;
+                }
+
+            .exp-table tfoot td {
+                font-weight: 700;
+                border-top: 2px solid #e0e0e0;
+                padding: 9px 12px;
+                background: #f9fffe;
+            }
+
+                .exp-table tfoot td:last-child {
+                    color: #27ae60;
+                    font-size: 15px;
+                    text-align: right;
+                }
+
+        .pay-row {
+            display: table;
+            width: 100%;
+            background: #f9fffe;
+            border: 1px solid #c8eedd;
+            border-radius: 7px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            font-size: 12px;
+        }
+
+        .pay-label {
+            display: table-cell;
+            color: #555;
+            vertical-align: middle;
+        }
+
+        .pay-value {
+            display: table-cell;
+            font-weight: 700;
+            color: #27ae60;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .pay-status {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: right;
+            background: #27ae60;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            width: 60px;
+        }
+
+        .notes-box {
+            background: #f4f6f9;
+            border-left: 4px solid #27ae60;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #444;
+            margin-bottom: 16px;
+        }
+
+            .notes-box strong {
+                color: #27ae60;
+            }
+
+        .note-box {
+            background: #fff8e1;
+            border-left: 4px solid #f39c12;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #6d4c00;
+            margin-bottom: 18px;
+        }
+
+            .note-box strong {
+                display: block;
+                margin-bottom: 4px;
+                font-size: 13px;
+                color: #5a3a00;
+            }
+
+            .note-box ul {
+                margin: 5px 0 0;
+                padding-left: 16px;
+            }
+
+            .note-box li {
+                margin-bottom: 3px;
+            }
+
+        .barcode-section {
+            text-align: center;
+            border-top: 1px dashed #ccc;
+            padding-top: 18px;
+            margin-bottom: 18px;
+        }
+
+        .barcode-ref {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+        }
+
+        .barcode-lbl {
+            font-size: 10px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .inv-footer {
+            background: #f9f9f9;
+            border-top: 1px solid #ececec;
+            padding: 12px 28px;
+            font-size: 11px;
+            color: #aaa;
+            display: table;
+            width: 100%;
+        }
+
+            .inv-footer span {
+                display: table-cell;
+            }
+
+                .inv-footer span:last-child {
+                    text-align: right;
+                }
+    </style>
+</head>
+<body>
+    <div class="inv-wrap">
+
+        <!-- Header -->
+        <div class="inv-header">
+            <div class="inv-header-left">
+                <h1>&#9679; LifeLink Blood Bank</h1>
+                <p>Dhaka Medical College Road, Dhaka-1000 &nbsp;|&nbsp; +880 1700-000000</p>
+            </div>
+            <div class="inv-header-right">
+                <strong>BLOOD REQUEST INVOICE</strong>
+                <span>Invoice No: @Model.InvoiceNumber</span>
+                <span>Date: @Model.RequestDate.ToString("dd MMM yyyy")</span>
+                <span>Time: @Model.RequestDate.ToString("hh:mm tt")</span>
+            </div>
+        </div>
+
+        <!-- Ribbon -->
+        <div class="inv-ribbon">
+            &#10003; Payment Confirmed &nbsp;·&nbsp; Request @Model.Status
+        </div>
+
+        <!-- Body -->
+        <div class="inv-body">
+
+            <!-- Info Grid -->
+            <div class="inv-grid">
+                <div class="inv-col">
+                    <div class="inv-block">
+                        <h4>Requester Details</h4>
+                        <table>
+                            <tr><td>Patient Name</td><td>@Model.RequesterName</td></tr>
+                            <tr>
+                                <td>Blood Group</td>
+                                <td><span class="inv-badge">@Model.BloodGroup</span></td>
+                            </tr>
+                            <tr><td>Units</td><td>@Model.UnitsRequired unit(s)</td></tr>
+                            <tr><td>Contact</td><td>@(Model.ContactNumber ?? "—")</td></tr>
+                            <tr><td>Required Date</td><td>@Model.RequiredDate.ToString("dd MMM yyyy")</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="inv-col">
+                    <div class="inv-block">
+                        <h4>Request Details</h4>
+                        <table>
+                            <tr><td>Hospital</td><td>@(Model.Hospital ?? "—")</td></tr>
+                            <tr><td>Request ID</td><td>#@Model.InvoiceNumber</td></tr>
+                            <tr><td>Request Date</td><td>@Model.RequestDate.ToString("dd MMM yyyy")</td></tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>
+                                    @if (Model.Status == "Pending")
+                                    {
+                                        <span class="status-pill status-pending">Pending</span>
+                                    }
+                                    else if (Model.Status == "Approved")
+                                    {
+                                        <span class="status-pill status-approved">Approved</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill status-rejected">Rejected</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr><td>Valid Until</td><td>@Model.RequestDate.AddDays(3).ToString("dd MMM yyyy")</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="notes-box">
+                    <strong>Additional Notes: </strong>@Model.Notes
+                </div>
+            }
+
+            <!-- Expense Breakdown -->
+            <div class="section-label">Expense Breakdown</div>
+            <table class="exp-table">
+                <thead>
+                    <tr><th>#</th><th>Item</th><th>Qty</th><th>Amount</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Needle</td><td>1</td><td>Tk 10</td></tr>
+                    <tr><td>2</td><td>Blood collection bag</td><td>1</td><td>Tk 100</td></tr>
+                    <tr><td>3</td><td>Gloves (pair)</td><td>1</td><td>Tk 30</td></tr>
+                    <tr><td>4</td><td>Antiseptic wipe</td><td>1</td><td>Tk 10</td></tr>
+                    <tr><td>5</td><td>Bandage</td><td>1</td><td>Tk 15</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="3">Total Paid</td><td>Tk 165</td></tr>
+                </tfoot>
+            </table>
+
+            <!-- Payment -->
+            <div class="pay-row">
+                <span class="pay-label">Payment Method</span>
+                <span class="pay-value">
+                    @Model.PaymentMethod
+                    @if (!string.IsNullOrEmpty(Model.MobileNumber))
+                    {
+                        <text> &nbsp;·&nbsp; @Model.MobileNumber</text>
+                    }
+                </span>
+                <span class="pay-status">PAID</span>
+            </div>
+
+            <!-- Barcode -->
+            <div class="barcode-section">
+                <div class="barcode-ref">@Model.InvoiceNumber</div>
+                <div class="barcode-lbl">Present this code at the blood bank counter</div>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="note-box">
+                <strong>Important — Please Read Before Visiting</strong>
+                <ul>
+                    <li>Bring this invoice (printed or on your phone) to the blood bank.</li>
+                    <li>A valid National ID or passport of the patient or guardian is required.</li>
+                    <li>This invoice is valid for <strong>3 days</strong> from the date of issue.</li>
+                    <li>Blood will only be released after admin/staff approval.</li>
+                    <li>For assistance, call: <strong>+880 1700-000000</strong></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="inv-footer">
+            <span>Generated by BBMS Blood Bank System</span>
+            <span>Ref: @Model.InvoiceNumber</span>
+        </div>
+
+    </div>
+</body>
+</html>

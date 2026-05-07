@@ -271,7 +271,7 @@
     <div class="card-container">
         <div class="card">
             <div class="card-icon"><i class="fa-solid fa-users"></i></div>
-            <a asp-controller="Home" asp-action="ManageDonors">Manage Donors</a>
+            <a asp-controller="Donor" asp-action="ManageDonors">Manage Donors</a>
             <p>View &amp; edit donor records</p>
         </div>
         <div class="card">
@@ -296,12 +296,12 @@
         </div>
         <div class="card">
             <div class="card-icon"><i class="fa-solid fa-file-medical"></i></div>
-            <a asp-controller="Home" asp-action="CheckRequest">Blood Requests</a>
+            <a asp-controller="Home" asp-action="BloodRequests">Blood Requests</a>
             <p>Review incoming requests</p>
         </div>
         <div class="card">
             <div class="card-icon"><i class="fa-solid fa-chart-pie"></i></div>
-            <a asp-controller="Report" asp-action="Index">Generate Reports</a>
+            <a asp-controller="Home" asp-action="AdminReports">Generate Reports</a>
             <p>Export system reports</p>
         </div>
     </div>

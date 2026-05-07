@@ -1,4 +1,6 @@
-﻿@{
+﻿@model BBMS.Models.DonateBlood
+
+@{
     ViewData["Title"] = "Donate Blood";
 }
 
@@ -19,11 +21,11 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    .form-container h2 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #e74c3c;
-    }
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
 
     .form-group {
         margin-bottom: 15px;
@@ -54,23 +56,44 @@
         margin-top: 10px;
     }
 
-    .btn:hover {
-        background: #c0392b;
+        .btn:hover {
+            background: #c0392b;
+        }
+
+    .text-danger {
+        color: red;
+        font-size: 12px;
     }
 </style>
 
 <div class="form-container">
     <h2><i class="fa-solid fa-droplet"></i> Donate Blood</h2>
 
-    <form>
+    <form asp-action="Donate" asp-controller="Home" method="post">
+        @Html.AntiForgeryToken()
+
         <div class="form-group">
             <label>Full Name</label>
-            <input type="text" placeholder="Enter your name" required>
+            <input asp-for="FullName" placeholder="Enter your name" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+      
+
+        <div class="form-group">
+            <label>Gender</label>
+            <select asp-for="Gender">
+                <option value="">Select Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+            <span asp-validation-for="Gender" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label>Blood Group</label>
-            <select required>
+            <select asp-for="BloodGroup">
                 <option value="">Select</option>
                 <option>A+</option>
                 <option>A-</option>
@@ -81,25 +104,31 @@
                 <option>AB+</option>
                 <option>AB-</option>
             </select>
+            <span asp-validation-for="BloodGroup" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label>Last Donation Date</label>
-            <input type="date">
+            <input asp-for="LastDonationDate" type="date" />
         </div>
 
         <div class="form-group">
             <label>Location</label>
-            <input type="text" placeholder="Your area">
+            <input asp-for="Location" placeholder="Your area" />
+            <span asp-validation-for="Location" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label>Contact Number</label>
-            <input type="text" placeholder="01XXXXXXXXX">
+            <input asp-for="ContactNumber" placeholder="01XXXXXXXXX" />
+            <span asp-validation-for="ContactNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input asp-for="Email" type="email" placeholder="example@email.com" />
+            <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
-        <a asp-controller="Home" asp-action="DonationSuccess" class="btn">
-            Submit Donation
-        </a>
+        <button type="submit" class="btn">Submit Donation</button>
     </form>
 </div>

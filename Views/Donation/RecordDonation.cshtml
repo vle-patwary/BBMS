@@ -1,0 +1,189 @@
+﻿@model IEnumerable<BBMS.Models.DonateBlood>
+
+@{
+    ViewData["Title"] = "Record Donation";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .page-container {
+        width: 1000px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        color: white;
+        padding: 20px 28px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+    }
+
+        .page-header h2 {
+            margin: 0 0 4px 0;
+            font-size: 22px;
+        }
+
+        .page-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    thead tr {
+        background: linear-gradient(135deg, #b30000, #e53935);
+        color: white;
+    }
+
+    thead th {
+        padding: 13px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        tbody tr:hover {
+            background: #fff5f5;
+        }
+
+    td {
+        padding: 11px 14px;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    .donor-name {
+        font-weight: 600;
+        color: #222;
+    }
+
+    .donor-id {
+        font-size: 11px;
+        color: #b30000;
+        font-weight: 600;
+    }
+
+    .blood-badge {
+        display: inline-block;
+        background: #fde8e8;
+        color: #b30000;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid #f5c0c0;
+    }
+
+    .btn-record {
+        background: #b30000;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 5px;
+        font-size: 12px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+        .btn-record:hover {
+            background: #ff3333;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #aaa;
+    }
+</style>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h2>Record Donation</h2>
+        <p>Select a donor below to record their blood donation</p>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Donor</th>
+                    <th>Blood Group</th>
+                    <th>Contact</th>
+                    <th>Gender</th>
+                    <th>Last Donation</th>
+                    <th>Eligibility</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int serial = 1;
+                    foreach (var donor in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+                            <td>
+                                <div class="donor-name">@donor.FullName</div>
+                                <div class="donor-id">@donor.DonorId</div>
+                            </td>
+                            <td><span class="blood-badge">@donor.BloodGroup</span></td>
+                            <td>@donor.ContactNumber</td>
+                            <td>@donor.Gender</td>
+                            <td>
+                                @(donor.LastDonationDate.HasValue
+                                                        ? donor.LastDonationDate.Value.ToString("dd MMM yyyy")
+                                                        : "Never")
+                            </td>
+                            <td>@donor.Eligibility</td>
+                            <td>
+                                <a asp-controller="Donation"
+                                   asp-action="CreateRecord"
+                                   asp-route-donorId="@donor.DonorId"
+                                   class="btn-record">
+                                    + Record Donation
+                                </a>
+                            </td>
+                        </tr>
+                        serial++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <p>No donors found. Add donors first from the Donate page.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

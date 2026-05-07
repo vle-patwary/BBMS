@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "View Blood Collections";
 }
 
@@ -10,7 +9,6 @@
         background: #f4f6f9;
     }
 
-    /* Container */
     .table-container {
         width: 90%;
         margin: 50px auto;
@@ -20,7 +18,6 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
-    /* Header */
     .table-header {
         background: linear-gradient(135deg,#b30000,#ff4d4d);
         color: white;
@@ -34,7 +31,28 @@
             margin: 0;
         }
 
-    /* Table */
+    /* Search Bar */
+    .search-box {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+        .search-box input {
+            width: 300px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .search-box button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #b30000;
+            color: white;
+            cursor: pointer;
+        }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -56,7 +74,6 @@
         background: #f9f9f9;
     }
 
-    /* Buttons */
     .btn {
         padding: 6px 12px;
         border: none;
@@ -89,6 +106,14 @@
     <div class="table-header">
         <h2>Blood Collection Records</h2>
         <p>All stored blood donation data</p>
+    </div>
+
+    <!-- 🔍 Search Box -->
+    <div class="search-box">
+        <form method="get" asp-controller="Collection" asp-action="ViewCollection">
+            <input type="text" name="searchString" placeholder="Search by Name, Blood Group, Location..." value="@Context.Request.Query["searchString"]" />
+            <button type="submit">Search</button>
+        </form>
     </div>
 
     <table>

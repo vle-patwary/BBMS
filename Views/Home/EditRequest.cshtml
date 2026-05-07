@@ -1,0 +1,146 @@
+﻿@model YourApp.Models.BloodRequest
+@{
+    ViewData["Title"] = "Edit Request";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; }
+    .form-container {
+        width: 480px; margin: 50px auto; background: white;
+        padding: 32px; border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .form-container h2 { text-align: center; margin-bottom: 6px; color: #8b0000; }
+    .subtitle { text-align: center; font-size: 13px; color: #999; margin-bottom: 22px; }
+    .form-group { margin-bottom: 15px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 13px; }
+    input, select, textarea {
+        width: 100%; padding: 10px; border-radius: 6px;
+        border: 1px solid #ccc; box-sizing: border-box; font-size: 14px;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    input:focus, select:focus, textarea:focus {
+        outline: none; border-color: #8b0000;
+        box-shadow: 0 0 0 2px rgba(139,0,0,0.1);
+    }
+    textarea { resize: none; height: 80px; }
+    .notice-bar {
+        background: #fff3e0; border-left: 4px solid #f39c12;
+        padding: 10px 14px; font-size: 13px; color: #7a4900;
+        border-radius: 0 6px 6px 0; margin-bottom: 20px;
+    }
+    .btn-row { display: flex; gap: 12px; margin-top: 20px; }
+    .btn-save {
+        flex: 1; padding: 12px; background: #8b0000; color: white;
+        border: none; border-radius: 6px; font-weight: bold;
+        cursor: pointer; font-size: 14px; font-family: 'Segoe UI', sans-serif;
+    }
+    .btn-save:hover { background: #6b0000; }
+    .btn-cancel {
+        flex: 1; padding: 12px; background: #f0f0f0; color: #444;
+        border: none; border-radius: 6px; font-weight: bold;
+        cursor: pointer; font-size: 14px; text-align: center;
+        text-decoration: none; display: block; font-family: 'Segoe UI', sans-serif;
+    }
+    .btn-cancel:hover { background: #e0e0e0; }
+    .invoice-info {
+        background: #f9f9f9; border: 1px solid #e8e8e8;
+        border-radius: 8px; padding: 12px 16px; font-size: 13px;
+        color: #555; margin-bottom: 20px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .inv-number {
+        font-family: 'Courier New', monospace;
+        font-weight: 700; color: #8b0000; font-size: 14px;
+    }
+    .pending-pill {
+        background: #fff3e0; color: #e65100; padding: 3px 12px;
+        border-radius: 20px; font-size: 12px; font-weight: 700;
+    }
+</style>
+
+<div class="form-container">
+    <h2><i class="fa-solid fa-pen-to-square"></i> Edit Request</h2>
+    <p class="subtitle">You can only edit requests that are still pending.</p>
+
+    <div class="notice-bar">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <strong>Note:</strong> Payment method cannot be changed after submission.
+        Only patient and location details can be updated.
+    </div>
+
+    <div class="invoice-info">
+        <span>Invoice: <span class="inv-number">@Model.InvoiceNumber</span></span>
+        <span class="pending-pill">⏳ Pending</span>
+    </div>
+
+    <form asp-controller="Home" asp-action="EditRequest" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id"            value="@Model.Id" />
+        <input type="hidden" name="InvoiceNumber" value="@Model.InvoiceNumber" />
+        <input type="hidden" name="RequestDate"   value="@Model.RequestDate.ToString("o")" />
+        <input type="hidden" name="Status"        value="@Model.Status" />
+        <input type="hidden" name="PaymentMethod" value="@Model.PaymentMethod" />
+        <input type="hidden" name="MobileNumber"  value="@Model.MobileNumber" />
+        <input type="hidden" name="UnitsRequired" value="@Model.UnitsRequired" />
+
+        <div class="form-group">
+            <label>Patient Name</label>
+            <input type="text" name="RequesterName"
+                   value="@Model.RequesterName" required>
+        </div>
+
+        <div class="form-group">
+            <label>Blood Group Needed</label>
+            <select name="BloodGroup" required>
+                @{
+                    var groups = new[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" };
+                    foreach (var bg in groups)
+                    {
+                        if (Model.BloodGroup == bg)
+                        {
+                            <option value="@bg" selected>@bg</option>
+                        }
+                        else
+                        {
+                            <option value="@bg">@bg</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Required Date</label>
+            <input type="date" name="RequiredDate"
+                   value="@Model.RequiredDate.ToString("yyyy-MM-dd")" required>
+        </div>
+
+        <div class="form-group">
+            <label>Hospital / Location</label>
+            <input type="text" name="Hospital"
+                   value="@Model.Hospital" placeholder="Where needed">
+        </div>
+
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" name="ContactNumber"
+                   value="@Model.ContactNumber" placeholder="01XXXXXXXXX">
+        </div>
+
+        <div class="form-group">
+            <label>Additional Notes</label>
+            <textarea name="Notes"
+                      placeholder="Optional details...">@Model.Notes</textarea>
+        </div>
+
+        <div class="btn-row">
+            <a asp-controller="Home" asp-action="BloodRequests" class="btn-cancel">
+                <i class="fa-solid fa-arrow-left"></i> Cancel
+            </a>
+            <button type="submit" class="btn-save">
+                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>

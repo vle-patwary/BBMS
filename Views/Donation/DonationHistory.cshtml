@@ -1,0 +1,495 @@
+﻿@model IEnumerable<BBMS.Models.RecordDonation>
+
+@{
+    ViewData["Title"] = "Donation History";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .page-container {
+        width: 1100px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        color: white;
+        padding: 20px 28px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .page-header h2 {
+            margin: 0 0 4px 0;
+            font-size: 22px;
+        }
+
+        .page-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+    .btn-back {
+        background: #ccc;
+        color: #333;
+        padding: 10px 22px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+        .btn-back:hover {
+            background: #bbb;
+        }
+
+    /* Stats */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        border-left: 4px solid #b30000;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .stat-card.green {
+            border-left-color: #2e7d32;
+        }
+
+        .stat-card.orange {
+            border-left-color: #f57c00;
+        }
+
+        .stat-card.blue {
+            border-left-color: #1565c0;
+        }
+
+    .stat-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #b30000;
+        line-height: 1;
+    }
+
+    .stat-card.green .stat-value {
+        color: #2e7d32;
+    }
+
+    .stat-card.orange .stat-value {
+        color: #f57c00;
+    }
+
+    .stat-card.blue .stat-value {
+        color: #1565c0;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+            .filter-bar input:focus,
+            .filter-bar select:focus {
+                border-color: #b30000;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(179,0,0,0.1);
+            }
+
+    .btn-search {
+        background: #b30000;
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: inherit;
+    }
+
+        .btn-search:hover {
+            background: #ff3333;
+        }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    thead tr {
+        background: linear-gradient(135deg, #b30000, #e53935);
+        color: white;
+    }
+
+    thead th {
+        padding: 13px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.15s;
+    }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #fff5f5;
+        }
+
+    td {
+        padding: 11px 14px;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    .donor-name {
+        font-weight: 600;
+        color: #222;
+    }
+
+    .donor-id {
+        font-size: 11px;
+        color: #b30000;
+        font-weight: 600;
+    }
+
+    .blood-badge {
+        display: inline-block;
+        background: #fde8e8;
+        color: #b30000;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid #f5c0c0;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-collected {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #bbdefb;
+    }
+
+    .badge-available {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .badge-processing {
+        background: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffe0b2;
+    }
+
+    .badge-tested {
+        background: #f3e5f5;
+        color: #6a1b9a;
+        border: 1px solid #e1bee7;
+    }
+
+    .badge-discarded {
+        background: #f5f5f5;
+        color: #616161;
+        border: 1px solid #e0e0e0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #aaa;
+    }
+
+        .empty-state p {
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+    .pagination-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-top: 1px solid #f0f0f0;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .pagination-btns {
+        display: flex;
+        gap: 6px;
+    }
+
+    .pg-btn {
+        padding: 5px 11px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 12px;
+        background: white;
+        color: #444;
+        text-decoration: none;
+    }
+
+        .pg-btn:hover {
+            background: #f4f6f9;
+        }
+
+        .pg-btn.active {
+            background: #b30000;
+            color: white;
+            border-color: #b30000;
+        }
+</style>
+
+<div class="page-container">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h2>Donation History</h2>
+            <p>Complete record of all blood donations recorded in the system</p>
+        </div>
+        <a asp-controller="Donation" asp-action="RecordDonation" class="btn-back">&#8592; Back</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Total Records</div>
+            <div class="stat-value">@ViewBag.TotalRecords</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-label">Available</div>
+            <div class="stat-value">@ViewBag.Available</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-label">Processing</div>
+            <div class="stat-value">@ViewBag.Processing</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">Total ML Collected</div>
+            <div class="stat-value">@ViewBag.TotalML</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <form method="get" asp-controller="Donation"
+              asp-action="DonationHistory" style="display:contents;">
+
+            <input type="text" name="search"
+                   value="@ViewBag.Search"
+                   placeholder="Search by donor name or ID..." />
+
+            <select name="bloodGroup">
+                <option value="">All Blood Groups</option>
+                @foreach (var bg in new[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" })
+                {
+                    if (ViewBag.BloodGroup == bg)
+                    {
+                        <option value="@bg" selected>@bg</option>
+                    }
+                    else
+                    {
+                        <option value="@bg">@bg</option>
+                    }
+                }
+            </select>
+
+            <select name="status">
+                <option value="">All Status</option>
+                @foreach (var s in new[] { "Collected", "Processing", "Tested", "Available", "Discarded" })
+                {
+                    if (ViewBag.Status == s)
+                    {
+                        <option value="@s" selected>@s</option>
+                    }
+                    else
+                    {
+                        <option value="@s">@s</option>
+                    }
+                }
+            </select>
+
+            <button type="submit" class="btn-search">Search</button>
+
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Donor</th>
+                    <th>Blood Group</th>
+                    <th>Donation Type</th>
+                    <th>Quantity (ml)</th>
+                    <th>Donation Date</th>
+                    <th>Location</th>
+                    <th>Screening</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int serial = 1;
+                    foreach (var record in Model)
+                    {
+                        <tr>
+                            <td>@serial</td>
+                            <td>
+                                <div class="donor-name">@record.DonorName</div>
+                                <div class="donor-id">@record.DonorId</div>
+                            </td>
+                            <td><span class="blood-badge">@record.BloodGroup</span></td>
+                            <td>@record.DonationType</td>
+                            <td>@record.Quantity ml</td>
+                            <td>@record.DonationDate.ToString("dd MMM yyyy")</td>
+                            <td>@record.Location</td>
+                            <td>@(string.IsNullOrEmpty(record.ScreeningResult) ? "—" : record.ScreeningResult)</td>
+                            <td>
+                                @{
+                                    var badgeClass = record.Status switch
+                                    {
+                                        "Available" => "badge-available",
+                                        "Processing" => "badge-processing",
+                                        "Tested" => "badge-tested",
+                                        "Discarded" => "badge-discarded",
+                                        _ => "badge-collected"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@record.Status</span>
+                            </td>
+                        </tr>
+                        serial++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <p>No donation records found.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination-bar">
+            <span>Showing @ViewBag.From – @ViewBag.To of @ViewBag.TotalRecords records</span>
+            <div class="pagination-btns">
+
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a asp-controller="Donation" asp-action="DonationHistory"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-bloodGroup="@ViewBag.BloodGroup"
+                       asp-route-status="@ViewBag.Status"
+                       class="pg-btn">&#8249; Prev</a>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <a asp-controller="Donation" asp-action="DonationHistory"
+                       asp-route-page="@i"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-bloodGroup="@ViewBag.BloodGroup"
+                       asp-route-status="@ViewBag.Status"
+                       class="pg-btn @(ViewBag.CurrentPage == i ? "active" : "")">@i</a>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a asp-controller="Donation" asp-action="DonationHistory"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-bloodGroup="@ViewBag.BloodGroup"
+                       asp-route-status="@ViewBag.Status"
+                       class="pg-btn">Next &#8250;</a>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
