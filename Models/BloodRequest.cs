@@ -17,14 +17,12 @@ namespace YourApp.Models
         public DateTime RequiredDate { get; set; }
 
         public string? Hospital { get; set; }
-
         public string? ContactNumber { get; set; }
-
         public string? Notes { get; set; }
-
         public string? PaymentMethod { get; set; }
-
         public string? MobileNumber { get; set; }
+
+        public int Quantity { get; set; } = 1;
 
         // Server-side auto-filled
         public string InvoiceNumber { get; set; } = "";
@@ -33,5 +31,8 @@ namespace YourApp.Models
 
         // Units (default 1)
         public int UnitsRequired { get; set; } = 1;
+
+        // Total cost = Quantity * 165
+        public int TotalCost { get; set; } = 165;
     }
 }

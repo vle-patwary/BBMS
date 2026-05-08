@@ -17,5 +17,6 @@ namespace BBMS.Data
         public DbSet<RecordDonation> RecordDonations { get; set; }
         public DbSet<BloodRequest> BloodRequests { get; set; }
         public DbSet<Staff> Staffs { get; set; }
+        public DbSet<Hospital> Hospitals { get; set; }
     }
 }

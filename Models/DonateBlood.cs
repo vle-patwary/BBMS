@@ -32,6 +32,10 @@ namespace BBMS.Models
         [Required(ErrorMessage = "Contact Number is required")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "Must be 11 digits")]
         public string ContactNumber { get; set; }
+        [Required(ErrorMessage = "Age is required")]
+        public int Age { get; set; }
+
+        public int TotalDonations { get; set; } = 0;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

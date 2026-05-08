@@ -57,13 +57,14 @@ namespace BBMS.Controllers
                 record.CreatedAt = DateTime.Now;
                 _db.RecordDonations.Add(record);
 
-                // Update LastDonationDate in DonateBloods table
+                // Update LastDonationDate and TotalDonations in DonateBloods table
                 var donor = _db.DonateBloods
                     .FirstOrDefault(d => d.DonorId == record.DonorId);
 
                 if (donor != null)
                 {
                     donor.LastDonationDate = record.DonationDate;
+                    donor.TotalDonations += 1; // ← increment total donations
                     _db.DonateBloods.Update(donor);
                 }
 

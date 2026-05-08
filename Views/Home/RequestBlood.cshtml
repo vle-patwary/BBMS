@@ -335,9 +335,16 @@
             </select>
         </div>
         <div class="form-group">
+            <label>Quantity (Units)</label>
+            <input type="number" name="Quantity" id="quantity-input"
+                   min="1" max="20" value="1" placeholder="Enter units needed"
+                   required onchange="updateTotal()" oninput="updateTotal()">
+        </div>
+        <div class="form-group">
             <label>Required Date</label>
             <input type="date" name="RequiredDate" required>
         </div>
+
         <div class="form-group">
             <label>Hospital / Location</label>
             <input type="text" name="Hospital" placeholder="Where needed">
@@ -358,13 +365,22 @@
         </div>
         <table class="invoice-table">
             <tbody>
-                <tr><td>Needle</td><td>Tk 10</td></tr>
-                <tr><td>Blood collection bag</td><td>Tk 100</td></tr>
-                <tr><td>Gloves (pair)</td><td>Tk 30</td></tr>
-                <tr><td>Antiseptic wipe</td><td>Tk 10</td></tr>
-                <tr><td>Bandage</td><td>Tk 15</td></tr>
+                <tr><td>Needle</td><td id="cost-needle">Tk 10</td></tr>
+                <tr><td>Blood collection bag</td><td id="cost-bag">Tk 100</td></tr>
+                <tr><td>Gloves (pair)</td><td id="cost-gloves">Tk 30</td></tr>
+                <tr><td>Antiseptic wipe</td><td id="cost-wipe">Tk 10</td></tr>
+                <tr><td>Bandage</td><td id="cost-bandage">Tk 15</td></tr>
+                <tr>
+                    <td style="color:#555">Quantity (Units)</td>
+                    <td id="cost-qty" style="color:#555">× 1</td>
+                </tr>
             </tbody>
-            <tfoot><tr><td>Total</td><td>Tk 165</td></tr></tfoot>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td id="cost-total">Tk 165</td>
+                </tr>
+            </tfoot>
         </table>
 
         <hr class="section-divider">
@@ -389,13 +405,13 @@
 
         <div id="pay-section">
             <button type="button" class="btn" id="pay-now-btn" onclick="openPaymentModal()" disabled>
-                <i class="fa-solid fa-lock"></i> Pay Tk 165
+                <i class="fa-solid fa-lock"></i> Pay Tk <span id="btn-total-display">165</span>
             </button>
         </div>
 
         <div id="paid-section" style="display:none;">
             <div class="paid-badge">
-                <i class="fa-solid fa-circle-check"></i> Payment Successful — Tk 165 Paid
+                <i class="fa-solid fa-circle-check"></i> Payment Successful — Tk <span id="paid-total-display">165</span> Paid
             </div>
         </div>
 
@@ -412,7 +428,7 @@
         <div id="modal-step-1">
             <div class="modal-title" id="modal-title">bKash Payment</div>
             <div class="modal-sub" id="modal-sub">Send to: 01700-000000</div>
-            <div class="modal-amount">Tk 165</div>
+            <div class="modal-amount">Tk <span id="modal-amount-display">165</span></div>
             <label id="modal-number-label">Your bKash Number</label>
             <input type="text" id="modal-number-input" placeholder="01XXXXXXXXX" oninput="clearError()">
             <label>PIN</label>
@@ -436,29 +452,57 @@
 </div>
 
 <script>
+    const unitCost = 165;
     const cashMethods = ['Cash on site', 'Bank transfer'];
 
+    function updateTotal() {
+        const qty = parseInt(document.getElementById('quantity-input').value) || 1;
+        const total = unitCost * qty;
+
+        document.getElementById('cost-needle').textContent   = 'Tk ' + (10  * qty);
+        document.getElementById('cost-bag').textContent      = 'Tk ' + (100 * qty);
+        document.getElementById('cost-gloves').textContent   = 'Tk ' + (30  * qty);
+        document.getElementById('cost-wipe').textContent     = 'Tk ' + (10  * qty);
+        document.getElementById('cost-bandage').textContent  = 'Tk ' + (15  * qty);
+        document.getElementById('cost-qty').textContent      = '× ' + qty;
+        document.getElementById('cost-total').textContent    = 'Tk ' + total;
+
+        // update pay button
+        const payBtn = document.getElementById('pay-now-btn');
+        const method = document.getElementById('payment-method').value;
+        if (method && !cashMethods.includes(method)) {
+            payBtn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Pay Tk ' + total;
+        }
+
+        // update modal amount and paid badge
+        document.getElementById('modal-amount-display').textContent = total;
+        document.getElementById('btn-total-display').textContent    = total;
+        document.getElementById('paid-total-display').textContent   = total;
+    }
+
     function toggleMobileField() {
-        const val = document.getElementById('payment-method').value;
+        const val   = document.getElementById('payment-method').value;
         const group = document.getElementById('mobile-number-group');
         const label = document.getElementById('mobile-number-label');
         const payBtn = document.getElementById('pay-now-btn');
+        const qty   = parseInt(document.getElementById('quantity-input').value) || 1;
+        const total = unitCost * qty;
 
         if (['bKash', 'Nagad', 'Rocket'].includes(val)) {
-            group.style.display = 'block';
-            label.textContent = val + ' Number';
+            group.style.display  = 'block';
+            label.textContent    = val + ' Number';
         } else {
-            group.style.display = 'none';
+            group.style.display  = 'none';
         }
 
         if (val) {
             payBtn.disabled = false;
             payBtn.innerHTML = cashMethods.includes(val)
                 ? '<i class="fa-solid fa-money-bill-wave"></i> Confirm Payment (Cash)'
-                : '<i class="fa-solid fa-credit-card"></i> Pay Tk 165';
+                : '<i class="fa-solid fa-credit-card"></i> Pay Tk ' + total;
         } else {
             payBtn.disabled = true;
-            payBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Tk 165';
+            payBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Tk <span id="btn-total-display">' + total + '</span>';
         }
     }
 
@@ -466,22 +510,26 @@
         const val = document.getElementById('payment-method').value;
         if (!val) return;
 
+        const qty   = parseInt(document.getElementById('quantity-input').value) || 1;
+        const total = unitCost * qty;
+        document.getElementById('modal-amount-display').textContent = total;
+
         if (cashMethods.includes(val)) {
             document.getElementById('modal-step-1').style.display = 'none';
             document.getElementById('modal-step-2').style.display = 'block';
             document.getElementById('modal-overlay').classList.add('open');
-            startProcessing(val);
+            startProcessing(val, total);
             return;
         }
 
         const numberMap = { bKash: '01700-000000', Nagad: '01800-000000', Rocket: '01900-000000' };
-        document.getElementById('modal-title').textContent = val + ' Payment';
-        document.getElementById('modal-sub').textContent = 'Send to: ' + (numberMap[val] || '');
+        document.getElementById('modal-title').textContent       = val + ' Payment';
+        document.getElementById('modal-sub').textContent         = 'Send to: ' + (numberMap[val] || '');
         document.getElementById('modal-number-label').textContent = 'Your ' + val + ' Number';
-        document.getElementById('modal-number-input').value = '';
-        document.getElementById('modal-pin-input').value = '';
-        document.getElementById('modal-step-1').style.display = 'block';
-        document.getElementById('modal-step-2').style.display = 'none';
+        document.getElementById('modal-number-input').value      = '';
+        document.getElementById('modal-pin-input').value         = '';
+        document.getElementById('modal-step-1').style.display    = 'block';
+        document.getElementById('modal-step-2').style.display    = 'none';
         document.getElementById('modal-overlay').classList.add('open');
     }
 
@@ -500,13 +548,15 @@
             document.getElementById('error-msg').style.display = 'block';
             return;
         }
-        const val = document.getElementById('payment-method').value;
+        const val   = document.getElementById('payment-method').value;
+        const qty   = parseInt(document.getElementById('quantity-input').value) || 1;
+        const total = unitCost * qty;
         document.getElementById('modal-step-1').style.display = 'none';
         document.getElementById('modal-step-2').style.display = 'block';
-        startProcessing(val);
+        startProcessing(val, total);
     }
 
-    function startProcessing(method) {
+    function startProcessing(method, total) {
         document.getElementById('processing-content').innerHTML = `
             <div class="spinner"></div>
             <p class="big">Processing payment...</p>
@@ -522,21 +572,32 @@
                     </svg>
                 </div>
                 <p class="big">Payment Successful!</p>
-                <p>Tk 165 paid via ${method}</p>
-                <button type="button" class="done-btn" onclick="onPaymentDone()">
+                <p>Tk ${total} paid via ${method}</p>
+                <button type="button" class="done-btn" onclick="onPaymentDone(${total})">
                     <i class="fa-solid fa-check"></i> Done
                 </button>
             `;
         }, 2500);
     }
 
-    function onPaymentDone() {
+        function onPaymentDone(total) {
         closeModal();
-        document.getElementById('pay-section').style.display = 'none';
-        document.getElementById('paid-section').style.display = 'block';
+        document.getElementById('pay-section').style.display         = 'none';
+        document.getElementById('paid-section').style.display        = 'block';
+        document.getElementById('paid-total-display').textContent    = total;
         document.getElementById('mobile-number-group').style.display = 'none';
-        document.getElementById('payment-method').disabled = true;
-        document.getElementById('submit-btn').disabled = false;
+
+        // Use readOnly instead of disabled so values still submit with the form
+        document.getElementById('quantity-input').readOnly           = true;
+        document.getElementById('quantity-input').style.background   = '#f0f0f0';
+        document.getElementById('quantity-input').style.color        = '#888';
+
+        // Lock payment method visually without disabling it
+        document.getElementById('payment-method').style.pointerEvents = 'none';
+        document.getElementById('payment-method').style.background    = '#f0f0f0';
+        document.getElementById('payment-method').style.color         = '#888';
+
+        document.getElementById('submit-btn').disabled               = false;
         document.getElementById('submit-btn').innerHTML =
             '<i class="fa-solid fa-paper-plane"></i> Submit Request';
     }

@@ -371,7 +371,7 @@
                                 <td>Blood Group</td>
                                 <td><span class="inv-badge">@Model.BloodGroup</span></td>
                             </tr>
-                            <tr><td>Units</td><td>@Model.UnitsRequired unit(s)</td></tr>
+                            <tr><td>Units</td><td>@Model.Quantity unit(s)</td></tr>
                             <tr><td>Contact</td><td>@(Model.ContactNumber ?? "—")</td></tr>
                             <tr><td>Required Date</td><td>@Model.RequiredDate.ToString("dd MMM yyyy")</td></tr>
                         </table>
@@ -416,20 +416,24 @@
             }
 
             <!-- Expense Breakdown -->
+            <!-- Expense Breakdown -->
             <div class="section-label">Expense Breakdown</div>
             <table class="exp-table">
                 <thead>
-                    <tr><th>#</th><th>Item</th><th>Qty</th><th>Amount</th></tr>
+                    <tr><th>#</th><th>Item</th><th>Unit Cost</th><th>Qty</th><th>Amount</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>1</td><td>Needle</td><td>1</td><td>Tk 10</td></tr>
-                    <tr><td>2</td><td>Blood collection bag</td><td>1</td><td>Tk 100</td></tr>
-                    <tr><td>3</td><td>Gloves (pair)</td><td>1</td><td>Tk 30</td></tr>
-                    <tr><td>4</td><td>Antiseptic wipe</td><td>1</td><td>Tk 10</td></tr>
-                    <tr><td>5</td><td>Bandage</td><td>1</td><td>Tk 15</td></tr>
+                    <tr><td>1</td><td>Needle</td><td>Tk 10</td><td>@Model.Quantity</td><td>Tk @(10 * Model.Quantity)</td></tr>
+                    <tr><td>2</td><td>Blood collection bag</td><td>Tk 100</td><td>@Model.Quantity</td><td>Tk @(100 * Model.Quantity)</td></tr>
+                    <tr><td>3</td><td>Gloves (pair)</td><td>Tk 30</td><td>@Model.Quantity</td><td>Tk @(30 * Model.Quantity)</td></tr>
+                    <tr><td>4</td><td>Antiseptic wipe</td><td>Tk 10</td><td>@Model.Quantity</td><td>Tk @(10 * Model.Quantity)</td></tr>
+                    <tr><td>5</td><td>Bandage</td><td>Tk 15</td><td>@Model.Quantity</td><td>Tk @(15 * Model.Quantity)</td></tr>
                 </tbody>
                 <tfoot>
-                    <tr><td colspan="3">Total Paid</td><td>Tk 165</td></tr>
+                    <tr>
+                        <td colspan="4">Total Paid (@Model.Quantity unit(s) × Tk 165)</td>
+                        <td>Tk @Model.TotalCost</td>
+                    </tr>
                 </tfoot>
             </table>
 

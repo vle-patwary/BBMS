@@ -21,7 +21,6 @@
         margin: 32px auto;
     }
 
-    /* ── HEADER ── */
     .header {
         background: #8b0000;
         color: white;
@@ -95,7 +94,6 @@
             background: rgba(255,255,255,0.25);
         }
 
-    /* ── FILTER BAR ── */
     .filter-bar {
         background: white;
         border: 1px solid #f0e0e0;
@@ -135,7 +133,6 @@
         font-size: 14px;
     }
 
-    /* ── SECTION TITLE ── */
     .section-title {
         margin-top: 28px;
         margin-bottom: 14px;
@@ -156,7 +153,6 @@
             border-radius: 2px;
         }
 
-    /* ── REPORT CARD ── */
     .report-card {
         background: white;
         border: 1px solid #f0e0e0;
@@ -205,7 +201,6 @@
             background: rgba(255,255,255,0.28);
         }
 
-    /* ── TABLE ── */
     .report-table-wrap {
         overflow-x: auto;
     }
@@ -240,7 +235,6 @@
         background: #fff8f8;
     }
 
-    /* ── BADGES ── */
     .badge {
         display: inline-block;
         padding: 3px 11px;
@@ -274,7 +268,6 @@
         color: #555;
     }
 
-    /* ── SUMMARY ROW ── */
     .summary-row td {
         background: #fff5f5 !important;
         font-weight: 700;
@@ -282,7 +275,6 @@
         border-top: 2px solid #f0e0e0;
     }
 
-    /* ── STATS ROW (top of page) ── */
     .stats-grid {
         display: flex;
         gap: 16px;
@@ -313,7 +305,6 @@
             margin-top: 4px;
         }
 
-    /* ── PRINT HIDDEN ── */
     @@media print {
         .download-btn, .filter-bar, .back-btn {
             display: none !important;
@@ -339,11 +330,11 @@
     <!-- QUICK STATS -->
     <div class="section-title">Overview</div>
     <div class="stats-grid">
-        <div class="stat-card"><div class="s-val">52</div><div class="s-lbl">Total Donors</div></div>
-        <div class="stat-card"><div class="s-val">12</div><div class="s-lbl">Pending Requests</div></div>
+        <div class="stat-card"><div class="s-val">@ViewBag.TotalDonors</div><div class="s-lbl">Total Donors</div></div>
+        <div class="stat-card"><div class="s-val">@ViewBag.PendingRequests</div><div class="s-lbl">Pending Requests</div></div>
         <div class="stat-card"><div class="s-val">80</div><div class="s-lbl">Blood Units in Stock</div></div>
-        <div class="stat-card"><div class="s-val">8</div><div class="s-lbl">Active Staff</div></div>
-        <div class="stat-card"><div class="s-val">5</div><div class="s-lbl">Partner Hospitals</div></div>
+        <div class="stat-card"><div class="s-val">@ViewBag.ActiveStaff</div><div class="s-lbl">Active Staff</div></div>
+        <div class="stat-card"><div class="s-val">@ViewBag.TotalHospitals</div><div class="s-lbl">Partner Hospitals</div></div>
     </div>
 
     <!-- FILTER BAR -->
@@ -354,13 +345,6 @@
         <span class="filter-sep">—</span>
         <label>To:</label>
         <input type="date" id="filterTo" value="2025-12-31">
-        <label>Status:</label>
-        <select id="filterStatus">
-            <option value="all">All</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-        </select>
         <label>Blood Group:</label>
         <select id="filterBlood">
             <option value="all">All Groups</option>
@@ -376,13 +360,13 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════
-         1. DONORS REPORT
+         1. DONORS REPORT  ← DYNAMIC
     ═══════════════════════════════════════════════ -->
     <div class="section-title">Donors Report</div>
     <div class="report-card" id="section-donors">
         <div class="report-card-header">
             <h3><i class="fa-solid fa-users"></i> Registered Donors</h3>
-            <button class="download-btn" onclick="downloadPDF('section-donors','Donors_Report')">
+            <button class="download-btn" onclick="downloadDonorsPDF()">
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
         </div>
@@ -390,80 +374,53 @@
             <table id="tbl-donors">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>Serial</th>
                         <th>Donor Name</th>
                         <th>Blood Group</th>
+                        <th>Gender</th>
                         <th>Age</th>
                         <th>Contact</th>
                         <th>Last Donation</th>
                         <th>Total Donations</th>
-                        <th>Status</th>
+                        <th>Eligibility</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Arif Hossain</td>
-                        <td>A+</td>
-                        <td>28</td>
-                        <td>01711-000001</td>
-                        <td>2025-03-12</td>
-                        <td>5</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Nusrat Jahan</td>
-                        <td>B+</td>
-                        <td>24</td>
-                        <td>01811-000002</td>
-                        <td>2025-01-08</td>
-                        <td>3</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Rakibul Islam</td>
-                        <td>O+</td>
-                        <td>32</td>
-                        <td>01911-000003</td>
-                        <td>2024-11-25</td>
-                        <td>7</td>
-                        <td><span class="badge badge-yellow">Inactive</span></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Tasnia Akter</td>
-                        <td>AB+</td>
-                        <td>26</td>
-                        <td>01611-000004</td>
-                        <td>2025-04-01</td>
-                        <td>2</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Mehedi Hasan</td>
-                        <td>O-</td>
-                        <td>30</td>
-                        <td>01711-000005</td>
-                        <td>2025-02-18</td>
-                        <td>4</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>Sharmin Begum</td>
-                        <td>A-</td>
-                        <td>22</td>
-                        <td>01811-000006</td>
-                        <td>2024-12-30</td>
-                        <td>1</td>
-                        <td><span class="badge badge-red">Deferred</span></td>
-                    </tr>
+                    @{
+                        int donorSerial = 1;
+                        var donorList = ViewBag.DonorList as List<BBMS.Models.DonateBlood>;
+                    }
+                    @if (donorList != null && donorList.Any())
+                    {
+                        foreach (var d in donorList)
+                        {
+                            <tr>
+                                <td>@(donorSerial++)</td>
+                                <td>
+                                    <div>@d.FullName</div>
+                                    <div style="font-size:11px; color:#8b0000;">@d.DonorId</div>
+                                </td>
+                                <td>@d.BloodGroup</td>
+                                <td>@d.Gender</td>
+                                <td>@d.Age</td>
+                                <td>@d.ContactNumber</td>
+                                <td>@(d.LastDonationDate.HasValue? d.LastDonationDate.Value.ToString("dd MMM yyyy") : "—")</td>
+                                <td style="text-align:center;">@d.TotalDonations</td>
+                                <td>
+                                    <span class="badge @(d.Eligibility == "Eligible" ? "badge-green" : "badge-yellow")">
+                                        @d.Eligibility
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="9" style="text-align:center; color:#aaa; padding:30px;">No donors found.</td></tr>
+                    }
                     <tr class="summary-row">
-                        <td colspan="6">Total Registered Donors</td>
-                        <td colspan="2">52 donors</td>
+                        <td colspan="7">Total Registered Donors</td>
+                        <td colspan="2">@ViewBag.TotalDonors donors</td>
                     </tr>
                 </tbody>
             </table>
@@ -495,78 +452,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>A+</strong></td>
-                        <td>15</td>
-                        <td>3</td>
-                        <td>8</td>
-                        <td>2</td>
-                        <td>2025-04-30</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>A-</strong></td>
-                        <td>4</td>
-                        <td>1</td>
-                        <td>3</td>
-                        <td>1</td>
-                        <td>2025-04-29</td>
-                        <td><span class="badge badge-yellow">Low</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>B+</strong></td>
-                        <td>12</td>
-                        <td>2</td>
-                        <td>6</td>
-                        <td>0</td>
-                        <td>2025-04-30</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>B-</strong></td>
-                        <td>2</td>
-                        <td>0</td>
-                        <td>2</td>
-                        <td>2</td>
-                        <td>2025-04-28</td>
-                        <td><span class="badge badge-red">Critical</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>O+</strong></td>
-                        <td>20</td>
-                        <td>5</td>
-                        <td>14</td>
-                        <td>3</td>
-                        <td>2025-04-30</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>O-</strong></td>
-                        <td>6</td>
-                        <td>2</td>
-                        <td>5</td>
-                        <td>1</td>
-                        <td>2025-04-30</td>
-                        <td><span class="badge badge-yellow">Low</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>AB+</strong></td>
-                        <td>5</td>
-                        <td>1</td>
-                        <td>3</td>
-                        <td>0</td>
-                        <td>2025-04-29</td>
-                        <td><span class="badge badge-yellow">Low</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>AB-</strong></td>
-                        <td>3</td>
-                        <td>0</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>2025-04-27</td>
-                        <td><span class="badge badge-yellow">Low</span></td>
-                    </tr>
+                    <tr><td><strong>A+</strong></td><td>15</td><td>3</td><td>8</td><td>2</td><td>2025-04-30</td><td><span class="badge badge-green">Normal</span></td></tr>
+                    <tr><td><strong>A-</strong></td><td>4</td><td>1</td><td>3</td><td>1</td><td>2025-04-29</td><td><span class="badge badge-yellow">Low</span></td></tr>
+                    <tr><td><strong>B+</strong></td><td>12</td><td>2</td><td>6</td><td>0</td><td>2025-04-30</td><td><span class="badge badge-green">Normal</span></td></tr>
+                    <tr><td><strong>B-</strong></td><td>2</td><td>0</td><td>2</td><td>2</td><td>2025-04-28</td><td><span class="badge badge-red">Critical</span></td></tr>
+                    <tr><td><strong>O+</strong></td><td>20</td><td>5</td><td>14</td><td>3</td><td>2025-04-30</td><td><span class="badge badge-green">Normal</span></td></tr>
+                    <tr><td><strong>O-</strong></td><td>6</td><td>2</td><td>5</td><td>1</td><td>2025-04-30</td><td><span class="badge badge-yellow">Low</span></td></tr>
+                    <tr><td><strong>AB+</strong></td><td>5</td><td>1</td><td>3</td><td>0</td><td>2025-04-29</td><td><span class="badge badge-yellow">Low</span></td></tr>
+                    <tr><td><strong>AB-</strong></td><td>3</td><td>0</td><td>1</td><td>1</td><td>2025-04-27</td><td><span class="badge badge-yellow">Low</span></td></tr>
                     <tr class="summary-row">
                         <td><strong>TOTAL</strong></td>
                         <td><strong>67</strong></td>
@@ -607,72 +500,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>REQ-1001</td>
-                        <td>Kamal Uddin</td>
-                        <td>A+</td>
-                        <td>2</td>
-                        <td>Dhaka Medical</td>
-                        <td>2025-04-01</td>
-                        <td>2025-04-03</td>
-                        <td><span class="badge badge-green">Approved</span></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>REQ-1002</td>
-                        <td>Rina Khatun</td>
-                        <td>O+</td>
-                        <td>3</td>
-                        <td>BSMMU</td>
-                        <td>2025-04-05</td>
-                        <td>2025-04-06</td>
-                        <td><span class="badge badge-yellow">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>REQ-1003</td>
-                        <td>Farhan Ahmed</td>
-                        <td>B-</td>
-                        <td>1</td>
-                        <td>Square Hospital</td>
-                        <td>2025-04-08</td>
-                        <td>2025-04-09</td>
-                        <td><span class="badge badge-red">Rejected</span></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>REQ-1004</td>
-                        <td>Sumaiya Islam</td>
-                        <td>AB+</td>
-                        <td>2</td>
-                        <td>Apollo Hospital</td>
-                        <td>2025-04-10</td>
-                        <td>2025-04-12</td>
-                        <td><span class="badge badge-green">Approved</span></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>REQ-1005</td>
-                        <td>Jahir Raihan</td>
-                        <td>O-</td>
-                        <td>4</td>
-                        <td>Dhaka Medical</td>
-                        <td>2025-04-14</td>
-                        <td>2025-04-15</td>
-                        <td><span class="badge badge-yellow">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>REQ-1006</td>
-                        <td>Mitu Begum</td>
-                        <td>A-</td>
-                        <td>1</td>
-                        <td>Ibn Sina</td>
-                        <td>2025-04-18</td>
-                        <td>2025-04-20</td>
-                        <td><span class="badge badge-blue">Processing</span></td>
-                    </tr>
+                    <tr><td>1</td><td>REQ-1001</td><td>Kamal Uddin</td><td>A+</td><td>2</td><td>Dhaka Medical</td><td>2025-04-01</td><td>2025-04-03</td><td><span class="badge badge-green">Approved</span></td></tr>
+                    <tr><td>2</td><td>REQ-1002</td><td>Rina Khatun</td><td>O+</td><td>3</td><td>BSMMU</td><td>2025-04-05</td><td>2025-04-06</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+                    <tr><td>3</td><td>REQ-1003</td><td>Farhan Ahmed</td><td>B-</td><td>1</td><td>Square Hospital</td><td>2025-04-08</td><td>2025-04-09</td><td><span class="badge badge-red">Rejected</span></td></tr>
+                    <tr><td>4</td><td>REQ-1004</td><td>Sumaiya Islam</td><td>AB+</td><td>2</td><td>Apollo Hospital</td><td>2025-04-10</td><td>2025-04-12</td><td><span class="badge badge-green">Approved</span></td></tr>
+                    <tr><td>5</td><td>REQ-1005</td><td>Jahir Raihan</td><td>O-</td><td>4</td><td>Dhaka Medical</td><td>2025-04-14</td><td>2025-04-15</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+                    <tr><td>6</td><td>REQ-1006</td><td>Mitu Begum</td><td>A-</td><td>1</td><td>Ibn Sina</td><td>2025-04-18</td><td>2025-04-20</td><td><span class="badge badge-blue">Processing</span></td></tr>
                     <tr class="summary-row">
                         <td colspan="4">Total Requests: 12</td>
                         <td colspan="5">Approved: 5 &nbsp;|&nbsp; Pending: 4 &nbsp;|&nbsp; Rejected: 2 &nbsp;|&nbsp; Processing: 1</td>
@@ -697,7 +530,7 @@
             <table id="tbl-staff">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>Serial</th>
                         <th>Staff Name</th>
                         <th>Role</th>
                         <th>Email</th>
@@ -707,55 +540,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Dr. Mahbub Alam</td>
-                        <td>Chief Medical Officer</td>
-                        <td>mahbub@bloodbank.org</td>
-                        <td>01711-100001</td>
-                        <td>2020-01-15</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Fatema Tuz Zohra</td>
-                        <td>Lab Technician</td>
-                        <td>fatema@bloodbank.org</td>
-                        <td>01811-100002</td>
-                        <td>2021-06-01</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Sabbir Rahman</td>
-                        <td>Blood Bank Officer</td>
-                        <td>sabbir@bloodbank.org</td>
-                        <td>01911-100003</td>
-                        <td>2022-03-20</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Nasrin Sultana</td>
-                        <td>Nurse</td>
-                        <td>nasrin@bloodbank.org</td>
-                        <td>01611-100004</td>
-                        <td>2021-09-11</td>
-                        <td><span class="badge badge-yellow">On Leave</span></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Imran Hossain</td>
-                        <td>Data Entry Operator</td>
-                        <td>imran@bloodbank.org</td>
-                        <td>01711-100005</td>
-                        <td>2023-02-05</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr class="summary-row">
-                        <td colspan="6">Total Staff</td>
-                        <td>8 members</td>
-                    </tr>
+                    <tr><td>1</td><td>Dr. Mahbub Alam</td><td>Chief Medical Officer</td><td>mahbub@bloodbank.org</td><td>01711-100001</td><td>2020-01-15</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>2</td><td>Fatema Tuz Zohra</td><td>Lab Technician</td><td>fatema@bloodbank.org</td><td>01811-100002</td><td>2021-06-01</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>3</td><td>Sabbir Rahman</td><td>Blood Bank Officer</td><td>sabbir@bloodbank.org</td><td>01911-100003</td><td>2022-03-20</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>4</td><td>Nasrin Sultana</td><td>Nurse</td><td>nasrin@bloodbank.org</td><td>01611-100004</td><td>2021-09-11</td><td><span class="badge badge-yellow">On Leave</span></td></tr>
+                    <tr><td>5</td><td>Imran Hossain</td><td>Data Entry Operator</td><td>imran@bloodbank.org</td><td>01711-100005</td><td>2023-02-05</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr class="summary-row"><td colspan="6">Total Staff</td><td>8 members</td></tr>
                 </tbody>
             </table>
         </div>
@@ -787,56 +577,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Dhaka Medical College</td>
-                        <td>Dhaka</td>
-                        <td>Dr. Rahman</td>
-                        <td>02-1234567</td>
-                        <td>25</td>
-                        <td>48</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>BSMMU</td>
-                        <td>Dhaka</td>
-                        <td>Dr. Hossain</td>
-                        <td>02-7654321</td>
-                        <td>18</td>
-                        <td>32</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Square Hospital</td>
-                        <td>Dhaka</td>
-                        <td>Dr. Karim</td>
-                        <td>02-9988776</td>
-                        <td>10</td>
-                        <td>15</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Apollo Hospital</td>
-                        <td>Dhaka</td>
-                        <td>Dr. Nasim</td>
-                        <td>02-5566778</td>
-                        <td>7</td>
-                        <td>12</td>
-                        <td><span class="badge badge-green">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Ibn Sina Hospital</td>
-                        <td>Dhaka</td>
-                        <td>Dr. Akter</td>
-                        <td>02-3344556</td>
-                        <td>4</td>
-                        <td>6</td>
-                        <td><span class="badge badge-yellow">Pending Approval</span></td>
-                    </tr>
+                    <tr><td>1</td><td>Dhaka Medical College</td><td>Dhaka</td><td>Dr. Rahman</td><td>02-1234567</td><td>25</td><td>48</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>2</td><td>BSMMU</td><td>Dhaka</td><td>Dr. Hossain</td><td>02-7654321</td><td>18</td><td>32</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>3</td><td>Square Hospital</td><td>Dhaka</td><td>Dr. Karim</td><td>02-9988776</td><td>10</td><td>15</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>4</td><td>Apollo Hospital</td><td>Dhaka</td><td>Dr. Nasim</td><td>02-5566778</td><td>7</td><td>12</td><td><span class="badge badge-green">Active</span></td></tr>
+                    <tr><td>5</td><td>Ibn Sina Hospital</td><td>Dhaka</td><td>Dr. Akter</td><td>02-3344556</td><td>4</td><td>6</td><td><span class="badge badge-yellow">Pending Approval</span></td></tr>
                     <tr class="summary-row">
                         <td colspan="5">Total</td>
                         <td><strong>64</strong></td>
@@ -875,61 +620,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>DON-2001</td>
-                        <td>Arif Hossain</td>
-                        <td>A+</td>
-                        <td>1</td>
-                        <td>2025-03-12</td>
-                        <td>Fatema Tuz Zohra</td>
-                        <td>Stock</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>DON-2002</td>
-                        <td>Rakibul Islam</td>
-                        <td>O+</td>
-                        <td>1</td>
-                        <td>2025-03-18</td>
-                        <td>Sabbir Rahman</td>
-                        <td>Dhaka Medical</td>
-                        <td><span class="badge badge-blue">Urgent</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>DON-2003</td>
-                        <td>Mehedi Hasan</td>
-                        <td>O-</td>
-                        <td>1</td>
-                        <td>2025-04-02</td>
-                        <td>Fatema Tuz Zohra</td>
-                        <td>Stock</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>DON-2004</td>
-                        <td>Tasnia Akter</td>
-                        <td>AB+</td>
-                        <td>1</td>
-                        <td>2025-04-10</td>
-                        <td>Sabbir Rahman</td>
-                        <td>Apollo Hospital</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>DON-2005</td>
-                        <td>Nusrat Jahan</td>
-                        <td>B+</td>
-                        <td>1</td>
-                        <td>2025-04-22</td>
-                        <td>Fatema Tuz Zohra</td>
-                        <td>Stock</td>
-                        <td><span class="badge badge-green">Normal</span></td>
-                    </tr>
+                    <tr><td>1</td><td>DON-2001</td><td>Arif Hossain</td><td>A+</td><td>1</td><td>2025-03-12</td><td>Fatema Tuz Zohra</td><td>Stock</td><td><span class="badge badge-green">Normal</span></td></tr>
+                    <tr><td>2</td><td>DON-2002</td><td>Rakibul Islam</td><td>O+</td><td>1</td><td>2025-03-18</td><td>Sabbir Rahman</td><td>Dhaka Medical</td><td><span class="badge badge-blue">Urgent</span></td></tr>
+                    <tr><td>3</td><td>DON-2003</td><td>Mehedi Hasan</td><td>O-</td><td>1</td><td>2025-04-02</td><td>Fatema Tuz Zohra</td><td>Stock</td><td><span class="badge badge-green">Normal</span></td></tr>
+                    <tr><td>4</td><td>DON-2004</td><td>Tasnia Akter</td><td>AB+</td><td>1</td><td>2025-04-10</td><td>Sabbir Rahman</td><td>Apollo Hospital</td><td><span class="badge badge-green">Normal</span></td></tr>
+                    <tr><td>5</td><td>DON-2005</td><td>Nusrat Jahan</td><td>B+</td><td>1</td><td>2025-04-22</td><td>Fatema Tuz Zohra</td><td>Stock</td><td><span class="badge badge-green">Normal</span></td></tr>
                     <tr class="summary-row">
                         <td colspan="8">Total Donations This Period</td>
                         <td>42 units</td>
@@ -952,31 +647,24 @@
 
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     PDF GENERATION SCRIPT
-═══════════════════════════════════════════════ -->
 <script>
     const { jsPDF } = window.jspdf;
+    const DARK_RED  = [139, 0, 0];
+    const LIGHT_RED = [255, 240, 240];
+    const HEADER_BG = [255, 245, 245];
+    const TEXT_DARK = [30,  30,  30];
+    const TEXT_GRAY = [120, 120, 120];
+    const WHITE     = [255, 255, 255];
 
-    // Colour palette matching the dashboard
-    const DARK_RED   = [139, 0, 0];
-    const LIGHT_RED  = [255, 240, 240];
-    const HEADER_BG  = [255, 245, 245];
-    const TEXT_DARK  = [30,  30,  30];
-    const TEXT_GRAY  = [120, 120, 120];
-    const WHITE      = [255, 255, 255];
-
-    // Map a status badge text to an RGB colour
     function statusColor(text) {
         const t = text.toLowerCase();
-        if (t === 'active' || t === 'approved' || t === 'normal') return [26, 138, 74];
-        if (t === 'pending' || t === 'inactive' || t === 'low' || t === 'on leave') return [184, 134, 11];
-        if (t === 'rejected' || t === 'critical' || t === 'deferred') return [139, 0, 0];
-        if (t === 'processing' || t === 'urgent' || t === 'blue') return [21, 101, 192];
+        if (t === 'active' || t === 'approved' || t === 'normal' || t === 'eligible') return [26, 138, 74];
+        if (t === 'pending' || t === 'inactive' || t === 'low' || t === 'on leave' || t === 'deferred') return [184, 134, 11];
+        if (t === 'rejected' || t === 'critical') return [139, 0, 0];
+        if (t === 'processing' || t === 'urgent') return [21, 101, 192];
         return [80, 80, 80];
     }
 
-    // Build header + table content from a section DOM element
     function buildDocContent(sectionId) {
         const section = document.getElementById(sectionId);
         const title   = section.querySelector('.report-card-header h3').innerText.trim();
@@ -984,7 +672,6 @@
         const headers = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
         const rows    = [];
         const isSummary = [];
-
         table.querySelectorAll('tbody tr').forEach(tr => {
             rows.push([...tr.querySelectorAll('td')].map(td => td.innerText.trim()));
             isSummary.push(tr.classList.contains('summary-row'));
@@ -992,13 +679,11 @@
         return { title, headers, rows, isSummary };
     }
 
-    // Draw one table section into the PDF doc
     function drawSection(doc, { title, headers, rows, isSummary }, startY) {
-        const pageW = doc.internal.pageSize.getWidth();
+        const pageW  = doc.internal.pageSize.getWidth();
         const margin = 14;
         const usable = pageW - margin * 2;
 
-        // Section heading bar
         doc.setFillColor(...DARK_RED);
         doc.roundedRect(margin, startY, usable, 10, 2, 2, 'F');
         doc.setFont('helvetica', 'bold');
@@ -1006,69 +691,45 @@
         doc.setTextColor(...WHITE);
         doc.text(title, margin + 5, startY + 6.5);
 
-        const tableStartY = startY + 12;
-
         doc.autoTable({
-            startY: tableStartY,
+            startY: startY + 12,
             head: [headers],
             body: rows,
             margin: { left: margin, right: margin },
             tableWidth: usable,
-            styles: {
-                fontSize: 7.5,
-                cellPadding: 3,
-                overflow: 'linebreak',
-                textColor: TEXT_DARK
-            },
-            headStyles: {
-                fillColor: HEADER_BG,
-                textColor: DARK_RED,
-                fontStyle: 'bold',
-                lineWidth: 0.1,
-                lineColor: [240, 224, 224]
-            },
-            bodyStyles: {
-                lineWidth: 0.1,
-                lineColor: [245, 237, 237]
-            },
-            alternateRowStyles: {
-                fillColor: [255, 252, 252]
-            },
+            styles: { fontSize: 7.5, cellPadding: 3, overflow: 'linebreak', textColor: TEXT_DARK },
+            headStyles: { fillColor: HEADER_BG, textColor: DARK_RED, fontStyle: 'bold', lineWidth: 0.1, lineColor: [240, 224, 224] },
+            bodyStyles: { lineWidth: 0.1, lineColor: [245, 237, 237] },
+            alternateRowStyles: { fillColor: [255, 252, 252] },
             didParseCell: function(data) {
                 if (data.section === 'body' && isSummary[data.row.index]) {
                     data.cell.styles.fillColor = LIGHT_RED;
-                    data.cell.styles.fontStyle  = 'bold';
-                    data.cell.styles.textColor  = DARK_RED;
+                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.textColor = DARK_RED;
                 }
             },
             willDrawCell: function(data) {
-                // Colour badge cells
                 if (data.section === 'body') {
                     const text = data.cell.raw ? data.cell.raw.toString().trim() : '';
-                    const keywords = ['Active','Inactive','Approved','Pending','Rejected',
-                                      'Processing','Normal','Low','Critical','Deferred',
-                                      'On Leave','Urgent','Pending Approval'];
+                    const keywords = ['Active','Eligible','Approved','Normal','Inactive','Deferred',
+                                      'Pending','Low','On Leave','Rejected','Critical',
+                                      'Processing','Urgent','Pending Approval'];
                     if (keywords.includes(text)) {
                         const [r, g, b] = statusColor(text);
                         doc.setTextColor(r, g, b);
                     }
                 }
             },
-            didDrawCell: function(data) {
-                doc.setTextColor(...TEXT_DARK); // reset
-            }
+            didDrawCell: function(data) { doc.setTextColor(...TEXT_DARK); }
         });
 
         return doc.lastAutoTable.finalY + 10;
     }
 
-    // Add a page header + footer
     function addPageDecor(doc, reportTitle) {
         const pageW  = doc.internal.pageSize.getWidth();
         const pageH  = doc.internal.pageSize.getHeight();
         const margin = 14;
-
-        // Top banner
         doc.setFillColor(...DARK_RED);
         doc.rect(0, 0, pageW, 20, 'F');
         doc.setFont('helvetica', 'bold');
@@ -1078,36 +739,27 @@
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         doc.text(reportTitle, pageW - margin, 13, { align: 'right' });
-
-        // Footer
         doc.setFillColor(245, 237, 237);
         doc.rect(0, pageH - 12, pageW, 12, 'F');
         doc.setFontSize(7);
         doc.setTextColor(...TEXT_GRAY);
-        const now = new Date().toLocaleString();
-        doc.text(`Generated: ${now}`, margin, pageH - 4);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, margin, pageH - 4);
         doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber}`, pageW - margin, pageH - 4, { align: 'right' });
     }
 
-    // ── SINGLE SECTION ──────────────────────────────
     function downloadPDF(sectionId, filename) {
         const doc     = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const content = buildDocContent(sectionId);
-
         addPageDecor(doc, content.title);
         drawSection(doc, content, 26);
-
-        // Re-decorate all pages (autoTable may add pages)
         const totalPages = doc.internal.getNumberOfPages();
         for (let p = 1; p <= totalPages; p++) {
             doc.setPage(p);
             addPageDecor(doc, content.title);
         }
-
         doc.save(`${filename}_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
-    // ── ALL SECTIONS ────────────────────────────────
     function downloadAllPDF() {
         const sections = [
             { id: 'section-donors',    name: 'Donors Report'          },
@@ -1117,18 +769,14 @@
             { id: 'section-hospitals', name: 'Hospital Report'         },
             { id: 'section-history',   name: 'Donation History Report' }
         ];
-
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         let y = 26;
-
         sections.forEach((s, idx) => {
             if (idx > 0) { doc.addPage(); y = 26; }
             const content = buildDocContent(s.id);
             addPageDecor(doc, s.name);
             y = drawSection(doc, content, y);
         });
-
-        // Footer on every page
         const total = doc.internal.getNumberOfPages();
         for (let p = 1; p <= total; p++) {
             doc.setPage(p);
@@ -1141,7 +789,129 @@
             doc.text(`Generated: ${new Date().toLocaleString()}`, 14, pageH - 4);
             doc.text(`Page ${p} of ${total}`, pageW - 14, pageH - 4, { align: 'right' });
         }
-
         doc.save(`Full_Blood_Bank_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+        function downloadDonorsPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margin = 14;
+
+        // ── HEADER BANNER ──
+        doc.setFillColor(139, 0, 0);
+        doc.rect(0, 0, pageW, 28, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(255, 255, 255);
+        doc.text('Blood Bank Management System', margin, 12);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text('Registered Donors Report', margin, 20);
+
+        // Date on right
+        doc.setFontSize(8);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, pageW - margin, 12, { align: 'right' });
+        doc.text(`Total Donors: @ViewBag.TotalDonors`, pageW - margin, 20, { align: 'right' });
+
+        // ── SUMMARY BOXES ──
+        const boxY = 34;
+        const boxes = [
+            { label: 'Total Donors',   value: '@ViewBag.TotalDonors' },
+            { label: 'Eligible',       value: '@(ViewBag.DonorList != null ? ((List<BBMS.Models.DonateBlood>)ViewBag.DonorList).Count(d => d.Eligibility == "Eligible") : 0)' },
+            { label: 'Deferred',       value: '@(ViewBag.DonorList != null ? ((List<BBMS.Models.DonateBlood>)ViewBag.DonorList).Count(d => d.Eligibility == "Deferred") : 0)' },
+        ];
+
+        // build from DOM instead (simpler, no Razor in JS)
+        const totalDonors   = document.querySelectorAll('#tbl-donors tbody tr:not(.summary-row)').length;
+        const eligibleCount = [...document.querySelectorAll('#tbl-donors tbody tr:not(.summary-row)')]
+                                .filter(r => r.innerText.includes('Eligible')).length;
+        const deferredCount = totalDonors - eligibleCount;
+
+        const summaryBoxes = [
+            { label: 'Total Donors', value: totalDonors,   color: [139, 0, 0]    },
+            { label: 'Eligible',     value: eligibleCount, color: [26, 138, 74]  },
+            { label: 'Deferred',     value: deferredCount, color: [184, 134, 11] },
+        ];
+
+        const boxW = 55;
+        summaryBoxes.forEach((b, i) => {
+            const bx = margin + i * (boxW + 8);
+            doc.setFillColor(250, 245, 245);
+            doc.roundedRect(bx, boxY, boxW, 18, 2, 2, 'F');
+            doc.setDrawColor(...b.color);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(bx, boxY, boxW, 18, 2, 2, 'S');
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.setTextColor(...b.color);
+            doc.text(String(b.value), bx + boxW / 2, boxY + 10, { align: 'center' });
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            doc.setTextColor(100, 100, 100);
+            doc.text(b.label, bx + boxW / 2, boxY + 15, { align: 'center' });
+        });
+
+        // ── TABLE ──
+        const headers = ['#', 'Donor Name', 'Donor ID', 'Blood Group', 'Gender', 'Age', 'Contact', 'Last Donation', 'Total Donations', 'Eligibility'];
+        const rows = [];
+
+        document.querySelectorAll('#tbl-donors tbody tr:not(.summary-row)').forEach((tr, idx) => {
+            const tds = tr.querySelectorAll('td');
+            rows.push([
+                idx + 1,
+                tds[1].querySelector('div')?.innerText ?? tds[1].innerText,
+                tds[1].querySelector('div:last-child')?.innerText ?? '',
+                tds[2].innerText.trim(),
+                tds[3].innerText.trim(),
+                tds[4].innerText.trim(),
+                tds[5].innerText.trim(),
+                tds[6].innerText.trim(),
+                tds[7].innerText.trim(),
+                tds[8].innerText.trim(),
+            ]);
+        });
+
+        doc.autoTable({
+            startY: boxY + 24,
+            head: [headers],
+            body: rows,
+            margin: { left: margin, right: margin },
+            styles: { fontSize: 8, cellPadding: 3.5, textColor: [30, 30, 30] },
+            headStyles: {
+                fillColor: [139, 0, 0],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 8
+            },
+            alternateRowStyles: { fillColor: [255, 250, 250] },
+            bodyStyles: { lineWidth: 0.1, lineColor: [240, 220, 220] },
+            didParseCell: function(data) {
+                if (data.section === 'body' && data.column.index === 9) {
+                    const val = data.cell.raw;
+                    if (val === 'Eligible')  data.cell.styles.textColor = [26, 138, 74];
+                    if (val === 'Deferred')  data.cell.styles.textColor = [184, 134, 11];
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+        });
+
+        // ── FOOTER on every page ──
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= totalPages; p++) {
+            doc.setPage(p);
+            doc.setFillColor(245, 237, 237);
+            doc.rect(0, pageH - 10, pageW, 10, 'F');
+            doc.setFontSize(7);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Blood Bank Management System — Confidential', margin, pageH - 3);
+            doc.text(`Page ${p} of ${totalPages}`, pageW - margin, pageH - 3, { align: 'right' });
+        }
+
+        doc.save(`Donors_Report_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 </script>

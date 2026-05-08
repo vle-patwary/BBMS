@@ -56,7 +56,12 @@ namespace BBMS.Controllers
             model.InvoiceNumber = "INV-" + (count + 1).ToString("D6");
             model.RequestDate = DateTime.Now;
             model.Status = "Pending";
-            model.UnitsRequired = 1;
+
+            // DO NOT override Quantity here — it comes from the form
+            if (model.Quantity <= 0)
+                model.Quantity = 1;
+
+            model.TotalCost = model.Quantity * 165;
 
             _db.BloodRequests.Add(model);
             _db.SaveChanges();
@@ -148,6 +153,8 @@ namespace BBMS.Controllers
             r.Hospital = model.Hospital;
             r.ContactNumber = model.ContactNumber;
             r.Notes = model.Notes;
+            r.Quantity = model.Quantity <= 0 ? 1 : model.Quantity;
+            r.TotalCost = r.Quantity * 165;
 
             _db.SaveChanges();
             TempData["SuccessMessage"] = "Request updated successfully.";
@@ -190,7 +197,6 @@ namespace BBMS.Controllers
         // ─── STAFF CRUD ───────────────────────────────────────
         // ═══════════════════════════════════════════════════════
 
-        // LIST
         [HttpGet]
         public IActionResult ManageStaff(string search, string role, string status)
         {
@@ -212,15 +218,16 @@ namespace BBMS.Controllers
             ViewBag.ActiveStaff = _db.Staffs.Count(s => s.Status == "Active");
             ViewBag.OnLeave = _db.Staffs.Count(s => s.Status == "On Leave");
             ViewBag.Admins = _db.Staffs.Count(s => s.Role == "Admin");
+            ViewBag.Search = search;
+            ViewBag.Role = role;
+            ViewBag.Status = status;
 
             return View(query.OrderByDescending(s => s.JoinDate).ToList());
         }
 
-        // ADD — GET
         [HttpGet]
         public IActionResult AddStaff() => View(new Staff());
 
-        // ADD — POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddStaff(Staff model)
@@ -244,7 +251,6 @@ namespace BBMS.Controllers
             return RedirectToAction("ManageStaff");
         }
 
-        // EDIT — GET
         [HttpGet]
         public IActionResult EditStaff(int id)
         {
@@ -253,7 +259,6 @@ namespace BBMS.Controllers
             return View(staff);
         }
 
-        // EDIT — POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult EditStaff(Staff model)
@@ -277,7 +282,6 @@ namespace BBMS.Controllers
             staff.Status = model.Status;
             staff.JoinDate = model.JoinDate;
 
-            // Only update password if a new one was typed
             if (!string.IsNullOrWhiteSpace(model.Password))
                 staff.Password = model.Password;
 
@@ -286,7 +290,6 @@ namespace BBMS.Controllers
             return RedirectToAction("ManageStaff");
         }
 
-        // DELETE — POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteStaff(int id)
@@ -301,6 +304,113 @@ namespace BBMS.Controllers
             return RedirectToAction("ManageStaff");
         }
 
+        // ═══════════════════════════════════════════════════════
+        // ─── HOSPITAL CRUD ────────────────────────────────────
+        // ═══════════════════════════════════════════════════════
+
+        [HttpGet]
+        public IActionResult ManageHospital(string search)
+        {
+            var query = _db.Hospitals.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(h =>
+                    h.Name.Contains(search) ||
+                    h.Address.Contains(search) ||
+                    h.Contact.Contains(search) ||
+                    h.Email.Contains(search));
+
+            ViewBag.TotalHospitals = _db.Hospitals.Count();
+            ViewBag.ActiveHospitals = _db.Hospitals.Count(h => h.Status == "Active");
+            ViewBag.TotalCities = _db.Hospitals
+                                         .Where(h => h.Address != null && h.Address != "")
+                                         .Select(h => h.Address)
+                                         .Distinct()
+                                         .Count();
+            ViewBag.Search = search;
+
+            return View(query.OrderBy(h => h.Name).ToList());
+        }
+
+        [HttpGet]
+        public IActionResult AddHospital() => View(new Hospital());
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddHospital(Hospital model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (_db.Hospitals.Any(h => h.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "A hospital with this email already exists.");
+                return View(model);
+            }
+
+            model.Status = string.IsNullOrEmpty(model.Status) ? "Active" : model.Status;
+
+            _db.Hospitals.Add(model);
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Hospital added successfully!";
+            return RedirectToAction("ManageHospital");
+        }
+
+        [HttpGet]
+        public IActionResult EditHospital(int id)
+        {
+            var hospital = _db.Hospitals.Find(id);
+            if (hospital == null) return NotFound();
+            return View(hospital);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditHospital(Hospital model)
+        {
+            var hospital = _db.Hospitals.Find(model.Id);
+            if (hospital == null) return NotFound();
+
+            if (_db.Hospitals.Any(h => h.Email == model.Email && h.Id != model.Id))
+            {
+                ModelState.AddModelError("Email", "A hospital with this email already exists.");
+                return View(model);
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            hospital.Name = model.Name;
+            hospital.Email = model.Email;
+            hospital.Contact = model.Contact;
+            hospital.Address = model.Address;
+            hospital.Status = model.Status;
+
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = "Hospital updated successfully!";
+            return RedirectToAction("ManageHospital");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteHospital(int id)
+        {
+            var hospital = _db.Hospitals.Find(id);
+            if (hospital != null)
+            {
+                _db.Hospitals.Remove(hospital);
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Hospital deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Hospital not found.";
+            }
+            return RedirectToAction("ManageHospital");
+        }
+
+
         // ─── OTHER PAGES ──────────────────────────────────────
         public new IActionResult User() => View();
         public IActionResult Staff() => View();
@@ -310,13 +420,26 @@ namespace BBMS.Controllers
         public IActionResult TrackRequest() => View();
         public IActionResult ViewCollection() => View();
         public IActionResult ViewDonation() => View();
-        public IActionResult ManageHospital() => View();
         public IActionResult ManageBloodStock() => View();
         public IActionResult CheckRequest() => View();
-        public IActionResult AdminReports() => View();
+        public IActionResult AdminReports()
+        {
+            var donors = _db.DonateBloods
+                .OrderByDescending(d => d.CreatedAt)
+                .ToList();
+
+            ViewBag.DonorList = donors;
+            ViewBag.TotalDonors = donors.Count;
+            ViewBag.PendingRequests = _db.BloodRequests.Count(r => r.Status == "Pending");
+            ViewBag.ActiveStaff = _db.Staffs.Count(s => s.Status == "Active");
+            ViewBag.TotalHospitals = _db.Hospitals.Count();
+
+            return View();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() =>
             View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
     }
 }
