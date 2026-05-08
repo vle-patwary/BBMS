@@ -1,0 +1,391 @@
+﻿@model BBMS.Models.Hospital
+@{
+    ViewData["Title"] = "Add Hospital";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    .dashboard {
+        width: 92%;
+        max-width: 680px;
+        margin: 32px auto 50px;
+    }
+
+    .header {
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 28px;
+    }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-right {
+        z-index: 1;
+    }
+
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffb3b3;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+    .form-card {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        background: #8b0000;
+        color: white;
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .form-body {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        label i {
+            color: #8b0000;
+            font-size: 11px;
+        }
+
+        label .req {
+            color: #8b0000;
+        }
+
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="number"], select, textarea {
+        padding: 10px 13px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        outline: none;
+        font-family: inherit;
+        width: 100%;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #8b0000;
+            box-shadow: 0 0 0 3px rgba(139,0,0,0.07);
+            background: white;
+        }
+
+    .input-validation-error {
+        border-color: #e53935 !important;
+        box-shadow: 0 0 0 3px rgba(229,57,53,0.08) !important;
+    }
+
+    .field-validation-error {
+        font-size: 11px;
+        color: #e53935;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 75px;
+    }
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 20px 28px;
+        border-top: 1px solid #f5eded;
+        background: #fffafa;
+    }
+
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 26px;
+        border-radius: 8px;
+        border: none;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 4px 12px rgba(139,0,0,0.25);
+        transition: all 0.2s;
+    }
+
+        .btn-submit:hover {
+            background: #6e0000;
+        }
+
+    .alert {
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .alert-danger {
+        background: #fff0f0;
+        color: #8b0000;
+        border: 1px solid #f5c0c0;
+    }
+
+    @@media (max-width:560px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="dashboard">
+
+    <div class="header">
+        <div class="header-left">
+            <h2><i class="fa-solid fa-hospital" style="margin-right:10px"></i>Add New Hospital</h2>
+            <p>Register a new partner hospital to the system</p>
+        </div>
+        <div class="header-right">
+            <a asp-controller="Home" asp-action="ManageHospital" class="btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <form asp-controller="Home" asp-action="AddHospital" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fa-solid fa-clipboard-list"></i> Hospital Details
+            </div>
+
+            <div class="form-body">
+
+                <!-- Hospital Name -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-hospital"></i> Hospital Name <span class="req">*</span></label>
+                    <input asp-for="Name" placeholder="e.g. Dhaka Medical College Hospital" />
+                    <span asp-validation-for="Name" class="field-validation-error"></span>
+                </div>
+
+                <!-- Type + Location -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-tag"></i> Type <span class="req">*</span></label>
+                        <select asp-for="Type">
+                            <option value="">— Select Type —</option>
+                            <option value="Government">Government</option>
+                            <option value="Private">Private</option>
+                            <option value="NGO">NGO</option>
+                        </select>
+                        <span asp-validation-for="Type" class="field-validation-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-location-dot"></i> Location <span class="req">*</span></label>
+                        <input asp-for="Location" placeholder="e.g. Dhaka" />
+                        <span asp-validation-for="Location" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <!-- Contact Person + Phone -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user-doctor"></i> Contact Person <span class="req">*</span></label>
+                        <input asp-for="ContactPerson" placeholder="e.g. Dr. Rahman" />
+                        <span asp-validation-for="ContactPerson" class="field-validation-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-phone"></i> Phone <span class="req">*</span></label>
+                        <input asp-for="Phone" placeholder="e.g. 02-1234567" />
+                        <span asp-validation-for="Phone" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <!-- Email + Status -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+                        <input asp-for="Email" placeholder="e.g. info@hospital.com" />
+                        <span asp-validation-for="Email" class="field-validation-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-toggle-on"></i> Status</label>
+                        <select asp-for="Status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Pending Approval">Pending Approval</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Requests + Units Supplied -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-file-medical"></i> Total Requests</label>
+                        <input asp-for="Requests" type="number" min="0" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-droplet"></i> Units Supplied</label>
+                        <input asp-for="UnitsSupplied" type="number" min="0" placeholder="0" />
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-note-sticky"></i> Notes</label>
+                    <textarea asp-for="Notes" placeholder="Any additional information about the hospital…"></textarea>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a asp-controller="Home" asp-action="ManageHospital" class="btn-cancel">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </a>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Hospital
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

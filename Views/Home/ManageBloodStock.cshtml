@@ -2,182 +2,1068 @@
     ViewData["Title"] = "Manage Blood Stock";
 }
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
     body {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
+        font-family: 'Segoe UI', sans-serif;
         background: #f4f6f9;
     }
 
-    /* Main Container */
-    .container {
-        max-width: 850px;
-        margin: 50px auto;
-        background: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    .dashboard {
+        width: 92%;
+        margin: 32px auto 50px;
     }
 
-    /* Header */
+    /* ── HEADER ── */
     .header {
-        background: linear-gradient(135deg, #b30000, #ff4d4d);
+        background: #8b0000;
         color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        margin-bottom: 25px;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 26px;
     }
 
-        .header h2 {
-            margin: 0;
-            font-size: 22px;
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
         }
 
-        .header p {
-            margin-top: 5px;
-            font-size: 14px;
-            opacity: 0.9;
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
         }
 
-    /* Table Alignment Fix */
-    .table-wrapper {
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-right {
         display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1;
+    }
+
+    .header-stat {
+        text-align: center;
+    }
+
+        .header-stat .val {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .header-stat .lbl {
+            font-size: 11px;
+            color: #ffb3b3;
+            margin-top: 2px;
+        }
+
+    .h-divider {
+        width: 1px;
+        height: 40px;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffb3b3;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
+
+    /* ── STAT CARDS ── */
+    .stat-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 140px;
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-top: 4px solid #8b0000;
+        border-radius: 10px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        background: #fff0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .sc-icon i {
+            color: #8b0000;
+            font-size: 17px;
+        }
+
+    .sc-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: #8b0000;
+    }
+
+    .sc-lbl {
+        font-size: 12px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .search-wrap {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 9px 12px 9px 34px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+            font-family: inherit;
+        }
+
+            .search-wrap input:focus {
+                border-color: #8b0000;
+            }
+
+    .toolbar select {
+        padding: 9px 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        outline: none;
+        font-family: inherit;
+    }
+
+    .btn-add {
+        background: #8b0000;
+        color: white;
+        padding: 9px 18px;
+        border-radius: 8px;
+        border: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: inherit;
+        text-decoration: none;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+        .btn-add:hover {
+            background: #6e0000;
+        }
+
+    /* ── TABLE SECTION ── */
+    .table-section {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+
+    .table-section-header {
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f5eded;
+    }
+
+        .table-section-header span {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+    .record-count {
+        font-size: 12px;
+        background: #fff0f0;
+        color: #8b0000;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
     }
 
     table {
         width: 100%;
-        max-width: 750px;
         border-collapse: collapse;
     }
 
-    th, td {
-        padding: 12px;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-        font-size: 14px;
-    }
-
-    th {
-        background: #b30000;
+    thead th {
+        background: #8b0000;
         color: white;
-    }
-
-    tr:hover {
-        background: #f9f9f9;
-    }
-
-    /* Status */
-    .good {
-        color: green;
+        padding: 12px 16px;
+        font-size: 12px;
         font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
     }
 
-    .low {
-        color: orange;
-        font-weight: 600;
+    tbody td {
+        padding: 13px 16px;
+        border-bottom: 1px solid #f5eded;
+        font-size: 13px;
+        color: #333;
+        vertical-align: middle;
     }
 
-    .critical {
-        color: red;
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fff8f8;
+    }
+
+    /* ── BLOOD GROUP CELL ── */
+    .blood-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .blood-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 800;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .blood-group-name {
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 15px;
+    }
+
+    .blood-group-sub {
+        font-size: 11px;
+        color: #aaa;
+        margin-top: 1px;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .units-cell {
+        min-width: 140px;
+    }
+
+    .units-val {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+    }
+
+    .progress-bar-wrap {
+        height: 6px;
+        background: #f0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.4s;
+    }
+
+    .bar-good {
+        background: #1a8a4a;
+    }
+
+    .bar-low {
+        background: #b8860b;
+    }
+
+    .bar-critical {
+        background: #8b0000;
+    }
+
+    /* ── STATUS BADGES ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 20px;
+        font-size: 11px;
         font-weight: 700;
     }
 
-    /* Buttons */
-    .btn {
-        padding: 8px 16px;
-        border: none;
+    .status-good {
+        background: #e6f9ef;
+        color: #1a8a4a;
+    }
+
+    .status-low {
+        background: #fff8e1;
+        color: #b8860b;
+    }
+
+    .status-critical {
+        background: #fff0f0;
+        color: #8b0000;
+    }
+
+    /* ── ACTIONS ── */
+    .actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
         border-radius: 6px;
-        cursor: pointer;
-        font-size: 13px;
+        font-size: 12px;
+        font-weight: 600;
         text-decoration: none;
-        display: inline-block;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition: all 0.15s;
     }
 
     .btn-update {
-        background: #b30000;
-        color: white;
+        background: #e8f4fd;
+        color: #1565c0;
     }
 
         .btn-update:hover {
-            background: #ff3333;
+            background: #1565c0;
+            color: white;
         }
 
-    .btn-back {
-        background: #ccc;
-        color: #333;
-        margin-top: 25px;
+    .btn-history {
+        background: #f3f3f3;
+        color: #555;
     }
 
-        .btn-back:hover {
-            background: #bbb;
+        .btn-history:hover {
+            background: #555;
+            color: white;
         }
 
-    .btn-group {
-        text-align: center;
+    /* ── UPDATE MODAL ── */
+    .modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+    .modal-box {
+        background: white;
+        border-radius: 12px;
+        width: 420px;
+        max-width: 95vw;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: #8b0000;
+        color: white;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .modal-header-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.7);
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+    .modal-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .modal-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .modal-group label i {
+                color: #8b0000;
+                font-size: 11px;
+            }
+
+        .modal-group input, .modal-group select {
+            padding: 10px 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+            font-family: inherit;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+            .modal-group input:focus, .modal-group select:focus {
+                border-color: #8b0000;
+                box-shadow: 0 0 0 3px rgba(139,0,0,0.07);
+                background: white;
+            }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #f5eded;
+        background: #fffafa;
+    }
+
+    .btn-cancel-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .btn-cancel-modal:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-save-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 22px;
+        border-radius: 8px;
+        border: none;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 4px 12px rgba(139,0,0,0.25);
+    }
+
+        .btn-save-modal:hover {
+            background: #6e0000;
+        }
+
+    @@media (max-width: 700px) {
+        .stat-row {
+            flex-direction: column;
+        }
+
+        .actions {
+            flex-wrap: wrap;
+        }
     }
 </style>
 
-<div class="container">
+<div class="dashboard">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <div class="header">
-        <h2>Manage Blood Stock</h2>
-        <p>Monitor and manage available blood units</p>
+        <div class="header-left">
+            <h2><i class="fa-solid fa-droplet" style="margin-right:10px"></i>Manage Blood Stock</h2>
+            <p>Monitor and update available blood unit inventory</p>
+        </div>
+        <div class="header-right">
+            <div class="header-stat">
+                <div class="val">8</div><div class="lbl">Blood Groups</div>
+            </div>
+            <div class="h-divider"></div>
+            <div class="header-stat">
+                <div class="val" id="hdr-total">220</div><div class="lbl">Total Units</div>
+            </div>
+            <div class="h-divider"></div>
+            <div class="header-stat">
+                <div class="val" id="hdr-critical">2</div><div class="lbl">Critical</div>
+            </div>
+            <div class="h-divider"></div>
+            <a asp-controller="Home" asp-action="Admin" class="btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
     </div>
 
-    <!-- Table -->
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Blood Group</th>
-                    <th>Available Units</th>
-                    <th>Status</th>
-                    <th>Last Updated</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr>
-                    <td>A+</td>
-                    <td>50</td>
-                    <td class="good">Sufficient</td>
-                    <td>10 Apr 2026</td>
-                    <td><button class="btn btn-update">Update</button></td>
-                </tr>
-
-                <tr>
-                    <td>B+</td>
-                    <td>20</td>
-                    <td class="low">Low Stock</td>
-                    <td>09 Apr 2026</td>
-                    <td><button class="btn btn-update">Update</button></td>
-                </tr>
-
-                <tr>
-                    <td>O+</td>
-                    <td>70</td>
-                    <td class="good">Sufficient</td>
-                    <td>11 Apr 2026</td>
-                    <td><button class="btn btn-update">Update</button></td>
-                </tr>
-
-                <tr>
-                    <td>AB-</td>
-                    <td>10</td>
-                    <td class="critical">Critical</td>
-                    <td>08 Apr 2026</td>
-                    <td><button class="btn btn-update">Update</button></td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- STAT CARDS -->
+    <div class="section-title">Overview</div>
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-droplet"></i></div>
+            <div><div class="sc-val" id="stat-total">220</div><div class="sc-lbl">Total Units</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div><div class="sc-val" id="stat-sufficient">4</div><div class="sc-lbl">Sufficient Groups</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-clock"></i></div>
+            <div><div class="sc-val" id="stat-low">2</div><div class="sc-lbl">Low Stock</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div><div class="sc-val" id="stat-critical">2</div><div class="sc-lbl">Critical</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div><div class="sc-val">Today</div><div class="sc-lbl">Last Updated</div></div>
+        </div>
     </div>
 
-    <!-- Back Button -->
-    <div class="btn-group">
-        <a asp-controller="Home" asp-action="Admin" class="btn btn-back">Back</a>
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search blood group…" oninput="filterTable()">
+        </div>
+        <select id="statusFilter" onchange="filterTable()">
+            <option value="">All Status</option>
+            <option value="sufficient">Sufficient</option>
+            <option value="low">Low Stock</option>
+            <option value="critical">Critical</option>
+        </select>
+        <button class="btn-add" onclick="openAddModal()">
+            <i class="fa-solid fa-plus"></i> Add Stock Entry
+        </button>
     </div>
 
+    <!-- TABLE -->
+    <div class="table-section">
+        <div class="table-section-header">
+            <span><i class="fa-solid fa-list" style="color:#8b0000;margin-right:8px"></i>Blood Inventory</span>
+            <span class="record-count" id="recordCount">8 records</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Blood Group</th>
+                        <th>Available Units</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="stockBody">
+
+                    <tr data-group="A+" data-units="50" data-status="sufficient">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar">A+</div>
+                                <div>
+                                    <div class="blood-group-name">A Positive</div>
+                                    <div class="blood-group-sub">Universal donor compatible</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">50 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-good" style="width:67%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
+                        <td>10 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('A+', 50, '10 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="A-" data-units="25" data-status="low">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar" style="background:#b8860b">A-</div>
+                                <div>
+                                    <div class="blood-group-name">A Negative</div>
+                                    <div class="blood-group-sub">Rare type</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">25 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-low" style="width:33%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-low"><i class="fa-solid fa-clock"></i> Low Stock</span></td>
+                        <td>09 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('A-', 25, '09 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="B+" data-units="20" data-status="low">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar" style="background:#b8860b">B+</div>
+                                <div>
+                                    <div class="blood-group-name">B Positive</div>
+                                    <div class="blood-group-sub">Common type</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">20 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-low" style="width:27%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-low"><i class="fa-solid fa-clock"></i> Low Stock</span></td>
+                        <td>09 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('B+', 20, '09 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="B-" data-units="8" data-status="critical">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar" style="background:#6e0000">B-</div>
+                                <div>
+                                    <div class="blood-group-name">B Negative</div>
+                                    <div class="blood-group-sub">Very rare</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">8 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-critical" style="width:11%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-critical"><i class="fa-solid fa-triangle-exclamation"></i> Critical</span></td>
+                        <td>07 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('B-', 8, '07 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="O+" data-units="70" data-status="sufficient">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar">O+</div>
+                                <div>
+                                    <div class="blood-group-name">O Positive</div>
+                                    <div class="blood-group-sub">Most common</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">70 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-good" style="width:93%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
+                        <td>11 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('O+', 70, '11 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="O-" data-units="35" data-status="sufficient">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar">O-</div>
+                                <div>
+                                    <div class="blood-group-name">O Negative</div>
+                                    <div class="blood-group-sub">Universal donor</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">35 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-good" style="width:47%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
+                        <td>10 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('O-', 35, '10 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="AB+" data-units="40" data-status="sufficient">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar">AB+</div>
+                                <div>
+                                    <div class="blood-group-name">AB Positive</div>
+                                    <div class="blood-group-sub">Universal recipient</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">40 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-good" style="width:53%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
+                        <td>11 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('AB+', 40, '11 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr data-group="AB-" data-units="10" data-status="critical">
+                        <td>
+                            <div class="blood-cell">
+                                <div class="blood-avatar" style="background:#6e0000">AB-</div>
+                                <div>
+                                    <div class="blood-group-name">AB Negative</div>
+                                    <div class="blood-group-sub">Rarest blood type</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="units-cell">
+                            <div class="units-val">10 units</div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar bar-critical" style="width:13%"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-critical"><i class="fa-solid fa-triangle-exclamation"></i> Critical</span></td>
+                        <td>08 Apr 2026</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-update" onclick="openUpdateModal('AB-', 10, '08 Apr 2026')">
+                                    <i class="fa-solid fa-pen"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:14px 22px; border-top:1px solid #f5eded; font-size:13px; color:#888;">
+            Showing <span id="pageInfo">8</span> blood group entries
+        </div>
+    </div>
 </div>
+
+<!-- UPDATE MODAL -->
+<div class="modal-backdrop" id="updateModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-header-title">
+                <i class="fa-solid fa-droplet"></i>
+                <span id="modalGroupTitle">Update Stock</span>
+            </span>
+            <button class="modal-close" onclick="closeUpdateModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-group">
+                <label><i class="fa-solid fa-droplet"></i> Blood Group</label>
+                <input type="text" id="modal-group" readonly style="background:#f0f0f0; color:#888;">
+            </div>
+            <div class="modal-group">
+                <label><i class="fa-solid fa-flask"></i> Available Units <span style="color:#8b0000">*</span></label>
+                <input type="number" id="modal-units" min="0" placeholder="Enter unit count">
+            </div>
+            <div class="modal-group">
+                <label><i class="fa-solid fa-toggle-on"></i> Status</label>
+                <select id="modal-status">
+                    <option value="sufficient">Sufficient</option>
+                    <option value="low">Low Stock</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel-modal" onclick="closeUpdateModal()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <button class="btn-save-modal" onclick="saveUpdate()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── FILTER ────────────────────────────────────
+    function filterTable() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value.toLowerCase();
+        const rows   = document.querySelectorAll('#stockBody tr');
+        let visible  = 0;
+
+        rows.forEach(row => {
+            const group     = (row.dataset.group  || '').toLowerCase();
+            const rowStatus = (row.dataset.status || '').toLowerCase();
+            const ok = (!search || group.includes(search))
+                    && (!status || rowStatus === status);
+            row.style.display = ok ? '' : 'none';
+            if (ok) visible++;
+        });
+
+        document.getElementById('recordCount').innerText = visible + ' record' + (visible !== 1 ? 's' : '');
+        document.getElementById('pageInfo').innerText    = visible;
+    }
+
+    // ── UPDATE MODAL ──────────────────────────────
+    function openUpdateModal(group, units, date) {
+        document.getElementById('modalGroupTitle').innerText = 'Update – ' + group;
+        document.getElementById('modal-group').value         = group;
+        document.getElementById('modal-units').value         = units;
+
+        const statusEl = document.getElementById('modal-status');
+        if      (units >= 30) statusEl.value = 'sufficient';
+        else if (units >= 15) statusEl.value = 'low';
+        else                  statusEl.value = 'critical';
+
+        document.getElementById('updateModal').classList.add('show');
+    }
+
+    function closeUpdateModal() {
+        document.getElementById('updateModal').classList.remove('show');
+    }
+
+    function saveUpdate() {
+        closeUpdateModal();
+        showToast('Blood stock updated successfully!');
+    }
+
+    // ── ADD MODAL (reuse update modal) ────────────
+    function openAddModal() {
+        document.getElementById('modalGroupTitle').innerText = 'Add Stock Entry';
+        document.getElementById('modal-group').value         = '';
+        document.getElementById('modal-group').removeAttribute('readonly');
+        document.getElementById('modal-group').style.background = '';
+        document.getElementById('modal-group').style.color = '';
+        document.getElementById('modal-units').value         = '';
+        document.getElementById('modal-status').value        = 'sufficient';
+        document.getElementById('updateModal').classList.add('show');
+    }
+
+    // ── BACKDROP CLICK ────────────────────────────
+    document.getElementById('updateModal').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('show');
+    });
+
+    // ── TOAST ─────────────────────────────────────
+    function showToast(msg) {
+        let t = document.getElementById('globalToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'globalToast';
+            t.style.cssText = [
+                'position:fixed','bottom:28px','right:28px',
+                'background:#1a8a4a','color:white',
+                'padding:14px 22px','border-radius:10px',
+                'font-size:13px','font-weight:600',
+                'display:flex','align-items:center','gap:10px',
+                'box-shadow:0 8px 28px rgba(0,0,0,0.18)',
+                "font-family:'Segoe UI',sans-serif",
+                'transform:translateY(80px)','opacity:0',
+                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)',
+                'z-index:9999'
+            ].join(';');
+            document.body.appendChild(t);
+        }
+        t.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + msg;
+        setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
+        setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3200);
+    }
+</script>

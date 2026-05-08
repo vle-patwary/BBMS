@@ -309,25 +309,31 @@ namespace BBMS.Controllers
         // ═══════════════════════════════════════════════════════
 
         [HttpGet]
-        public IActionResult ManageHospital(string search)
+        public IActionResult ManageHospital(string search, string type, string status)
         {
             var query = _db.Hospitals.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
                 query = query.Where(h =>
                     h.Name.Contains(search) ||
-                    h.Address.Contains(search) ||
-                    h.Contact.Contains(search) ||
-                    h.Email.Contains(search));
+                    h.Location.Contains(search) ||
+                    h.ContactPerson.Contains(search) ||
+                    h.Phone.Contains(search));
+
+            if (!string.IsNullOrEmpty(type))
+                query = query.Where(h => h.Type == type);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(h => h.Status == status);
 
             ViewBag.TotalHospitals = _db.Hospitals.Count();
             ViewBag.ActiveHospitals = _db.Hospitals.Count(h => h.Status == "Active");
-            ViewBag.TotalCities = _db.Hospitals
-                                         .Where(h => h.Address != null && h.Address != "")
-                                         .Select(h => h.Address)
-                                         .Distinct()
-                                         .Count();
+            ViewBag.PendingHospitals = _db.Hospitals.Count(h => h.Status == "Pending Approval");
+            ViewBag.TotalUnits = _db.Hospitals.Sum(h => (int?)h.UnitsSupplied) ?? 0;
+            ViewBag.TotalRequests = _db.Hospitals.Sum(h => (int?)h.Requests) ?? 0;
             ViewBag.Search = search;
+            ViewBag.Type = type;
+            ViewBag.Status = status;
 
             return View(query.OrderBy(h => h.Name).ToList());
         }
@@ -342,12 +348,18 @@ namespace BBMS.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            if (_db.Hospitals.Any(h => h.Email == model.Email))
+            // Duplicate email check (only if email was provided)
+            if (!string.IsNullOrEmpty(model.Email) &&
+                _db.Hospitals.Any(h => h.Email == model.Email))
             {
                 ModelState.AddModelError("Email", "A hospital with this email already exists.");
                 return View(model);
             }
 
+            // Auto-generate HospitalCode: HSP-0001, HSP-0002, …
+            int count = _db.Hospitals.Count();
+            model.HospitalCode = "HSP-" + (count + 1).ToString("D4");
+            model.CreatedAt = DateTime.Now;
             model.Status = string.IsNullOrEmpty(model.Status) ? "Active" : model.Status;
 
             _db.Hospitals.Add(model);
@@ -372,7 +384,8 @@ namespace BBMS.Controllers
             var hospital = _db.Hospitals.Find(model.Id);
             if (hospital == null) return NotFound();
 
-            if (_db.Hospitals.Any(h => h.Email == model.Email && h.Id != model.Id))
+            if (!string.IsNullOrEmpty(model.Email) &&
+                _db.Hospitals.Any(h => h.Email == model.Email && h.Id != model.Id))
             {
                 ModelState.AddModelError("Email", "A hospital with this email already exists.");
                 return View(model);
@@ -382,10 +395,15 @@ namespace BBMS.Controllers
                 return View(model);
 
             hospital.Name = model.Name;
+            hospital.Type = model.Type;
+            hospital.Location = model.Location;
+            hospital.ContactPerson = model.ContactPerson;
+            hospital.Phone = model.Phone;
             hospital.Email = model.Email;
-            hospital.Contact = model.Contact;
-            hospital.Address = model.Address;
             hospital.Status = model.Status;
+            hospital.Requests = model.Requests;
+            hospital.UnitsSupplied = model.UnitsSupplied;
+            hospital.Notes = model.Notes;
 
             _db.SaveChanges();
             TempData["SuccessMessage"] = "Hospital updated successfully!";
@@ -422,6 +440,7 @@ namespace BBMS.Controllers
         public IActionResult ViewDonation() => View();
         public IActionResult ManageBloodStock() => View();
         public IActionResult CheckRequest() => View();
+       
         public IActionResult AdminReports()
         {
             var donors = _db.DonateBloods

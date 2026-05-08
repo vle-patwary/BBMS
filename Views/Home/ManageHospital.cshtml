@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<BBMS.Models.Hospital>
-
 @{
-    ViewData["Title"] = "Manage Hospital";
+    ViewData["Title"] = "Manage Hospitals";
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -20,9 +19,10 @@
 
     .dashboard {
         width: 92%;
-        margin: 32px auto;
+        margin: 32px auto 50px;
     }
 
+    /* HEADER */
     .header {
         background: #8b0000;
         color: white;
@@ -61,6 +61,7 @@
     .header-left h2 {
         font-size: 22px;
         font-weight: 700;
+        color: #fff;
         margin-bottom: 5px;
     }
 
@@ -76,19 +77,17 @@
         z-index: 1;
     }
 
-    .header-stat {
-        text-align: center;
+    .header-stat .val {
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
     }
 
-        .header-stat .val {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .header-stat .lbl {
-            font-size: 11px;
-            color: #ffb3b3;
-        }
+    .header-stat .lbl {
+        font-size: 11px;
+        color: #ffb3b3;
+        margin-top: 2px;
+    }
 
     .h-divider {
         width: 1px;
@@ -108,36 +107,14 @@
         font-size: 13px;
         font-weight: 600;
         text-decoration: none;
-        transition: .2s;
+        transition: background 0.2s;
     }
 
         .btn-ghost:hover {
             background: rgba(255,255,255,0.18);
         }
 
-    .alert {
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
-    }
-
-    .alert-success {
-        background: #e6f9ef;
-        color: #1a8a4a;
-        border: 1px solid #b7ecd0;
-    }
-
-    .alert-danger {
-        background: #fff0f0;
-        color: #8b0000;
-        border: 1px solid #f5c0c0;
-    }
-
+    /* SECTION TITLE */
     .section-title {
         font-size: 15px;
         font-weight: 700;
@@ -150,12 +127,14 @@
 
         .section-title::before {
             content: '';
+            display: block;
             width: 4px;
             height: 16px;
             background: #8b0000;
             border-radius: 2px;
         }
 
+    /* STAT CARDS */
     .stat-row {
         display: flex;
         gap: 16px;
@@ -165,7 +144,7 @@
 
     .stat-card {
         flex: 1;
-        min-width: 160px;
+        min-width: 140px;
         background: white;
         border: 1px solid #f0e0e0;
         border-top: 4px solid #8b0000;
@@ -179,11 +158,12 @@
     .sc-icon {
         width: 44px;
         height: 44px;
-        border-radius: 50%;
         background: #fff0f0;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
     }
 
         .sc-icon i {
@@ -200,14 +180,17 @@
     .sc-lbl {
         font-size: 12px;
         color: #888;
+        margin-top: 2px;
     }
 
+    /* TOOLBAR */
     .toolbar {
         background: white;
         border: 1px solid #f0e0e0;
         border-radius: 10px;
         padding: 16px 22px;
         display: flex;
+        align-items: center;
         flex-wrap: wrap;
         gap: 12px;
         margin-bottom: 20px;
@@ -215,7 +198,7 @@
 
     .search-wrap {
         flex: 1;
-        min-width: 220px;
+        min-width: 200px;
         position: relative;
     }
 
@@ -233,14 +216,27 @@
             padding: 9px 12px 9px 34px;
             border: 1px solid #ddd;
             border-radius: 7px;
-            background: #fafafa;
             font-size: 13px;
+            color: #333;
+            background: #fafafa;
             outline: none;
+            font-family: inherit;
         }
 
             .search-wrap input:focus {
                 border-color: #8b0000;
             }
+
+    .toolbar select {
+        padding: 9px 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        outline: none;
+        font-family: inherit;
+    }
 
     .btn-add {
         background: #8b0000;
@@ -254,14 +250,17 @@
         display: inline-flex;
         align-items: center;
         gap: 7px;
+        font-family: inherit;
         text-decoration: none;
-        transition: .2s;
+        transition: background 0.2s;
+        white-space: nowrap;
     }
 
         .btn-add:hover {
             background: #6e0000;
         }
 
+    /* TABLE */
     .table-section {
         background: white;
         border: 1px solid #f0e0e0;
@@ -273,23 +272,24 @@
     .table-section-header {
         padding: 16px 22px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         border-bottom: 1px solid #f5eded;
     }
 
         .table-section-header span {
             font-size: 14px;
             font-weight: 700;
+            color: #1a1a1a;
         }
 
     .record-count {
         font-size: 12px;
         background: #fff0f0;
         color: #8b0000;
-        padding: 4px 10px;
-        border-radius: 20px;
         font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
     }
 
     .table-wrap {
@@ -306,7 +306,9 @@
         color: white;
         padding: 12px 16px;
         font-size: 12px;
+        font-weight: 600;
         text-align: left;
+        white-space: nowrap;
     }
 
     tbody td {
@@ -317,26 +319,33 @@
         vertical-align: middle;
     }
 
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
     tbody tr:hover td {
         background: #fff8f8;
     }
 
+    /* HOSPITAL CELL */
     .hospital-cell {
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
-    .hospital-icon {
+    .hospital-avatar {
         width: 38px;
         height: 38px;
-        border-radius: 50%;
+        border-radius: 8px;
         background: #8b0000;
         color: white;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
     }
 
     .hospital-name {
@@ -346,9 +355,11 @@
 
     .hospital-id {
         font-size: 11px;
-        color: #999;
+        color: #aaa;
+        margin-top: 1px;
     }
 
+    /* BADGES */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -369,9 +380,41 @@
         color: #777;
     }
 
+    .status-pending {
+        background: #fff8e1;
+        color: #b8860b;
+    }
+
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .type-govt {
+        background: #e8f4fd;
+        color: #1565c0;
+    }
+
+    .type-private {
+        background: #fff0f0;
+        color: #8b0000;
+    }
+
+    .type-ngo {
+        background: #e6f9ef;
+        color: #1a8a4a;
+    }
+
+    /* ACTIONS */
     .actions {
         display: flex;
         gap: 6px;
+        align-items: center;
     }
 
     .action-btn {
@@ -382,10 +425,11 @@
         border-radius: 6px;
         font-size: 12px;
         font-weight: 600;
-        border: none;
-        cursor: pointer;
         text-decoration: none;
-        transition: .2s;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition: all 0.15s;
     }
 
     .btn-edit {
@@ -408,49 +452,55 @@
             color: white;
         }
 
-    .empty-state {
-        text-align: center;
-        padding: 50px 20px;
-        color: #bbb;
-    }
-
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 12px;
-            color: #e0c0c0;
-            display: block;
-        }
-
-    .pagination {
-        padding: 14px 22px;
-        border-top: 1px solid #f5eded;
+    /* ALERTS */
+    .alert {
+        padding: 12px 18px;
+        border-radius: 8px;
         font-size: 13px;
-        color: #888;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
     }
 
-    .modal-backdrop {
+    .alert-success {
+        background: #e6f9ef;
+        color: #1a8a4a;
+        border: 1px solid #b2dfcc;
+    }
+
+    .alert-danger {
+        background: #fff0f0;
+        color: #8b0000;
+        border: 1px solid #f5c0c0;
+    }
+
+    /* DELETE MODAL */
+    .del-modal-backdrop {
         display: none;
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.45);
-        z-index: 999;
+        z-index: 1000;
         align-items: center;
         justify-content: center;
     }
 
-        .modal-backdrop.show {
+        .del-modal-backdrop.show {
             display: flex;
         }
 
-    .modal-box {
+    .del-modal-box {
         background: white;
         border-radius: 12px;
         padding: 32px 28px;
         width: 360px;
         text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
 
-    .modal-icon {
+    .del-icon {
         width: 56px;
         height: 56px;
         border-radius: 50%;
@@ -461,352 +511,288 @@
         justify-content: center;
     }
 
-        .modal-icon i {
+        .del-icon i {
             color: #8b0000;
             font-size: 22px;
         }
 
-    .modal-box h3 {
+    .del-modal-box h3 {
+        font-size: 17px;
+        color: #1a1a1a;
         margin-bottom: 8px;
     }
 
-    .modal-box p {
+    .del-modal-box p {
         font-size: 13px;
         color: #777;
         margin-bottom: 24px;
     }
 
-    .modal-actions {
+    .del-actions {
         display: flex;
         gap: 10px;
         justify-content: center;
     }
 
-    .btn-modal-cancel {
+    .btn-del-cancel {
         padding: 9px 22px;
         border-radius: 7px;
         border: 1px solid #ddd;
         background: white;
+        font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
+        color: #555;
     }
 
-    .btn-modal-delete {
+    .btn-del-confirm {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         padding: 9px 22px;
         border-radius: 7px;
         border: none;
         background: #8b0000;
         color: white;
+        font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
+    }
+
+    @@media (max-width:700px) {
+        .stat-row {
+            flex-direction: column;
+        }
+
+        .actions {
+            flex-wrap: wrap;
+        }
     }
 </style>
 
 <div class="dashboard">
 
+    <!-- ALERTS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
     <!-- HEADER -->
     <div class="header">
         <div class="header-left">
-            <h2>
-                <i class="fa-solid fa-hospital" style="margin-right:10px"></i>
-                Manage Hospital
-            </h2>
-            <p>Add, edit, and manage all hospital information</p>
+            <h2><i class="fa-solid fa-building" style="margin-right:10px"></i>Manage Hospitals</h2>
+            <p>Add, edit, and manage all partner hospitals</p>
         </div>
-
         <div class="header-right">
             <div class="header-stat">
                 <div class="val">@ViewBag.TotalHospitals</div>
                 <div class="lbl">Total</div>
             </div>
-
             <div class="h-divider"></div>
-
             <div class="header-stat">
                 <div class="val">@ViewBag.ActiveHospitals</div>
                 <div class="lbl">Active</div>
             </div>
-
             <div class="h-divider"></div>
-
+            <div class="header-stat">
+                <div class="val">@ViewBag.PendingHospitals</div>
+                <div class="lbl">Pending</div>
+            </div>
+            <div class="h-divider"></div>
             <a asp-controller="Home" asp-action="Admin" class="btn-ghost">
                 <i class="fa-solid fa-arrow-left"></i> Back
             </a>
         </div>
     </div>
 
-    <!-- ALERTS -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            <i class="fa-solid fa-circle-check"></i>
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            @TempData["ErrorMessage"]
-        </div>
-    }
-
-    <!-- STATISTICS -->
+    <!-- STAT CARDS -->
     <div class="section-title">Overview</div>
-
     <div class="stat-row">
         <div class="stat-card">
-            <div class="sc-icon">
-                <i class="fa-solid fa-hospital"></i>
-            </div>
-            <div>
-                <div class="sc-val">@ViewBag.TotalHospitals</div>
-                <div class="sc-lbl">Total Hospitals</div>
-            </div>
+            <div class="sc-icon"><i class="fa-solid fa-hospital"></i></div>
+            <div><div class="sc-val">@ViewBag.TotalHospitals</div><div class="sc-lbl">Total Hospitals</div></div>
         </div>
-
         <div class="stat-card">
-            <div class="sc-icon">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <div>
-                <div class="sc-val">@ViewBag.ActiveHospitals</div>
-                <div class="sc-lbl">Active Hospitals</div>
-            </div>
+            <div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div><div class="sc-val">@ViewBag.ActiveHospitals</div><div class="sc-lbl">Active</div></div>
         </div>
-
         <div class="stat-card">
-            <div class="sc-icon">
-                <i class="fa-solid fa-location-dot"></i>
-            </div>
-            <div>
-                <div class="sc-val">@ViewBag.TotalCities</div>
-                <div class="sc-lbl">Cities Covered</div>
-            </div>
+            <div class="sc-icon"><i class="fa-solid fa-clock"></i></div>
+            <div><div class="sc-val">@ViewBag.PendingHospitals</div><div class="sc-lbl">Pending Approval</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-droplet"></i></div>
+            <div><div class="sc-val">@ViewBag.TotalUnits</div><div class="sc-lbl">Units Supplied</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-file-medical"></i></div>
+            <div><div class="sc-val">@ViewBag.TotalRequests</div><div class="sc-lbl">Total Requests</div></div>
         </div>
     </div>
 
-    <!-- TOOLBAR -->
-    <form method="get" asp-action="ManageHospital">
+    <!-- TOOLBAR (server-side filter form) -->
+    <form method="get" asp-action="ManageHospital" asp-controller="Home">
         <div class="toolbar">
-
             <div class="search-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text"
-                       name="search"
-                       value="@ViewBag.Search"
-                       placeholder="Search by hospital name, address, contact...">
+                <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by name, location, contact…">
             </div>
-
-            <button type="submit" class="btn-add">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                Search
+            <select name="type">
+                <option value="">All Types</option>
+                <option value="Government" selected="@(ViewBag.Type == "Government" ? "selected" : null)">Government</option>
+                <option value="Private" selected="@(ViewBag.Type == "Private" ? "selected" : null)">Private</option>
+                <option value="NGO" selected="@(ViewBag.Type == "NGO" ? "selected" : null)">NGO</option>
+            </select>
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="Active" selected="@(ViewBag.Status == "Active" ? "selected" : null)">Active</option>
+                <option value="Inactive" selected="@(ViewBag.Status == "Inactive" ? "selected" : null)">Inactive</option>
+                <option value="Pending Approval" selected="@(ViewBag.Status == "Pending Approval" ? "selected" : null)">Pending Approval</option>
+            </select>
+            <button type="submit" class="btn-add" style="background:#555;">
+                <i class="fa-solid fa-filter"></i> Filter
             </button>
-
-            <a asp-action="AddHospital"
-               asp-controller="Home"
-               class="btn-add">
-                <i class="fa-solid fa-plus"></i>
-                Add Hospital
+            <a asp-action="AddHospital" asp-controller="Home" class="btn-add">
+                <i class="fa-solid fa-plus"></i> Add New Hospital
             </a>
-
         </div>
     </form>
 
     <!-- TABLE -->
     <div class="table-section">
-
         <div class="table-section-header">
-            <span>
-                <i class="fa-solid fa-building" style="color:#8b0000;margin-right:8px"></i>
-                Hospital List
-            </span>
-
-            <span class="record-count">
-                @Model.Count() records
-            </span>
+            <span><i class="fa-solid fa-list" style="color:#8b0000;margin-right:8px"></i>Hospital List</span>
+            <span class="record-count">@Model.Count() record@(Model.Count() != 1 ? "s" : "")</span>
         </div>
-
         <div class="table-wrap">
-
-            @if (!Model.Any())
-            {
-                <div class="empty-state">
-                    <i class="fa-solid fa-hospital-user"></i>
-                    <p>No hospital found.</p>
-                </div>
-            }
-            else
-            {
-                <table>
-                    <thead>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hospital</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Contact Person</th>
+                        <th>Phone</th>
+                        <th>Requests</th>
+                        <th>Units Supplied</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
                         <tr>
-                            <th>#</th>
-                            <th>Hospital</th>
-                            <th>Email</th>
-                            <th>Contact</th>
-                            <th>Address</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <td colspan="10" style="text-align:center; padding:32px; color:#aaa;">
+                                <i class="fa-solid fa-hospital" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                                No hospitals found.
+                            </td>
                         </tr>
-                    </thead>
-
-                    <tbody>
-                        @{
-                            int i = 1;
-                        }
-
-                        @foreach (var h in Model)
+                    }
+                    else
+                    {
+                        int i = 1;
+                        foreach (var h in Model)
                         {
-                            var statusClass = h.Status == "Active"
-                            ? "status-active"
-                            : "status-inactive";
+                            // Avatar: first letters of each word, max 2
+                            var words = h.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            var avatar = words.Length >= 2
+                            ? $"{words[0][0]}{words[1][0]}"
+                            : h.Name.Substring(0, Math.Min(2, h.Name.Length));
+                            avatar = avatar.ToUpper();
+
+                            var typeCss = h.Type == "Government" ? "type-govt"
+                            : h.Type == "NGO" ? "type-ngo"
+                            : "type-private";
+                            var typeIcon = h.Type == "Government" ? "fa-landmark" : "fa-building";
+
+                            var statusCss = h.Status == "Active" ? "status-active"
+                            : h.Status == "Inactive" ? "status-inactive"
+                            : "status-pending";
 
                             <tr>
-
-                                <td>@(i++)</td>
-
+                                <td>@i</td>
                                 <td>
                                     <div class="hospital-cell">
-
-                                        <div class="hospital-icon">
-                                            <i class="fa-solid fa-hospital"></i>
-                                        </div>
-
+                                        <div class="hospital-avatar">@avatar</div>
                                         <div>
-                                            <div class="hospital-name">
-                                                @h.Name
-                                            </div>
-
-                                            <div class="hospital-id">
-                                                HSP-@h.Id.ToString("D4")
-                                            </div>
+                                            <div class="hospital-name">@h.Name</div>
+                                            <div class="hospital-id">@h.HospitalCode</div>
                                         </div>
-
                                     </div>
                                 </td>
-
-                                <td>@h.Email</td>
-
-                                <td>@h.Contact</td>
-
-                                <td>@h.Address</td>
-
-                                <td>
-                                    <span class="status-badge @statusClass">
-                                        @h.Status
-                                    </span>
-                                </td>
-
+                                <td><span class="type-badge @typeCss"><i class="fa-solid @typeIcon"></i> @h.Type</span></td>
+                                <td>@h.Location</td>
+                                <td>@h.ContactPerson</td>
+                                <td>@h.Phone</td>
+                                <td>@h.Requests</td>
+                                <td>@h.UnitsSupplied</td>
+                                <td><span class="status-badge @statusCss">@h.Status</span></td>
                                 <td>
                                     <div class="actions">
-
-                                        <a asp-action="EditHospital"
-                                           asp-route-id="@h.Id"
-                                           class="action-btn btn-edit">
-                                            <i class="fa-solid fa-pen"></i>
-                                            Edit
+                                        <a class="action-btn btn-edit"
+                                           asp-action="EditHospital" asp-controller="Home"
+                                           asp-route-id="@h.Id">
+                                            <i class="fa-solid fa-pen"></i> Edit
                                         </a>
-
-                                        <button type="button"
-                                                class="action-btn btn-delete"
-                                                onclick="openDelete(@h.Id, '@h.Name')">
-
-                                            <i class="fa-solid fa-trash"></i>
-                                            Delete
-
+                                        <button class="action-btn btn-delete"
+                                                onclick="openDeleteModal(@h.Id, '@h.Name.Replace("'", "\\'")')">
+                                            <i class="fa-solid fa-trash"></i> Delete
                                         </button>
-
                                     </div>
                                 </td>
-
                             </tr>
+                            i++;
                         }
-
-                    </tbody>
-                </table>
-            }
-
+                    }
+                </tbody>
+            </table>
         </div>
-
-        <div class="pagination">
-            Showing @Model.Count() hospitals
+        <div style="padding:14px 22px; border-top:1px solid #f5eded; font-size:13px; color:#888;">
+            Showing @Model.Count() hospital@(Model.Count() != 1 ? "s" : "")
         </div>
-
     </div>
-
 </div>
 
 <!-- DELETE MODAL -->
-<div class="modal-backdrop" id="deleteModal">
-
-    <div class="modal-box">
-
-        <div class="modal-icon">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-
+<div class="del-modal-backdrop" id="deleteModal">
+    <div class="del-modal-box">
+        <div class="del-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h3>Delete Hospital?</h3>
-
-        <p id="deleteMsg">
-            This action cannot be undone.
-        </p>
-
-        <div class="modal-actions">
-
-            <button class="btn-modal-cancel"
-                    onclick="closeModal()">
-                Cancel
-            </button>
-
+        <p id="del-msg">This action cannot be undone.</p>
+        <div class="del-actions">
+            <button class="btn-del-cancel" onclick="closeDeleteModal()">Cancel</button>
             <form id="deleteForm" method="post">
-
                 @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       name="id"
-                       id="deleteId" />
-
-                <button type="submit"
-                        class="btn-modal-delete">
-
-                    <i class="fa-solid fa-trash"></i>
-                    Yes, Delete
-
+                <button type="submit" class="btn-del-confirm">
+                    <i class="fa-solid fa-trash"></i> Yes, Delete
                 </button>
-
             </form>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
-
-    function openDelete(id, name) {
-
-        document.getElementById('deleteId').value = id;
-
-        document.getElementById('deleteMsg').textContent =
-            'Are you sure you want to delete "' + name + '"?';
-
-        document.getElementById('deleteForm').action =
-            '/Home/DeleteHospital';
-
+    function openDeleteModal(id, name) {
+        document.getElementById('del-msg').innerText =
+            'Are you sure you want to remove "' + name + '"? This action cannot be undone.';
+        document.getElementById('deleteForm').action = '/Home/DeleteHospital/' + id;
         document.getElementById('deleteModal').classList.add('show');
     }
-
-    function closeModal() {
+    function closeDeleteModal() {
         document.getElementById('deleteModal').classList.remove('show');
     }
-
-    document.getElementById('deleteModal')
-        .addEventListener('click', function (e) {
-
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
+    document.getElementById('deleteModal').addEventListener('click', function (e) {
+        if (e.target === this) this.classList.remove('show');
+    });
 </script>
