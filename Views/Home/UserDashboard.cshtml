@@ -404,46 +404,4 @@
         </table>
     </div>
 
-    <!-- REQUESTS TABLE -->
-    <div class="table-section">
-        <h3>Recent Blood Requests</h3>
-        <table>
-            <tr>
-                <th>Invoice</th>
-                <th>Blood Group</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-
-            @if (Model.MyRequests != null && Model.MyRequests.Any())
-            {
-                @foreach (var r in Model.MyRequests)
-                {
-                    <tr>
-                        <td>@r.InvoiceNumber</td>
-                        <td>@r.BloodGroup</td>
-                        <td>@r.RequestDate.ToString("dd-MM-yyyy")</td>
-                        <td>
-                            <span class="status-pill"
-                                  style="background:@(r.Status == "Approved" ? "#e8f5e9" :
-                                                                                        r.Status == "Rejected" ? "#fdecea" : "#fff8e1");
-                                                 color:@(r.Status == "Approved" ? "#2e7d32" :
-                                                                                   r.Status == "Rejected" ? "#c62828" : "#f57f17")">
-                                @r.Status
-                            </span>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="4" style="text-align:center; color:#999; padding:20px;">
-                        No blood requests found.
-                    </td>
-                </tr>
-            }
-        </table>
-    </div>
-
-</div>
+   
