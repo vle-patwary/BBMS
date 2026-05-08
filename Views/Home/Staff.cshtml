@@ -83,6 +83,11 @@
     .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .pill-green { background: #e8f5e9; color: #2e7d32; }
     .pill-amber { background: #fff8e1; color: #b45000; }
+
+    .pill-grey {
+        background: #f5f5f5;
+        color: #616161;
+    }
 </style>
 
 <div class="dashboard">
@@ -107,7 +112,7 @@
     <div class="card-container">
         <div class="card">
             <div class="card-icon"><i class="fa-solid fa-plus"></i></div>
-            <a asp-controller="Home" asp-action="AddCollection">Add Collection</a>
+            <a asp-controller="Home" asp-action="Donate">Add Collection</a>
             <p>Record a new blood collection</p>
         </div>
         <div class="card">
@@ -134,19 +139,65 @@
     </div>
 
     <!-- TABLE -->
+    <!-- TABLE -->
     <div class="table-section">
         <h3>Recent Blood Donations</h3>
         <table>
-            <tr><th>Donor Name</th><th>Blood Group</th><th>Date</th><th>Status</th></tr>
             <tr>
-                <td>Rahim</td><td>O+</td><td>12-03-2026</td>
-                <td><span class="pill pill-green">Tested</span></td>
+                <th>Donor Name</th>
+                <th>Blood Group</th>
+                <th>Donation Type</th>
+                <th>Quantity</th>
+                <th>Date</th>
+                <th>Status</th>
             </tr>
-            <tr>
-                <td>Karim</td><td>B+</td><td>11-03-2026</td>
-                <td><span class="pill pill-amber">Pending</span></td>
-            </tr>
-        </table>
-    </div>
 
-</div>
+            @if (ViewBag.RecentDonations != null && ((List<BBMS.Models.RecordDonation>)ViewBag.RecentDonations).Any())
+            {
+                foreach (var d in (List<BBMS.Models.RecordDonation>)ViewBag.RecentDonations)
+                {
+                    var pillClass = d.Status switch
+                    {
+                        "Available" => "pill-green",
+                        "Tested" => "pill-green",
+                        "Processing" => "pill-amber",
+                        "Discarded" => "pill-grey",
+                        _ => "pill-amber"
+                    };
+
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;color:#222">@d.DonorName</div>
+                            <div style="font-size:11px;color:#b30000;font-weight:600">@d.DonorId</div>
+                        </td>
+                        <td>
+                            <span style="background:#fde8e8;color:#8b0000;font-weight:700;
+                                             font-size:12px;padding:3px 10px;border-radius:20px;
+                                             border:1px solid #f5c0c0">
+                                @d.BloodGroup
+                            </span>
+                        </td>
+                        <td>@d.DonationType</td>
+                        <td>@d.Quantity ml</td>
+                        <td>@d.DonationDate.ToString("dd MMM yyyy")</td>
+                        <td><span class="pill @pillClass">@d.Status</span></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:30px;color:#aaa">
+                        No donation records found.
+                    </td>
+                </tr>
+            }
+        </table>
+
+        <div style="text-align:right;padding:12px 0 0">
+            <a asp-controller="Donation" asp-action="DonationHistory"
+               style="color:#8b0000;font-size:13px;font-weight:600;text-decoration:none">
+                View All Donations →
+            </a>
+        </div>
+    </div>

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<BBMS.Models.BloodStock>
+@{
     ViewData["Title"] = "Manage Blood Stock";
 }
 
@@ -21,7 +22,6 @@
         margin: 32px auto 50px;
     }
 
-    /* ── HEADER ── */
     .header {
         background: #8b0000;
         color: white;
@@ -117,7 +117,6 @@
             background: rgba(255,255,255,0.18);
         }
 
-    /* ── SECTION TITLE ── */
     .section-title {
         font-size: 15px;
         font-weight: 700;
@@ -137,7 +136,6 @@
             border-radius: 2px;
         }
 
-    /* ── STAT CARDS ── */
     .stat-row {
         display: flex;
         gap: 16px;
@@ -186,7 +184,6 @@
         margin-top: 2px;
     }
 
-    /* ── TOOLBAR ── */
     .toolbar {
         background: white;
         border: 1px solid #f0e0e0;
@@ -263,7 +260,6 @@
             background: #6e0000;
         }
 
-    /* ── TABLE SECTION ── */
     .table-section {
         background: white;
         border: 1px solid #f0e0e0;
@@ -330,7 +326,6 @@
         background: #fff8f8;
     }
 
-    /* ── BLOOD GROUP CELL ── */
     .blood-cell {
         display: flex;
         align-items: center;
@@ -363,7 +358,6 @@
         margin-top: 1px;
     }
 
-    /* ── PROGRESS BAR ── */
     .units-cell {
         min-width: 140px;
     }
@@ -400,7 +394,6 @@
         background: #8b0000;
     }
 
-    /* ── STATUS BADGES ── */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -448,48 +441,68 @@
         transition: all 0.15s;
     }
 
-    .btn-update {
-        background: #e8f4fd;
-        color: #1565c0;
+    .btn-edit {
+        background: #1565c0; /* solid blue instead of light */
+        color: white;
     }
 
-        .btn-update:hover {
+        .btn-edit:hover {
             background: #1565c0;
             color: white;
         }
 
-    .btn-history {
-        background: #f3f3f3;
-        color: #555;
-    }
+    .btn-delete {
+    background: #8b0000;   /* solid red instead of light */
+    color: white;
+}}
 
-        .btn-history:hover {
-            background: #555;
+        .btn-delete:hover {
+            background: #8b0000;
             color: white;
         }
 
-    /* ── UPDATE MODAL ── */
+    /* REPLACE your existing .modal-backdrop rule with this */
     .modal-backdrop {
         display: none;
         position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.45);
-        z-index: 999;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: 99999;
         align-items: center;
         justify-content: center;
+        /* pointer-events: none  ← DELETE THIS LINE */
     }
 
         .modal-backdrop.show {
             display: flex;
+            pointer-events: all;
         }
 
     .modal-box {
-        background: white;
+        background: #fff;
         border-radius: 12px;
-        width: 420px;
+        width: 440px;
         max-width: 95vw;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        box-shadow: 0 25px 70px rgba(0,0,0,0.35);
         overflow: hidden;
+        position: relative;
+        z-index: 100000;
+        animation: modalSlideIn 0.25s ease;
+    }
+
+    @@keyframes modalSlideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 
     .modal-header {
@@ -512,20 +525,25 @@
     .modal-close {
         background: none;
         border: none;
-        color: rgba(255,255,255,0.7);
-        font-size: 18px;
+        color: rgba(255,255,255,0.8);
+        font-size: 20px;
         cursor: pointer;
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: all 0.15s;
     }
 
         .modal-close:hover {
             color: white;
+            background: rgba(255,255,255,0.15);
         }
 
     .modal-body {
         padding: 24px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 18px;
     }
 
     .modal-group {
@@ -558,14 +576,34 @@
             outline: none;
             font-family: inherit;
             width: 100%;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
             .modal-group input:focus, .modal-group select:focus {
                 border-color: #8b0000;
-                box-shadow: 0 0 0 3px rgba(139,0,0,0.07);
+                box-shadow: 0 0 0 3px rgba(139,0,0,0.08);
                 background: white;
             }
+
+            .modal-group input[readonly] {
+                background: #f5f5f5;
+                color: #888;
+                cursor: not-allowed;
+            }
+
+    .modal-note {
+        background: #fff5f5;
+        border: 1px solid #f0e0e0;
+        border-left: 3px solid #8b0000;
+        border-radius: 7px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #8b0000;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
     .modal-footer {
         display: flex;
@@ -589,6 +627,7 @@
         font-weight: 600;
         cursor: pointer;
         font-family: inherit;
+        transition: all 0.2s;
     }
 
         .btn-cancel-modal:hover {
@@ -610,9 +649,72 @@
         cursor: pointer;
         font-family: inherit;
         box-shadow: 0 4px 12px rgba(139,0,0,0.25);
+        transition: all 0.2s;
     }
 
         .btn-save-modal:hover {
+            background: #6e0000;
+        }
+
+    /* ── DELETE CONFIRM MODAL ── */
+    .delete-modal-box {
+        background: white;
+        border-radius: 12px;
+        width: 400px;
+        max-width: 95vw;
+        overflow: hidden;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+        animation: modalSlideIn 0.25s ease;
+    }
+
+    .delete-modal-header {
+        background: #8b0000;
+        color: white;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .delete-modal-body {
+        padding: 24px;
+        font-size: 13px;
+        color: #444;
+        line-height: 1.6;
+    }
+
+        .delete-modal-body strong {
+            color: #8b0000;
+        }
+
+    .delete-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #f5eded;
+        background: #fffafa;
+    }
+
+    .btn-confirm-delete {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 22px;
+        border-radius: 8px;
+        border: none;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+
+        .btn-confirm-delete:hover {
             background: #6e0000;
         }
 
@@ -637,15 +739,15 @@
         </div>
         <div class="header-right">
             <div class="header-stat">
-                <div class="val">8</div><div class="lbl">Blood Groups</div>
+                <div class="val">@ViewBag.TotalGroups</div><div class="lbl">Blood Groups</div>
             </div>
             <div class="h-divider"></div>
             <div class="header-stat">
-                <div class="val" id="hdr-total">220</div><div class="lbl">Total Units</div>
+                <div class="val">@ViewBag.TotalUnits</div><div class="lbl">Total Units</div>
             </div>
             <div class="h-divider"></div>
             <div class="header-stat">
-                <div class="val" id="hdr-critical">2</div><div class="lbl">Critical</div>
+                <div class="val">@ViewBag.CriticalCount</div><div class="lbl">Critical</div>
             </div>
             <div class="h-divider"></div>
             <a asp-controller="Home" asp-action="Admin" class="btn-ghost">
@@ -659,19 +761,19 @@
     <div class="stat-row">
         <div class="stat-card">
             <div class="sc-icon"><i class="fa-solid fa-droplet"></i></div>
-            <div><div class="sc-val" id="stat-total">220</div><div class="sc-lbl">Total Units</div></div>
+            <div><div class="sc-val">@ViewBag.TotalUnits</div><div class="sc-lbl">Total Units</div></div>
         </div>
         <div class="stat-card">
             <div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div>
-            <div><div class="sc-val" id="stat-sufficient">4</div><div class="sc-lbl">Sufficient Groups</div></div>
+            <div><div class="sc-val">@ViewBag.SufficientCount</div><div class="sc-lbl">Sufficient</div></div>
         </div>
         <div class="stat-card">
             <div class="sc-icon"><i class="fa-solid fa-clock"></i></div>
-            <div><div class="sc-val" id="stat-low">2</div><div class="sc-lbl">Low Stock</div></div>
+            <div><div class="sc-val">@ViewBag.LowCount</div><div class="sc-lbl">Low</div></div>
         </div>
         <div class="stat-card">
             <div class="sc-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <div><div class="sc-val" id="stat-critical">2</div><div class="sc-lbl">Critical</div></div>
+            <div><div class="sc-val">@ViewBag.CriticalCount</div><div class="sc-lbl">Critical</div></div>
         </div>
         <div class="stat-card">
             <div class="sc-icon"><i class="fa-solid fa-calendar-day"></i></div>
@@ -691,16 +793,16 @@
             <option value="low">Low Stock</option>
             <option value="critical">Critical</option>
         </select>
-        <button class="btn-add" onclick="openAddModal()">
-            <i class="fa-solid fa-plus"></i> Add Stock Entry
-        </button>
+        <a asp-action="AddBloodStock" asp-controller="Home" class="btn-add">
+            <i class="fa-solid fa-plus"></i> Add Blood Entry
+        </a>
     </div>
 
     <!-- TABLE -->
     <div class="table-section">
         <div class="table-section-header">
             <span><i class="fa-solid fa-list" style="color:#8b0000;margin-right:8px"></i>Blood Inventory</span>
-            <span class="record-count" id="recordCount">8 records</span>
+            <span class="record-count" id="recordCount">@Model.Count records</span>
         </div>
         <div class="table-wrap">
             <table>
@@ -714,272 +816,152 @@
                     </tr>
                 </thead>
                 <tbody id="stockBody">
+                    @foreach (var item in Model)
+                    {
+                        var barClass = item.Status == "sufficient" ? "bar-good" : item.Status == "low" ? "bar-low" : "bar-critical";
+                        var badgeClass = item.Status == "sufficient" ? "status-good" : item.Status == "low" ? "status-low" : "status-critical";
+                        var avatarColor = item.Status == "sufficient" ? "#8b0000" : item.Status == "low" ? "#b8860b" : "#6e0000";
+                        var barWidth = Math.Min((item.Units / 75.0) * 100, 100).ToString("F0");
+                        var badgeIcon = item.Status == "sufficient" ? "fa-circle-check" : item.Status == "low" ? "fa-clock" : "fa-triangle-exclamation";
+                        var badgeLabel = item.Status == "sufficient" ? "Sufficient" : item.Status == "low" ? "Low Stock" : "Critical";
 
-                    <tr data-group="A+" data-units="50" data-status="sufficient">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar">A+</div>
-                                <div>
-                                    <div class="blood-group-name">A Positive</div>
-                                    <div class="blood-group-sub">Universal donor compatible</div>
+                        <tr data-group="@item.BloodGroup" data-units="@item.Units" data-status="@item.Status">
+                            <td>
+                                <div class="blood-cell">
+                                    <div class="blood-avatar" style="background:@avatarColor">@item.BloodGroup</div>
+                                    <div>
+                                        <div class="blood-group-name">@item.BloodGroup</div>
+                                        <div class="blood-group-sub">Added @item.CollectionDate.ToString("dd MMM yyyy")</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">50 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-good" style="width:67%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
-                        <td>10 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('A+', 50, '10 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="A-" data-units="25" data-status="low">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar" style="background:#b8860b">A-</div>
-                                <div>
-                                    <div class="blood-group-name">A Negative</div>
-                                    <div class="blood-group-sub">Rare type</div>
+                            </td>
+                            <td class="units-cell">
+                                <div class="units-val">@item.Units units</div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar @barClass" style="width:@barWidth%"></div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">25 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-low" style="width:33%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-low"><i class="fa-solid fa-clock"></i> Low Stock</span></td>
-                        <td>09 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('A-', 25, '09 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="B+" data-units="20" data-status="low">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar" style="background:#b8860b">B+</div>
-                                <div>
-                                    <div class="blood-group-name">B Positive</div>
-                                    <div class="blood-group-sub">Common type</div>
+                            </td>
+                            <td>
+                                <span class="status-badge @badgeClass">
+                                    <i class="fa-solid @badgeIcon"></i> @badgeLabel
+                                </span>
+                            </td>
+                            <td>@item.LastUpdated.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <div class="actions">
+                                    <!-- EDIT -->
+                                    <button class="action-btn btn-edit"
+                                            onclick="openEditModal('@item.BloodGroup', @item.Units, '@item.LastUpdated.ToString("dd MMM yyyy")', @item.Id)">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </button>
+                                    <!-- DELETE -->
+                                    <button class="action-btn btn-delete"
+                                            onclick="openDeleteModal(@item.Id, '@item.BloodGroup')">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">20 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-low" style="width:27%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-low"><i class="fa-solid fa-clock"></i> Low Stock</span></td>
-                        <td>09 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('B+', 20, '09 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="B-" data-units="8" data-status="critical">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar" style="background:#6e0000">B-</div>
-                                <div>
-                                    <div class="blood-group-name">B Negative</div>
-                                    <div class="blood-group-sub">Very rare</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">8 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-critical" style="width:11%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-critical"><i class="fa-solid fa-triangle-exclamation"></i> Critical</span></td>
-                        <td>07 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('B-', 8, '07 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="O+" data-units="70" data-status="sufficient">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar">O+</div>
-                                <div>
-                                    <div class="blood-group-name">O Positive</div>
-                                    <div class="blood-group-sub">Most common</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">70 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-good" style="width:93%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
-                        <td>11 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('O+', 70, '11 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="O-" data-units="35" data-status="sufficient">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar">O-</div>
-                                <div>
-                                    <div class="blood-group-name">O Negative</div>
-                                    <div class="blood-group-sub">Universal donor</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">35 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-good" style="width:47%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
-                        <td>10 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('O-', 35, '10 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="AB+" data-units="40" data-status="sufficient">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar">AB+</div>
-                                <div>
-                                    <div class="blood-group-name">AB Positive</div>
-                                    <div class="blood-group-sub">Universal recipient</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">40 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-good" style="width:53%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-good"><i class="fa-solid fa-circle-check"></i> Sufficient</span></td>
-                        <td>11 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('AB+', 40, '11 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-group="AB-" data-units="10" data-status="critical">
-                        <td>
-                            <div class="blood-cell">
-                                <div class="blood-avatar" style="background:#6e0000">AB-</div>
-                                <div>
-                                    <div class="blood-group-name">AB Negative</div>
-                                    <div class="blood-group-sub">Rarest blood type</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="units-cell">
-                            <div class="units-val">10 units</div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar bar-critical" style="width:13%"></div>
-                            </div>
-                        </td>
-                        <td><span class="status-badge status-critical"><i class="fa-solid fa-triangle-exclamation"></i> Critical</span></td>
-                        <td>08 Apr 2026</td>
-                        <td>
-                            <div class="actions">
-                                <button class="action-btn btn-update" onclick="openUpdateModal('AB-', 10, '08 Apr 2026')">
-                                    <i class="fa-solid fa-pen"></i> Update
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
         <div style="padding:14px 22px; border-top:1px solid #f5eded; font-size:13px; color:#888;">
-            Showing <span id="pageInfo">8</span> blood group entries
+            Showing <span id="pageInfo">@Model.Count</span> blood group entries
         </div>
     </div>
 </div>
 
-<!-- UPDATE MODAL -->
-<div class="modal-backdrop" id="updateModal">
+<!-- ═══════════════════════════════
+     EDIT MODAL
+═══════════════════════════════ -->
+<div class="modal-backdrop" id="editModal">
     <div class="modal-box">
         <div class="modal-header">
             <span class="modal-header-title">
-                <i class="fa-solid fa-droplet"></i>
-                <span id="modalGroupTitle">Update Stock</span>
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span id="editModalTitle">Edit Stock</span>
             </span>
-            <button class="modal-close" onclick="closeUpdateModal()">
+            <button class="modal-close" onclick="closeEditModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <div class="modal-body">
+            <div class="modal-note">
+                <i class="fa-solid fa-circle-info"></i>
+                <span id="editModalNote">Update the unit count and status below.</span>
+            </div>
             <div class="modal-group">
                 <label><i class="fa-solid fa-droplet"></i> Blood Group</label>
-                <input type="text" id="modal-group" readonly style="background:#f0f0f0; color:#888;">
+                <input type="text" id="edit-group" readonly>
             </div>
             <div class="modal-group">
                 <label><i class="fa-solid fa-flask"></i> Available Units <span style="color:#8b0000">*</span></label>
-                <input type="number" id="modal-units" min="0" placeholder="Enter unit count">
+                <input type="number" id="edit-units" min="0" placeholder="Enter unit count">
             </div>
             <div class="modal-group">
-                <label><i class="fa-solid fa-toggle-on"></i> Status</label>
-                <select id="modal-status">
-                    <option value="sufficient">Sufficient</option>
-                    <option value="low">Low Stock</option>
-                    <option value="critical">Critical</option>
+                <label><i class="fa-solid fa-toggle-on"></i> Stock Status</label>
+                <select id="edit-status">
+                    <option value="sufficient">Sufficient (30+ units)</option>
+                    <option value="low">Low Stock (15–29 units)</option>
+                    <option value="critical">Critical (0–14 units)</option>
                 </select>
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-cancel-modal" onclick="closeUpdateModal()">
+            <button class="btn-cancel-modal" onclick="closeEditModal()">
                 <i class="fa-solid fa-xmark"></i> Cancel
             </button>
-            <button class="btn-save-modal" onclick="saveUpdate()">
+            <button class="btn-save-modal" onclick="saveEdit()">
                 <i class="fa-solid fa-floppy-disk"></i> Save Changes
             </button>
         </div>
     </div>
 </div>
+
+
+<!-- Hidden form — Edit -->
+<form id="editForm" asp-action="UpdateBloodStock" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="edit-form-id" />
+    <input type="hidden" name="units" id="edit-form-units" />
+    <input type="hidden" name="status" id="edit-form-status" />
+</form>
+
+<!-- Hidden form — Delete -->
+<form id="deleteForm" asp-action="DeleteBloodStock" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="delete-form-id" />
+</form>
+<!-- ═══════════════════════════════
+     DELETE CONFIRM MODAL
+═══════════════════════════════ -->
+<div class="modal-backdrop" id="deleteModal">
+    <div class="delete-modal-box">
+        <div class="delete-modal-header">
+            <i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete
+        </div>
+        <div class="delete-modal-body">
+            Are you sure you want to delete the blood stock entry for
+            <strong id="deleteGroupLabel"></strong>?
+            This action <strong>cannot be undone</strong>.
+        </div>
+        <div class="delete-modal-footer">
+            <button class="btn-cancel-modal" onclick="closeDeleteModal()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <button class="btn-confirm-delete" onclick="confirmDelete()">
+                <i class="fa-solid fa-trash"></i> Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form — Delete -->
+<form id="deleteForm" asp-action="DeleteBloodStock" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="delete-form-id" />
+</form>
 
 <script>
     // ── FILTER ────────────────────────────────────
@@ -988,77 +970,93 @@
         const status = document.getElementById('statusFilter').value.toLowerCase();
         const rows   = document.querySelectorAll('#stockBody tr');
         let visible  = 0;
-
         rows.forEach(row => {
             const group     = (row.dataset.group  || '').toLowerCase();
             const rowStatus = (row.dataset.status || '').toLowerCase();
-            const ok = (!search || group.includes(search))
-                    && (!status || rowStatus === status);
+            const ok = (!search || group.includes(search)) && (!status || rowStatus === status);
             row.style.display = ok ? '' : 'none';
             if (ok) visible++;
         });
-
         document.getElementById('recordCount').innerText = visible + ' record' + (visible !== 1 ? 's' : '');
         document.getElementById('pageInfo').innerText    = visible;
     }
 
-    // ── UPDATE MODAL ──────────────────────────────
-    function openUpdateModal(group, units, date) {
-        document.getElementById('modalGroupTitle').innerText = 'Update – ' + group;
-        document.getElementById('modal-group').value         = group;
-        document.getElementById('modal-units').value         = units;
+    // ── EDIT MODAL ────────────────────────────────
+    function openEditModal(group, units, date, id) {
+        document.getElementById('edit-form-id').value        = id;
+        document.getElementById('editModalTitle').innerText  = 'Edit Stock — ' + group;
+        document.getElementById('edit-group').value          = group;
+        document.getElementById('edit-units').value          = units;
+        document.getElementById('editModalNote').innerText   = 'Last updated: ' + date + '. Change the values below.';
 
-        const statusEl = document.getElementById('modal-status');
-        if      (units >= 30) statusEl.value = 'sufficient';
-        else if (units >= 15) statusEl.value = 'low';
-        else                  statusEl.value = 'critical';
+        const s = document.getElementById('edit-status');
+        s.value = units >= 30 ? 'sufficient' : units >= 15 ? 'low' : 'critical';
 
-        document.getElementById('updateModal').classList.add('show');
+        document.getElementById('editModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
     }
 
-    function closeUpdateModal() {
-        document.getElementById('updateModal').classList.remove('show');
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('show');
+        document.body.style.overflow = '';
     }
 
-    function saveUpdate() {
-        closeUpdateModal();
-        showToast('Blood stock updated successfully!');
+    function saveEdit() {
+        const units = parseInt(document.getElementById('edit-units').value);
+        if (isNaN(units) || units < 0) {
+            document.getElementById('edit-units').style.borderColor = '#e53935';
+            document.getElementById('edit-units').focus();
+            return;
+        }
+        document.getElementById('edit-form-units').value  = units;
+        document.getElementById('edit-form-status').value = document.getElementById('edit-status').value;
+        document.getElementById('editForm').submit();
     }
 
-    // ── ADD MODAL (reuse update modal) ────────────
-    function openAddModal() {
-        document.getElementById('modalGroupTitle').innerText = 'Add Stock Entry';
-        document.getElementById('modal-group').value         = '';
-        document.getElementById('modal-group').removeAttribute('readonly');
-        document.getElementById('modal-group').style.background = '';
-        document.getElementById('modal-group').style.color = '';
-        document.getElementById('modal-units').value         = '';
-        document.getElementById('modal-status').value        = 'sufficient';
-        document.getElementById('updateModal').classList.add('show');
-    }
-
-    // ── BACKDROP CLICK ────────────────────────────
-    document.getElementById('updateModal').addEventListener('click', function(e) {
-        if (e.target === this) this.classList.remove('show');
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) closeEditModal();
     });
 
-    // ── TOAST ─────────────────────────────────────
+    // ── DELETE MODAL ──────────────────────────────
+    function openDeleteModal(id, group) {
+        document.getElementById('delete-form-id').value      = id;
+        document.getElementById('deleteGroupLabel').innerText = group;
+        document.getElementById('deleteModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function confirmDelete() {
+        document.getElementById('deleteForm').submit();
+    }
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+    });
+
+    // ── TOAST (for TempData messages) ─────────────
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => showToast('@TempData["SuccessMessage"]'));
+            </text>
+    }
+
     function showToast(msg) {
         let t = document.getElementById('globalToast');
         if (!t) {
             t = document.createElement('div');
             t.id = 'globalToast';
             t.style.cssText = [
-                'position:fixed','bottom:28px','right:28px',
-                'background:#1a8a4a','color:white',
-                'padding:14px 22px','border-radius:10px',
-                'font-size:13px','font-weight:600',
-                'display:flex','align-items:center','gap:10px',
-                'box-shadow:0 8px 28px rgba(0,0,0,0.18)',
-                "font-family:'Segoe UI',sans-serif",
-                'transform:translateY(80px)','opacity:0',
-                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)',
-                'z-index:9999'
+                'position:fixed','bottom:28px','right:28px','background:#1a8a4a','color:white',
+                'padding:14px 22px','border-radius:10px','font-size:13px','font-weight:600',
+                'display:flex','align-items:center','gap:10px','box-shadow:0 8px 28px rgba(0,0,0,0.18)',
+                "font-family:'Segoe UI',sans-serif",'transform:translateY(80px)','opacity:0',
+                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)','z-index:999999'
             ].join(';');
             document.body.appendChild(t);
         }

@@ -1,9 +1,12 @@
-﻿using System.Linq;
-using Rotativa.AspNetCore;
-using BBMS.Data;
+﻿using BBMS.Data;
 using BBMS.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
 using System.Diagnostics;
+using System.Linq;
 using YourApp.Models;
 
 namespace BBMS.Controllers
@@ -11,10 +14,12 @@ namespace BBMS.Controllers
     public class HomeController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager; // ✅ ADDED
 
-        public HomeController(AppDbContext db)
+        public HomeController(AppDbContext db, UserManager<IdentityUser> userManager) // ✅ ADDED
         {
             _db = db;
+            _userManager = userManager; // ✅ ADDED
         }
 
         public IActionResult Index() => View();
@@ -57,7 +62,6 @@ namespace BBMS.Controllers
             model.RequestDate = DateTime.Now;
             model.Status = "Pending";
 
-            // DO NOT override Quantity here — it comes from the form
             if (model.Quantity <= 0)
                 model.Quantity = 1;
 
@@ -304,6 +308,18 @@ namespace BBMS.Controllers
             return RedirectToAction("ManageStaff");
         }
 
+        // ─── STAFF DASHBOARD ──────────────────────────────────
+        public IActionResult Staff()
+        {
+            var recentDonations = _db.RecordDonations
+                .OrderByDescending(d => d.DonationDate)
+                .Take(10)
+                .ToList();
+
+            ViewBag.RecentDonations = recentDonations;
+            return View();
+        }
+
         // ═══════════════════════════════════════════════════════
         // ─── HOSPITAL CRUD ────────────────────────────────────
         // ═══════════════════════════════════════════════════════
@@ -348,7 +364,6 @@ namespace BBMS.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Duplicate email check (only if email was provided)
             if (!string.IsNullOrEmpty(model.Email) &&
                 _db.Hospitals.Any(h => h.Email == model.Email))
             {
@@ -356,7 +371,6 @@ namespace BBMS.Controllers
                 return View(model);
             }
 
-            // Auto-generate HospitalCode: HSP-0001, HSP-0002, …
             int count = _db.Hospitals.Count();
             model.HospitalCode = "HSP-" + (count + 1).ToString("D4");
             model.CreatedAt = DateTime.Now;
@@ -428,19 +442,137 @@ namespace BBMS.Controllers
             return RedirectToAction("ManageHospital");
         }
 
+        // ─── BLOOD STOCK ──────────────────────────────────────
+
+        [HttpGet]
+        public IActionResult AddBloodStock() => View(new BloodStock());
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddBloodStock(BloodStock model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            model.LastUpdated = DateTime.Now;
+            _db.BloodStocks.Add(model);
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Blood stock entry saved successfully!";
+            return RedirectToAction("ManageBloodStock");
+        }
+
+        [HttpGet]
+        public IActionResult ManageBloodStock(string search, string status)
+        {
+            var query = _db.BloodStocks.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(s => s.BloodGroup.Contains(search));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(s => s.Status == status);
+
+            var list = query.OrderBy(s => s.BloodGroup).ToList();
+
+            ViewBag.TotalUnits = _db.BloodStocks.Sum(s => (int?)s.Units) ?? 0;
+            ViewBag.TotalGroups = _db.BloodStocks.Count();
+            ViewBag.CriticalCount = _db.BloodStocks.Count(s => s.Status == "critical");
+            ViewBag.SufficientCount = _db.BloodStocks.Count(s => s.Status == "sufficient");
+            ViewBag.LowCount = _db.BloodStocks.Count(s => s.Status == "low");
+            ViewBag.Search = search;
+            ViewBag.Status = status;
+
+            return View(list);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateBloodStock(int id, int units, string status)
+        {
+            var stock = _db.BloodStocks.Find(id);
+            if (stock != null)
+            {
+                stock.Units = units;
+                stock.Status = status;
+                stock.LastUpdated = DateTime.Now;
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Stock updated successfully!";
+            }
+            return RedirectToAction("ManageBloodStock");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteBloodStock(int id)
+        {
+            var stock = _db.BloodStocks.Find(id);
+            if (stock != null)
+            {
+                _db.BloodStocks.Remove(stock);
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Blood stock deleted successfully!";
+            }
+            return RedirectToAction("ManageBloodStock");
+        }
+
+        // ─── USER DASHBOARD ───────────────────────────────────
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> UserDashboard()
+        {
+            // Get logged-in Identity user
+            var identityUser = await _userManager.GetUserAsync(User);
+            if (identityUser == null)
+                return RedirectToAction("LogIn", "Auth");
+
+            // Fetch their profile
+            var profile = _db.UserProfiles
+                .FirstOrDefault(p => p.IdentityUserId == identityUser.Id);
+
+            if (profile == null)
+                return RedirectToAction("LogIn", "Auth");
+
+            // Fetch their blood requests matched by name
+            var myRequests = _db.BloodRequests
+                .Where(r => r.RequesterName == profile.Name)
+                .OrderByDescending(r => r.RequestDate)
+                .Take(5)
+                .ToList();
+
+            // Fetch their donations
+            var myDonations = _db.DonateBloods
+                .OrderByDescending(d => d.CreatedAt)
+                .Take(5)
+                .ToList();
+
+            var lastDonation = myDonations.FirstOrDefault();
+
+            var viewModel = new UserDashboardViewModel
+            {
+                Name = profile.Name,
+                BloodGroup = profile.BloodGroup,
+                DonorStatus = profile.DonorStatus,
+                Email = identityUser.Email,
+                Phone = profile.Phone,
+                Address = profile.Address,
+                TotalDonations = myDonations.Count,
+                LastDonationDate = lastDonation?.CreatedAt.ToString("dd-MM-yyyy") ?? "N/A",
+                MyRequests = myRequests,
+                MyDonations = myDonations
+            };
+
+            return View(viewModel);
+        }
 
         // ─── OTHER PAGES ──────────────────────────────────────
-        public new IActionResult User() => View();
-        public IActionResult Staff() => View();
         public IActionResult Privacy() => View();
         public IActionResult Admin() => View();
         public IActionResult AddCollection() => View();
         public IActionResult TrackRequest() => View();
         public IActionResult ViewCollection() => View();
         public IActionResult ViewDonation() => View();
-        public IActionResult ManageBloodStock() => View();
         public IActionResult CheckRequest() => View();
-       
+
         public IActionResult AdminReports()
         {
             var donors = _db.DonateBloods
@@ -459,6 +591,5 @@ namespace BBMS.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() =>
             View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-
     }
 }
