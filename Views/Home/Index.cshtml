@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<BBMS.Models.BloodStock>
+@{
     ViewData["Title"] = "Home";
 }
 <style>
@@ -239,11 +240,11 @@
     <h1>Blood Bank Management System</h1>
     <p>Donate Blood &mdash; Save Lives</p>
     <div class="hero-stats">
-        <div class="stat-box"><div class="num">50+</div><div class="lbl">Donors</div></div>
+        <div class="stat-box"><div class="num">@ViewBag.TotalDonors</div><div class="lbl">Donors</div></div>
         <div class="hero-divider"></div>
         <div class="stat-box"><div class="num">200+</div><div class="lbl">Lives Saved</div></div>
         <div class="hero-divider"></div>
-        <div class="stat-box"><div class="num">8</div><div class="lbl">Blood Groups</div></div>
+        <div class="stat-box"><div class="num">@ViewBag.TotalGroups</div><div class="lbl">Blood Groups</div></div>
     </div>
     <div class="hero-btns">
         <a href="/Home/Donate" class="btn-donate">Donate Blood</a>
@@ -275,10 +276,44 @@
 <div class="section table-section">
     <h2>Blood Availability</h2>
     <table>
-        <tr><th>Blood Group</th><th>Available Units</th></tr>
-        <tr><td>A+</td><td><span class="unit-badge">15 units</span></td></tr>
-        <tr><td>B+</td><td><span class="unit-badge">10 units</span></td></tr>
-        <tr><td>O+</td><td><span class="unit-badge">20 units</span></td></tr>
-        <tr><td>AB+</td><td><span class="unit-badge">5 units</span></td></tr>
+        <tr>
+            <th>Blood Group</th>
+            <th>Available Units</th>
+            <th>Status</th>
+        </tr>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var stock in Model)
+            {
+                var badgeColor = stock.Status == "sufficient" ? "#e6f9ef"
+                : stock.Status == "low" ? "#fff8e1"
+                : "#fff0f0";
+                var textColor = stock.Status == "sufficient" ? "#1a8a4a"
+                : stock.Status == "low" ? "#b8860b"
+                : "#8b0000";
+                var label = stock.Status == "sufficient" ? "Sufficient"
+                : stock.Status == "low" ? "Low Stock"
+                : "Critical";
+                <tr>
+                    <td><strong>@stock.BloodGroup</strong></td>
+                    <td><span class="unit-badge">@stock.Units units</span></td>
+                    <td>
+                        <span style="background:@badgeColor; color:@textColor;
+                                         padding:3px 10px; border-radius:20px;
+                                         font-size:12px; font-weight:700;">
+                            @label
+                        </span>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" style="text-align:center; color:#aaa; padding:20px;">
+                    No blood stock records available.
+                </td>
+            </tr>
+        }
     </table>
 </div>

@@ -1,107 +1,306 @@
 ﻿@{
-    ViewData["Title"] = "Donation Success";
+    ViewData["Title"] = "Donation Submitted";
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
+    * {
+        box-sizing: border-box;
+    }
 
     body {
         font-family: 'Segoe UI', sans-serif;
         background: #f4f6f9;
     }
 
-    .success-container {
-        width: 420px;
-        margin: 80px auto;
+    .page-wrapper {
+        width: 94%;
+        max-width: 580px;
+        margin: 60px auto;
+    }
+
+    /* ── Card ── */
+    .success-card {
         background: white;
-        padding: 35px;
         border-radius: 12px;
+        border: 1px solid #f0e0e0;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(139,0,0,0.08);
+    }
+
+    /* ── Top Banner ── */
+    .card-banner {
+        background: #8b0000;
+        padding: 36px 30px;
         text-align: center;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
     }
 
-    .icon {
-        font-size: 60px;
-        color: green;
-        margin-bottom: 15px;
-    }
-
-    h2 {
-        color: #b30000;
-        margin-bottom: 10px;
-    }
-
-    p {
-        color: #555;
-        font-size: 14px;
-        margin-bottom: 20px;
-    }
-
-    .info-box {
-        background: #e6f9ee;
-        border-left: 5px solid green;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: left;
-        margin-bottom: 20px;
-    }
-
-        .info-box span {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
+        .card-banner::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
         }
 
-    .btn {
-        display: inline-block;
-        padding: 12px 18px;
-        margin: 5px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: bold;
+        .card-banner::after {
+            content: '';
+            position: absolute;
+            left: -30px;
+            bottom: -50px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .check-circle {
+        width: 72px;
+        height: 72px;
+        background: rgba(255,255,255,0.15);
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        position: relative;
+        z-index: 1;
+    }
+
+        .check-circle i {
+            font-size: 32px;
+            color: #fff;
+        }
+
+    .card-banner h2 {
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .card-banner p {
+        color: #ffb3b3;
+        font-size: 13px;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Body ── */
+    .card-body {
+        padding: 28px 30px;
+    }
+
+        .card-body > p {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin: 0 0 24px;
+            line-height: 1.6;
+        }
+
+    /* ── Info Rows ── */
+    .info-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #fff8f8;
+        border: 1px solid #f0e0e0;
+        border-left: 4px solid #8b0000;
+        border-radius: 8px;
+        padding: 14px 16px;
+    }
+
+        .info-row .row-icon {
+            width: 36px;
+            height: 36px;
+            background: #fff0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+            .info-row .row-icon i {
+                color: #8b0000;
+                font-size: 15px;
+            }
+
+        .info-row .row-text span {
+            display: block;
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .info-row .row-text strong {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+    /* ── Notice Box ── */
+    .notice-box {
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        border-radius: 8px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 28px;
+    }
+
+        .notice-box i {
+            color: #2e7d32;
+            font-size: 16px;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .notice-box p {
+            font-size: 13px;
+            color: #2e7d32;
+            margin: 0;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+    /* ── Buttons ── */
+    .btn-row {
+        display: flex;
+        gap: 12px;
     }
 
     .btn-primary {
-        background: #b30000;
+        flex: 1;
+        background: #8b0000;
         color: white;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        transition: background 0.2s;
     }
 
         .btn-primary:hover {
-            background: #800000;
+            background: #a00000;
         }
 
     .btn-secondary {
-        background: #ddd;
-        color: #333;
+        flex: 1;
+        background: #f5f5f5;
+        color: #555;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        border: 1px solid #ddd;
+        transition: background 0.2s;
     }
 
+        .btn-secondary:hover {
+            background: #ebebeb;
+        }
 </style>
 
-<div class="success-container">
+<div class="page-wrapper">
+    <div class="success-card">
 
-    <i class="fa-solid fa-circle-check icon"></i>
+        <!-- BANNER -->
+        <div class="card-banner">
+            <div class="check-circle">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2>Donation Submitted Successfully!</h2>
+            <p>Your registration has been received</p>
+        </div>
 
-    <h2>Donation Submitted Successfully!</h2>
+        <!-- BODY -->
+        <div class="card-body">
 
-    <p>
-        Thank you for your willingness to donate blood.
-        Your contribution can help save lives. Our team will contact you soon.
-    </p>
+            <p>
+                Thank you for your willingness to donate blood.
+                Your contribution can help save lives.
+                Our team will review your registration and contact you shortly.
+            </p>
 
-    <!-- Optional Info -->
-    <div class="info-box">
-        <span><strong>Status:</strong> Registered</span>
-        <span><strong>Next Step:</strong> Wait for confirmation call</span>
+            <!-- INFO ROWS -->
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="row-icon">
+                        <i class="fa-solid fa-circle-dot"></i>
+                    </div>
+                    <div class="row-text">
+                        <span>Registration Status</span>
+                        <strong>Registered</strong>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="row-icon">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div class="row-text">
+                        <span>Next Step</span>
+                        <strong>Wait for confirmation call</strong>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="row-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="row-text">
+                        <span>Response Time</span>
+                        <strong>Within 24–48 hours</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTICE -->
+            <div class="notice-box">
+                <i class="fa-solid fa-circle-info"></i>
+                <p>
+                    Please keep your phone available. Our staff will call you
+                    to confirm your donation appointment and provide further instructions.
+                </p>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="btn-row">
+                <a asp-controller="Home" asp-action="UserDashboard" class="btn-primary">
+                    <i class="fa-solid fa-house"></i> Back to Dashboard
+                </a>
+                <a asp-controller="Home" asp-action="Donate" class="btn-secondary">
+                    <i class="fa-solid fa-droplet"></i> Donate Again
+                </a>
+            </div>
+
+        </div>
     </div>
-
-    <!-- Buttons -->
-    <a asp-controller="Home" asp-action="User" class="btn btn-primary">
-        Back to Dashboard
-    </a>
-
-    <a asp-controller="Home" asp-action="Donate" class="btn btn-secondary">
-        Donate Again
-    </a>
-
 </div>

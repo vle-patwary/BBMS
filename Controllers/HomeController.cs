@@ -14,15 +14,24 @@ namespace BBMS.Controllers
     public class HomeController : Controller
     {
         private readonly AppDbContext _db;
-        private readonly UserManager<IdentityUser> _userManager; // ✅ ADDED
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(AppDbContext db, UserManager<IdentityUser> userManager) // ✅ ADDED
+        public HomeController(AppDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
-            _userManager = userManager; // ✅ ADDED
+            _userManager = userManager;
         }
 
-        public IActionResult Index() => View();
+        // ─── Home Page ───────────────────────────────────────────
+        public IActionResult Index()
+        {
+            var bloodStocks = _db.BloodStocks.OrderBy(s => s.BloodGroup).ToList();
+
+            ViewBag.TotalDonors = _db.DonateBloods.Count();
+            ViewBag.TotalGroups = _db.BloodStocks.Count();
+
+            return View(bloodStocks);
+        }
 
         // ─── DONATE ───────────────────────────────────────────
         [HttpGet]
@@ -520,26 +529,22 @@ namespace BBMS.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> UserDashboard()
         {
-            // Get logged-in Identity user
             var identityUser = await _userManager.GetUserAsync(User);
             if (identityUser == null)
                 return RedirectToAction("LogIn", "Auth");
 
-            // Fetch their profile
             var profile = _db.UserProfiles
                 .FirstOrDefault(p => p.IdentityUserId == identityUser.Id);
 
             if (profile == null)
                 return RedirectToAction("LogIn", "Auth");
 
-            // Fetch their blood requests matched by name
             var myRequests = _db.BloodRequests
                 .Where(r => r.RequesterName == profile.Name)
                 .OrderByDescending(r => r.RequestDate)
                 .Take(5)
                 .ToList();
 
-            // Fetch their donations
             var myDonations = _db.DonateBloods
                 .OrderByDescending(d => d.CreatedAt)
                 .Take(5)
@@ -565,13 +570,25 @@ namespace BBMS.Controllers
         }
 
         // ─── OTHER PAGES ──────────────────────────────────────
+
         public IActionResult Privacy() => View();
-        public IActionResult Admin() => View();
+
         public IActionResult AddCollection() => View();
-        public IActionResult TrackRequest() => View();
-        public IActionResult ViewCollection() => View();
+      
         public IActionResult ViewDonation() => View();
         public IActionResult CheckRequest() => View();
+
+        // ─── Admin Dashboard ──────────────────────────────────────
+        public IActionResult Admin()
+        {
+            var bloodStocks = _db.BloodStocks
+                .OrderBy(s => s.BloodGroup)
+                .ToList();
+            return View(bloodStocks);
+        }
+
+        // ─── ADMIN REPORTS ────────────────────────────────────
+        // Replace your existing AdminReports() action with this one:
 
         public IActionResult AdminReports()
         {
@@ -579,17 +596,37 @@ namespace BBMS.Controllers
                 .OrderByDescending(d => d.CreatedAt)
                 .ToList();
 
+            var bloodStocks = _db.BloodStocks
+                .OrderBy(s => s.BloodGroup)
+                .ToList();
+
+            var bloodRequests = _db.BloodRequests
+                .OrderByDescending(r => r.RequestDate)
+                .ToList();
+
+            var staffList = _db.Staffs
+                .OrderByDescending(s => s.JoinDate)
+                .ToList();
+
+            var hospitalList = _db.Hospitals
+                .OrderBy(h => h.Name)
+                .ToList();
+
+            // ── ViewBag data for all tables ──
             ViewBag.DonorList = donors;
+            ViewBag.BloodStockList = bloodStocks;
+            ViewBag.BloodRequestList = bloodRequests;
+            ViewBag.StaffList = staffList;
+            ViewBag.HospitalList = hospitalList;
+
+            // ── Quick stat cards ──
             ViewBag.TotalDonors = donors.Count;
+            ViewBag.TotalBloodUnits = bloodStocks.Sum(s => s.Units);
             ViewBag.PendingRequests = _db.BloodRequests.Count(r => r.Status == "Pending");
             ViewBag.ActiveStaff = _db.Staffs.Count(s => s.Status == "Active");
             ViewBag.TotalHospitals = _db.Hospitals.Count();
 
             return View();
         }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error() =>
-            View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

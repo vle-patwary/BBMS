@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +9,25 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BBMS.styles.css" asp-append-version="true" />
+    <style>
+        /* Force blood stock modals above everything */
+        #editModal, #deleteModal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 999999 !important;
+            background: rgba(0,0,0,0.82) !important;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+            #editModal.show, #deleteModal.show {
+                display: flex !important;
+            }
+    </style>
 </head>
 
 <body>

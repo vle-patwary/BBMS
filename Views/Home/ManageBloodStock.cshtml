@@ -442,54 +442,55 @@
     }
 
     .btn-edit {
-        background: #1565c0; /* solid blue instead of light */
+        background: #1565c0;
         color: white;
     }
 
         .btn-edit:hover {
-            background: #1565c0;
+            background: #0d47a1;
             color: white;
         }
 
     .btn-delete {
-    background: #8b0000;   /* solid red instead of light */
-    color: white;
-}}
+        background: #8b0000;
+        color: white;
+    }
 
         .btn-delete:hover {
-            background: #8b0000;
+            background: #6e0000;
             color: white;
         }
 
-    /* REPLACE your existing .modal-backdrop rule with this */
-    .modal-backdrop {
+    /* ── MODAL BACKDROP ── */
+    .bs-modal-overlay {
         display: none;
         position: fixed;
+        inset: 0;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.65);
-        z-index: 99999;
+        background: rgba(0, 0, 0, 0.82);
+        z-index: 999999;
         align-items: center;
         justify-content: center;
-        /* pointer-events: none  ← DELETE THIS LINE */
     }
 
-        .modal-backdrop.show {
+        .bs-modal-overlay.show {
             display: flex;
             pointer-events: all;
         }
 
     .modal-box {
-        background: #fff;
+        background: #ffffff;
+        isolation: isolate;
         border-radius: 12px;
-        width: 440px;
+        width: 500px;
         max-width: 95vw;
-        box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+        box-shadow: 0 25px 70px rgba(0,0,0,0.6);
         overflow: hidden;
         position: relative;
-        z-index: 100000;
+        z-index: 1000000;
         animation: modalSlideIn 0.25s ease;
     }
 
@@ -544,6 +545,7 @@
         display: flex;
         flex-direction: column;
         gap: 18px;
+        background: #ffffff;
     }
 
     .modal-group {
@@ -566,7 +568,8 @@
                 font-size: 11px;
             }
 
-        .modal-group input, .modal-group select {
+        .modal-group input,
+        .modal-group select {
             padding: 10px 13px;
             border: 1px solid #ddd;
             border-radius: 7px;
@@ -579,7 +582,8 @@
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-            .modal-group input:focus, .modal-group select:focus {
+            .modal-group input:focus,
+            .modal-group select:focus {
                 border-color: #8b0000;
                 box-shadow: 0 0 0 3px rgba(139,0,0,0.08);
                 background: white;
@@ -611,7 +615,7 @@
         gap: 10px;
         padding: 16px 24px;
         border-top: 1px solid #f5eded;
-        background: #fffafa;
+        background: #ffffff;
     }
 
     .btn-cancel-modal {
@@ -656,14 +660,17 @@
             background: #6e0000;
         }
 
-    /* ── DELETE CONFIRM MODAL ── */
+    /* ── DELETE MODAL ── */
     .delete-modal-box {
-        background: white;
+        background: #ffffff;
+        isolation: isolate;
         border-radius: 12px;
-        width: 400px;
+        width: 420px;
         max-width: 95vw;
         overflow: hidden;
-        box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+        box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+        position: relative;
+        z-index: 1000000;
         animation: modalSlideIn 0.25s ease;
     }
 
@@ -683,6 +690,7 @@
         font-size: 13px;
         color: #444;
         line-height: 1.6;
+        background: #ffffff;
     }
 
         .delete-modal-body strong {
@@ -695,7 +703,7 @@
         gap: 10px;
         padding: 16px 24px;
         border-top: 1px solid #f5eded;
-        background: #fffafa;
+        background: #ffffff;
     }
 
     .btn-confirm-delete {
@@ -849,12 +857,10 @@
                             <td>@item.LastUpdated.ToString("dd MMM yyyy")</td>
                             <td>
                                 <div class="actions">
-                                    <!-- EDIT -->
                                     <button class="action-btn btn-edit"
                                             onclick="openEditModal('@item.BloodGroup', @item.Units, '@item.LastUpdated.ToString("dd MMM yyyy")', @item.Id)">
                                         <i class="fa-solid fa-pen-to-square"></i> Edit
                                     </button>
-                                    <!-- DELETE -->
                                     <button class="action-btn btn-delete"
                                             onclick="openDeleteModal(@item.Id, '@item.BloodGroup')">
                                         <i class="fa-solid fa-trash"></i> Delete
@@ -875,7 +881,7 @@
 <!-- ═══════════════════════════════
      EDIT MODAL
 ═══════════════════════════════ -->
-<div class="modal-backdrop" id="editModal">
+<div class="bs-modal-overlay" id="editModal">
     <div class="modal-box">
         <div class="modal-header">
             <span class="modal-header-title">
@@ -919,24 +925,10 @@
     </div>
 </div>
 
-
-<!-- Hidden form — Edit -->
-<form id="editForm" asp-action="UpdateBloodStock" asp-controller="Home" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="id" id="edit-form-id" />
-    <input type="hidden" name="units" id="edit-form-units" />
-    <input type="hidden" name="status" id="edit-form-status" />
-</form>
-
-<!-- Hidden form — Delete -->
-<form id="deleteForm" asp-action="DeleteBloodStock" asp-controller="Home" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="id" id="delete-form-id" />
-</form>
 <!-- ═══════════════════════════════
      DELETE CONFIRM MODAL
 ═══════════════════════════════ -->
-<div class="modal-backdrop" id="deleteModal">
+<div class="bs-modal-overlay" id="deleteModal">
     <div class="delete-modal-box">
         <div class="delete-modal-header">
             <i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete
@@ -957,13 +949,29 @@
     </div>
 </div>
 
-<!-- Hidden form — Delete -->
+<!-- Hidden form — Edit -->
+<form id="editForm" asp-action="UpdateBloodStock" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="edit-form-id" />
+    <input type="hidden" name="units" id="edit-form-units" />
+    <input type="hidden" name="status" id="edit-form-status" />
+</form>
+
+<!-- Hidden form — Delete (only ONE, placed here at the bottom) -->
 <form id="deleteForm" asp-action="DeleteBloodStock" asp-controller="Home" method="post">
     @Html.AntiForgeryToken()
     <input type="hidden" name="id" id="delete-form-id" />
 </form>
 
 <script>
+    // ── Move modals to <body> so Bootstrap .container doesn't clip them ──
+    document.addEventListener('DOMContentLoaded', function () {
+        ['editModal', 'deleteModal'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) document.body.appendChild(el);
+        });
+    });
+
     // ── FILTER ────────────────────────────────────
     function filterTable() {
         const search = document.getElementById('searchInput').value.toLowerCase();
@@ -983,11 +991,11 @@
 
     // ── EDIT MODAL ────────────────────────────────
     function openEditModal(group, units, date, id) {
-        document.getElementById('edit-form-id').value        = id;
-        document.getElementById('editModalTitle').innerText  = 'Edit Stock — ' + group;
-        document.getElementById('edit-group').value          = group;
-        document.getElementById('edit-units').value          = units;
-        document.getElementById('editModalNote').innerText   = 'Last updated: ' + date + '. Change the values below.';
+        document.getElementById('edit-form-id').value       = id;
+        document.getElementById('editModalTitle').innerText = 'Edit Stock — ' + group;
+        document.getElementById('edit-group').value         = group;
+        document.getElementById('edit-units').value         = units;
+        document.getElementById('editModalNote').innerText  = 'Last updated: ' + date + '. Change the values below.';
 
         const s = document.getElementById('edit-status');
         s.value = units >= 30 ? 'sufficient' : units >= 15 ? 'low' : 'critical';
@@ -1013,8 +1021,22 @@
         document.getElementById('editForm').submit();
     }
 
-    document.getElementById('editModal').addEventListener('click', function(e) {
-        if (e.target === this) closeEditModal();
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('editModal').addEventListener('click', function (e) {
+            if (e.target === this) closeEditModal();
+        });
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteModal();
+        });
+    });
+
+    // Auto-update status when units change
+    document.getElementById('edit-units').addEventListener('input', function () {
+        const units = parseInt(this.value);
+        const sel   = document.getElementById('edit-status');
+        if (!isNaN(units)) {
+            sel.value = units >= 30 ? 'sufficient' : units >= 15 ? 'low' : 'critical';
+        }
     });
 
     // ── DELETE MODAL ──────────────────────────────
@@ -1034,11 +1056,7 @@
         document.getElementById('deleteForm').submit();
     }
 
-    document.getElementById('deleteModal').addEventListener('click', function(e) {
-        if (e.target === this) closeDeleteModal();
-    });
-
-    // ── TOAST (for TempData messages) ─────────────
+    // ── TOAST ─────────────────────────────────────
     @if (TempData["SuccessMessage"] != null)
     {
             <text>
@@ -1056,12 +1074,12 @@
                 'padding:14px 22px','border-radius:10px','font-size:13px','font-weight:600',
                 'display:flex','align-items:center','gap:10px','box-shadow:0 8px 28px rgba(0,0,0,0.18)',
                 "font-family:'Segoe UI',sans-serif",'transform:translateY(80px)','opacity:0',
-                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)','z-index:999999'
+                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)','z-index:9999999'
             ].join(';');
             document.body.appendChild(t);
         }
         t.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + msg;
-        setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
+        setTimeout(() => { t.style.transform = 'translateY(0)';   t.style.opacity = '1'; }, 10);
         setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3200);
     }
 </script>

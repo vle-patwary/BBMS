@@ -191,7 +191,7 @@
             background: rgba(255,255,255,0.28);
         }
 
-    /* PER-TABLE FILTER BAR */
+    /* FILTER BAR */
     .table-filter-bar {
         display: flex;
         align-items: center;
@@ -308,10 +308,6 @@
         background: #fff8f8;
     }
 
-    .hidden-row {
-        display: none;
-    }
-
     .badge {
         display: inline-block;
         padding: 3px 11px;
@@ -351,6 +347,24 @@
         color: #8b0000 !important;
         border-top: 2px solid #f0e0e0;
     }
+
+    /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #aaa;
+    }
+
+        .empty-state i {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+            color: #f0e0e0;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
 
     /* PAGINATION */
     .pagination-bar {
@@ -437,7 +451,8 @@
         }
 
     @@media print {
-        .download-btn, .table-filter-bar, .back-btn, .pagination-bar, .download-all-wrap {
+        .download-btn, .table-filter-bar, .back-btn,
+        .pagination-bar, .download-all-wrap {
             display: none !important;
         }
     }
@@ -461,14 +476,31 @@
     <!-- QUICK STATS -->
     <div class="section-title">Overview</div>
     <div class="stats-grid">
-        <div class="stat-card"><div class="s-val">@ViewBag.TotalDonors</div><div class="s-lbl">Total Donors</div></div>
-        <div class="stat-card"><div class="s-val">@ViewBag.PendingRequests</div><div class="s-lbl">Pending Requests</div></div>
-        <div class="stat-card"><div class="s-val">80</div><div class="s-lbl">Blood Units in Stock</div></div>
-        <div class="stat-card"><div class="s-val">@ViewBag.ActiveStaff</div><div class="s-lbl">Active Staff</div></div>
-        <div class="stat-card"><div class="s-val">@ViewBag.TotalHospitals</div><div class="s-lbl">Partner Hospitals</div></div>
+        <div class="stat-card">
+            <div class="s-val">@ViewBag.TotalDonors</div>
+            <div class="s-lbl">Total Donors</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-val">@ViewBag.PendingRequests</div>
+            <div class="s-lbl">Pending Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-val">@ViewBag.TotalBloodUnits</div>
+            <div class="s-lbl">Blood Units in Stock</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-val">@ViewBag.ActiveStaff</div>
+            <div class="s-lbl">Active Staff</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-val">@ViewBag.TotalHospitals</div>
+            <div class="s-lbl">Partner Hospitals</div>
+        </div>
     </div>
 
-    <!-- ═══════════════════ 1. DONORS ═══════════════════ -->
+    @* ─────────────────────────────────────────────────────────
+       1. DONORS
+    ───────────────────────────────────────────────────────── *@
     <div class="section-title">Donors Report</div>
     <div class="report-card" id="section-donors">
         <div class="report-card-header">
@@ -477,7 +509,6 @@
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
         </div>
-
         <div class="table-filter-bar">
             <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
             <input type="text" id="donors-search" placeholder="Search name, blood group, contact…">
@@ -506,7 +537,6 @@
                 <i class="fa-solid fa-xmark"></i> Clear
             </button>
         </div>
-
         <div class="report-table-wrap">
             <table id="tbl-donors">
                 <thead>
@@ -553,7 +583,14 @@
                     }
                     else
                     {
-                        <tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">No donors found.</td></tr>
+                        <tr>
+                            <td colspan="9">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-users-slash"></i>
+                                    <p>No donors found.</p>
+                                </div>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -564,7 +601,9 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ 2. BLOOD STOCK ═══════════════════ -->
+    @* ─────────────────────────────────────────────────────────
+       2. BLOOD STOCK
+    ───────────────────────────────────────────────────────── *@
     <div class="section-title">Blood Stock Report</div>
     <div class="report-card" id="section-stock">
         <div class="report-card-header">
@@ -573,16 +612,15 @@
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
         </div>
-
         <div class="table-filter-bar">
             <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
             <input type="text" id="stock-search" placeholder="Search blood group, stock level…">
             <label>Stock Level:</label>
             <select id="stock-level">
                 <option value="">All Levels</option>
-                <option>Normal</option>
-                <option>Low</option>
-                <option>Critical</option>
+                <option value="sufficient">Sufficient</option>
+                <option value="low">Low</option>
+                <option value="critical">Critical</option>
             </select>
             <button class="btn-search" onclick="filterTable('stock')">
                 <i class="fa-solid fa-magnifying-glass"></i> Search
@@ -591,29 +629,65 @@
                 <i class="fa-solid fa-xmark"></i> Clear
             </button>
         </div>
-
         <div class="report-table-wrap">
             <table id="tbl-stock">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Blood Group</th>
                         <th>Available Units</th>
-                        <th>Reserved Units</th>
-                        <th>Used This Month</th>
-                        <th>Expiring Soon (≤7 days)</th>
                         <th>Last Updated</th>
                         <th>Stock Level</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-stock">
-                    <tr><td><strong>A+</strong></td><td>15</td><td>3</td><td>8</td><td>2</td><td>2025-04-30</td><td><span class="badge badge-green">Normal</span></td></tr>
-                    <tr><td><strong>A-</strong></td><td>4</td><td>1</td><td>3</td><td>1</td><td>2025-04-29</td><td><span class="badge badge-yellow">Low</span></td></tr>
-                    <tr><td><strong>B+</strong></td><td>12</td><td>2</td><td>6</td><td>0</td><td>2025-04-30</td><td><span class="badge badge-green">Normal</span></td></tr>
-                    <tr><td><strong>B-</strong></td><td>2</td><td>0</td><td>2</td><td>2</td><td>2025-04-28</td><td><span class="badge badge-red">Critical</span></td></tr>
-                    <tr><td><strong>O+</strong></td><td>20</td><td>5</td><td>14</td><td>3</td><td>2025-04-30</td><td><span class="badge badge-green">Normal</span></td></tr>
-                    <tr><td><strong>O-</strong></td><td>6</td><td>2</td><td>5</td><td>1</td><td>2025-04-30</td><td><span class="badge badge-yellow">Low</span></td></tr>
-                    <tr><td><strong>AB+</strong></td><td>5</td><td>1</td><td>3</td><td>0</td><td>2025-04-29</td><td><span class="badge badge-yellow">Low</span></td></tr>
-                    <tr><td><strong>AB-</strong></td><td>3</td><td>0</td><td>1</td><td>1</td><td>2025-04-27</td><td><span class="badge badge-yellow">Low</span></td></tr>
+                    @{
+                        int stockSerial = 1;
+                        var stockList = ViewBag.BloodStockList as List<BBMS.Models.BloodStock>;
+                    }
+                    @if (stockList != null && stockList.Any())
+                    {
+                        foreach (var s in stockList)
+                        {
+                            string badgeClass = s.Status?.ToLower() switch
+                            {
+                                "sufficient" => "badge-green",
+                                "low" => "badge-yellow",
+                                "critical" => "badge-red",
+                                _ => "badge-gray"
+                            };
+                            string badgeLabel = s.Status?.ToLower() switch
+                            {
+                                "sufficient" => "Sufficient",
+                                "low" => "Low",
+                                "critical" => "Critical",
+                                _ => s.Status ?? "Unknown"
+                            };
+                            <tr>
+                                <td>@(stockSerial++)</td>
+                                <td><strong>@s.BloodGroup</strong></td>
+                                <td>@s.Units</td>
+                                <td>@s.LastUpdated.ToString("dd MMM yyyy")</td>
+                                <td><span class="badge @badgeClass">@badgeLabel</span></td>
+                            </tr>
+                        }
+                        <tr class="summary-row">
+                            <td colspan="2" style="text-align:right">Total Units:</td>
+                            <td><strong>@stockList.Sum(s => s.Units)</strong></td>
+                            <td colspan="2"></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-syringe"></i>
+                                    <p>No blood stock data found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -623,7 +697,9 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ 3. BLOOD REQUESTS ═══════════════════ -->
+    @* ─────────────────────────────────────────────────────────
+       3. BLOOD REQUESTS  ← now reading from DB
+    ───────────────────────────────────────────────────────── *@
     <div class="section-title">Blood Requests Report</div>
     <div class="report-card" id="section-requests">
         <div class="report-card-header">
@@ -632,10 +708,9 @@
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
         </div>
-
         <div class="table-filter-bar">
             <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
-            <input type="text" id="requests-search" placeholder="Search patient, hospital, request ID…">
+            <input type="text" id="requests-search" placeholder="Search requester, hospital, invoice…">
             <label>Blood Group:</label>
             <select id="requests-blood">
                 <option value="">All Groups</option>
@@ -654,12 +729,9 @@
                 <option>Approved</option>
                 <option>Pending</option>
                 <option>Rejected</option>
-                <option>Processing</option>
             </select>
-            <label>From:</label>
-            <input type="date" id="requests-from">
-            <label>To:</label>
-            <input type="date" id="requests-to">
+            <label>From:</label><input type="date" id="requests-from">
+            <label>To:</label><input type="date" id="requests-to">
             <button class="btn-search" onclick="filterTable('requests')">
                 <i class="fa-solid fa-magnifying-glass"></i> Search
             </button>
@@ -667,29 +739,73 @@
                 <i class="fa-solid fa-xmark"></i> Clear
             </button>
         </div>
-
         <div class="report-table-wrap">
             <table id="tbl-requests">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Request ID</th>
-                        <th>Patient Name</th>
+                        <th>Invoice No.</th>
+                        <th>Requester Name</th>
                         <th>Blood Group</th>
                         <th>Units Needed</th>
                         <th>Hospital</th>
                         <th>Request Date</th>
                         <th>Required By</th>
+                        <th>Total Cost (৳)</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-requests">
-                    <tr><td>1</td><td>REQ-1001</td><td>Kamal Uddin</td><td>A+</td><td>2</td><td>Dhaka Medical</td><td>2025-04-01</td><td>2025-04-03</td><td><span class="badge badge-green">Approved</span></td></tr>
-                    <tr><td>2</td><td>REQ-1002</td><td>Rina Khatun</td><td>O+</td><td>3</td><td>BSMMU</td><td>2025-04-05</td><td>2025-04-06</td><td><span class="badge badge-yellow">Pending</span></td></tr>
-                    <tr><td>3</td><td>REQ-1003</td><td>Farhan Ahmed</td><td>B-</td><td>1</td><td>Square Hospital</td><td>2025-04-08</td><td>2025-04-09</td><td><span class="badge badge-red">Rejected</span></td></tr>
-                    <tr><td>4</td><td>REQ-1004</td><td>Sumaiya Islam</td><td>AB+</td><td>2</td><td>Apollo Hospital</td><td>2025-04-10</td><td>2025-04-12</td><td><span class="badge badge-green">Approved</span></td></tr>
-                    <tr><td>5</td><td>REQ-1005</td><td>Jahir Raihan</td><td>O-</td><td>4</td><td>Dhaka Medical</td><td>2025-04-14</td><td>2025-04-15</td><td><span class="badge badge-yellow">Pending</span></td></tr>
-                    <tr><td>6</td><td>REQ-1006</td><td>Mitu Begum</td><td>A-</td><td>1</td><td>Ibn Sina</td><td>2025-04-18</td><td>2025-04-20</td><td><span class="badge badge-blue">Processing</span></td></tr>
+                    @{
+                        int reqSerial = 1;
+                        var requestList = ViewBag.BloodRequestList as List<YourApp.Models.BloodRequest>;
+                    }
+                    @if (requestList != null && requestList.Any())
+                    {
+                        foreach (var r in requestList)
+                        {
+                            string reqBadge = r.Status switch
+                            {
+                                "Approved" => "badge-green",
+                                "Rejected" => "badge-red",
+                                "Pending" => "badge-yellow",
+                                _ => "badge-gray"
+                            };
+                            <tr data-date="@r.RequestDate.ToString("yyyy-MM-dd")">
+                                <td>@(reqSerial++)</td>
+                                <td style="font-size:11px;color:#8b0000;font-weight:700">
+                                    @r.InvoiceNumber
+                                </td>
+                                <td>@r.RequesterName</td>
+                                <td><strong>@r.BloodGroup</strong></td>
+                                <td style="text-align:center">@r.UnitsRequired</td>
+                                <td>@(r.Hospital ?? "—")</td>
+                                <td>@r.RequestDate.ToString("dd MMM yyyy")</td>
+                                <td>@r.RequiredDate.ToString("dd MMM yyyy")</td>
+                                <td>৳ @r.TotalCost.ToString("N0")</td>
+                                <td><span class="badge @reqBadge">@r.Status</span></td>
+                            </tr>
+                        }
+                        <!-- Summary row -->
+                        <tr class="summary-row">
+                            <td colspan="4" style="text-align:right">Total Requests:</td>
+                            <td style="text-align:center"><strong>@requestList.Count</strong></td>
+                            <td colspan="3" style="text-align:right">Total Revenue:</td>
+                            <td><strong>৳ @requestList.Sum(r => r.TotalCost).ToString("N0")</strong></td>
+                            <td></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-file-medical"></i>
+                                    <p>No blood requests found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -699,7 +815,9 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ 4. STAFF ═══════════════════ -->
+    @* ─────────────────────────────────────────────────────────
+       4. STAFF
+    ───────────────────────────────────────────────────────── *@
     <div class="section-title">Staff Report</div>
     <div class="report-card" id="section-staff">
         <div class="report-card-header">
@@ -708,7 +826,6 @@
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
         </div>
-
         <div class="table-filter-bar">
             <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
             <input type="text" id="staff-search" placeholder="Search name, role, email…">
@@ -726,7 +843,6 @@
                 <i class="fa-solid fa-xmark"></i> Clear
             </button>
         </div>
-
         <div class="report-table-wrap">
             <table id="tbl-staff">
                 <thead>
@@ -741,11 +857,42 @@
                     </tr>
                 </thead>
                 <tbody id="tbody-staff">
-                    <tr><td>1</td><td>Dr. Mahbub Alam</td><td>Chief Medical Officer</td><td>mahbub@bloodbank.org</td><td>01711-100001</td><td>2020-01-15</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>2</td><td>Fatema Tuz Zohra</td><td>Lab Technician</td><td>fatema@bloodbank.org</td><td>01811-100002</td><td>2021-06-01</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>3</td><td>Sabbir Rahman</td><td>Blood Bank Officer</td><td>sabbir@bloodbank.org</td><td>01911-100003</td><td>2022-03-20</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>4</td><td>Nasrin Sultana</td><td>Nurse</td><td>nasrin@bloodbank.org</td><td>01611-100004</td><td>2021-09-11</td><td><span class="badge badge-yellow">On Leave</span></td></tr>
-                    <tr><td>5</td><td>Imran Hossain</td><td>Data Entry Operator</td><td>imran@bloodbank.org</td><td>01711-100005</td><td>2023-02-05</td><td><span class="badge badge-green">Active</span></td></tr>
+                    @{
+                        int staffSerial = 1;
+                        var staffList = ViewBag.StaffList as List<BBMS.Models.Staff>;
+                    }
+                    @if (staffList != null && staffList.Any())
+                    {
+                        foreach (var s in staffList)
+                        {
+                            string sBadge = s.Status switch
+                            {
+                                "Active" => "badge-green",
+                                "On Leave" => "badge-yellow",
+                                _ => "badge-gray"
+                            };
+                            <tr>
+                                <td>@(staffSerial++)</td>
+                                <td>@s.Name</td>
+                                <td>@s.Role</td>
+                                <td>@s.Email</td>
+                                <td>@s.Contact</td>
+                                <td>@s.JoinDate.ToString("dd MMM yyyy")</td>
+                                <td><span class="badge @sBadge">@s.Status</span></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <p>No staff records found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -755,7 +902,9 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ 5. HOSPITALS ═══════════════════ -->
+    @* ─────────────────────────────────────────────────────────
+       5. HOSPITALS
+    ───────────────────────────────────────────────────────── *@
     <div class="section-title">Hospital Report</div>
     <div class="report-card" id="section-hospitals">
         <div class="report-card-header">
@@ -764,7 +913,6 @@
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
         </div>
-
         <div class="table-filter-bar">
             <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
             <input type="text" id="hospitals-search" placeholder="Search hospital name, location…">
@@ -782,7 +930,6 @@
                 <i class="fa-solid fa-xmark"></i> Clear
             </button>
         </div>
-
         <div class="report-table-wrap">
             <table id="tbl-hospitals">
                 <thead>
@@ -798,84 +945,49 @@
                     </tr>
                 </thead>
                 <tbody id="tbody-hospitals">
-                    <tr><td>1</td><td>Dhaka Medical College</td><td>Dhaka</td><td>Dr. Rahman</td><td>02-1234567</td><td>25</td><td>48</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>2</td><td>BSMMU</td><td>Dhaka</td><td>Dr. Hossain</td><td>02-7654321</td><td>18</td><td>32</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>3</td><td>Square Hospital</td><td>Dhaka</td><td>Dr. Karim</td><td>02-9988776</td><td>10</td><td>15</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>4</td><td>Apollo Hospital</td><td>Dhaka</td><td>Dr. Nasim</td><td>02-5566778</td><td>7</td><td>12</td><td><span class="badge badge-green">Active</span></td></tr>
-                    <tr><td>5</td><td>Ibn Sina Hospital</td><td>Dhaka</td><td>Dr. Akter</td><td>02-3344556</td><td>4</td><td>6</td><td><span class="badge badge-yellow">Pending Approval</span></td></tr>
+                    @{
+                        int hospSerial = 1;
+                        var hospitalList = ViewBag.HospitalList as List<BBMS.Models.Hospital>;
+                    }
+                    @if (hospitalList != null && hospitalList.Any())
+                    {
+                        foreach (var h in hospitalList)
+                        {
+                            string hBadge = h.Status switch
+                            {
+                                "Active" => "badge-green",
+                                "Pending Approval" => "badge-yellow",
+                                _ => "badge-gray"
+                            };
+                            <tr>
+                                <td>@(hospSerial++)</td>
+                                <td>@h.Name</td>
+                                <td>@h.Location</td>
+                                <td>@h.ContactPerson</td>
+                                <td>@h.Phone</td>
+                                <td>@h.Requests</td>
+                                <td>@h.UnitsSupplied</td>
+                                <td><span class="badge @hBadge">@h.Status</span></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-building"></i>
+                                    <p>No hospital records found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
         <div class="pagination-bar" id="pag-hospitals">
             <span class="page-info" id="info-hospitals"></span>
             <div class="page-btns" id="btns-hospitals"></div>
-        </div>
-    </div>
-
-    <!-- ═══════════════════ 6. DONATION HISTORY ═══════════════════ -->
-    <div class="section-title">Donation History Report</div>
-    <div class="report-card" id="section-history">
-        <div class="report-card-header">
-            <h3><i class="fa-solid fa-heart-pulse"></i> Donation History Log</h3>
-            <button class="download-btn" onclick="downloadPDF('section-history','Donation_History_Report')">
-                <i class="fa-solid fa-file-pdf"></i> Download PDF
-            </button>
-        </div>
-
-        <div class="table-filter-bar">
-            <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
-            <input type="text" id="history-search" placeholder="Search donor name, blood group…">
-            <label>Blood Group:</label>
-            <select id="history-blood">
-                <option value="">All Groups</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>O+</option>
-                <option>O-</option>
-                <option>AB+</option>
-                <option>AB-</option>
-            </select>
-            <label>From:</label>
-            <input type="date" id="history-from">
-            <label>To:</label>
-            <input type="date" id="history-to">
-            <button class="btn-search" onclick="filterTable('history')">
-                <i class="fa-solid fa-magnifying-glass"></i> Search
-            </button>
-            <button class="btn-clear" onclick="clearFilter('history')">
-                <i class="fa-solid fa-xmark"></i> Clear
-            </button>
-        </div>
-
-        <div class="report-table-wrap">
-            <table id="tbl-history">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Donation ID</th>
-                        <th>Donor Name</th>
-                        <th>Blood Group</th>
-                        <th>Units</th>
-                        <th>Donation Date</th>
-                        <th>Collected By</th>
-                        <th>Transferred To</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-history">
-                    <tr><td>1</td><td>DON-2001</td><td>Arif Hossain</td><td>A+</td><td>1</td><td>2025-03-12</td><td>Fatema Tuz Zohra</td><td>Stock</td><td><span class="badge badge-green">Normal</span></td></tr>
-                    <tr><td>2</td><td>DON-2002</td><td>Rakibul Islam</td><td>O+</td><td>1</td><td>2025-03-18</td><td>Sabbir Rahman</td><td>Dhaka Medical</td><td><span class="badge badge-blue">Urgent</span></td></tr>
-                    <tr><td>3</td><td>DON-2003</td><td>Mehedi Hasan</td><td>O-</td><td>1</td><td>2025-04-02</td><td>Fatema Tuz Zohra</td><td>Stock</td><td><span class="badge badge-green">Normal</span></td></tr>
-                    <tr><td>4</td><td>DON-2004</td><td>Tasnia Akter</td><td>AB+</td><td>1</td><td>2025-04-10</td><td>Sabbir Rahman</td><td>Apollo Hospital</td><td><span class="badge badge-green">Normal</span></td></tr>
-                    <tr><td>5</td><td>DON-2005</td><td>Nusrat Jahan</td><td>B+</td><td>1</td><td>2025-04-22</td><td>Fatema Tuz Zohra</td><td>Stock</td><td><span class="badge badge-green">Normal</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination-bar" id="pag-history">
-            <span class="page-info" id="info-history"></span>
-            <div class="page-btns" id="btns-history"></div>
         </div>
     </div>
 
@@ -889,28 +1001,31 @@
 </div>
 
 <script>
-    // ══════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════
     // PAGINATION + FILTER ENGINE
-    // ══════════════════════════════════════════════════════
-
-    const PAGE_SIZE = 10;
-
-    // State per table: { allRows, filteredRows, currentPage }
+    // ════════════════════════════════════════════════════
+    const PAGE_SIZE  = 10;
     const tableState = {};
-
-    const tables = ['donors', 'stock', 'requests', 'staff', 'hospitals', 'history'];
+    const tables     = ['donors','stock','requests','staff','hospitals'];
 
     function initTable(name) {
         const tbody = document.getElementById('tbody-' + name);
-        const rows  = [...tbody.querySelectorAll('tr:not(.summary-row)')];
-        tableState[name] = { allRows: rows, filteredRows: rows, currentPage: 1 };
+        const rows  = [...tbody.querySelectorAll('tr:not(.summary-row)')].filter(r => {
+            // Skip the empty-state colspan rows from pagination
+            return r.querySelector('td[colspan]') === null || r.querySelector('.empty-state') === null;
+        });
+        // Actually: include all real data rows (no empty-state cell), exclude summary
+        const dataRows = [...tbody.querySelectorAll('tr:not(.summary-row)')].filter(r =>
+            !r.querySelector('.empty-state')
+        );
+        tableState[name] = { allRows: dataRows, filteredRows: dataRows, currentPage: 1 };
         renderPage(name);
     }
 
     function renderPage(name) {
-        const state = tableState[name];
+        const state      = tableState[name];
         const { filteredRows, currentPage } = state;
-        const total     = filteredRows.length;
+        const total      = filteredRows.length;
         const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
         const page       = Math.min(currentPage, totalPages);
         state.currentPage = page;
@@ -918,11 +1033,15 @@
         const start = (page - 1) * PAGE_SIZE;
         const end   = start + PAGE_SIZE;
 
-        // Show/hide rows
+        // Hide all data rows, show only current page slice
         state.allRows.forEach(r => r.style.display = 'none');
         filteredRows.forEach((r, i) => {
             r.style.display = (i >= start && i < end) ? '' : 'none';
         });
+
+        // Always show summary rows
+        const tbody = document.getElementById('tbody-' + name);
+        tbody.querySelectorAll('.summary-row').forEach(r => r.style.display = '');
 
         // Info text
         const infoEl = document.getElementById('info-' + name);
@@ -934,32 +1053,26 @@
             infoEl.textContent = `Showing ${s}–${e} of ${total} records`;
         }
 
-        // Pagination buttons
+        // Page buttons
         const btnsEl = document.getElementById('btns-' + name);
         btnsEl.innerHTML = '';
 
-        // Prev
-        const prev = makeBtn('‹', page <= 1, () => { state.currentPage = page - 1; renderPage(name); });
-        btnsEl.appendChild(prev);
+        btnsEl.appendChild(makeBtn('‹', page <= 1, () => { state.currentPage = page - 1; renderPage(name); }));
 
-        // Page numbers (show max 5 around current)
-        const delta = 2;
         for (let p = 1; p <= totalPages; p++) {
-            if (p === 1 || p === totalPages || (p >= page - delta && p <= page + delta)) {
+            if (p === 1 || p === totalPages || (p >= page - 2 && p <= page + 2)) {
                 const btn = makeBtn(p, false, () => { state.currentPage = p; renderPage(name); });
                 if (p === page) btn.classList.add('active');
                 btnsEl.appendChild(btn);
-            } else if (p === page - delta - 1 || p === page + delta + 1) {
+            } else if (p === page - 3 || p === page + 3) {
                 const dots = document.createElement('span');
                 dots.textContent = '…';
-                dots.style.cssText = 'padding: 0 4px; color:#aaa; font-size:13px; line-height:32px;';
+                dots.style.cssText = 'padding:0 4px;color:#aaa;font-size:13px;line-height:32px';
                 btnsEl.appendChild(dots);
             }
         }
 
-        // Next
-        const next = makeBtn('›', page >= totalPages, () => { state.currentPage = page + 1; renderPage(name); });
-        btnsEl.appendChild(next);
+        btnsEl.appendChild(makeBtn('›', page >= totalPages, () => { state.currentPage = page + 1; renderPage(name); }));
     }
 
     function makeBtn(label, disabled, onClick) {
@@ -971,19 +1084,23 @@
         return btn;
     }
 
-    // ── FILTER ──────────────────────────────────────
+    // ── FILTER ────────────────────────────────────────────
     function filterTable(name) {
         const state  = tableState[name];
         const search = (document.getElementById(name + '-search')?.value || '').toLowerCase().trim();
 
-        // Extra selects per table
+        // Date range filter (requests only)
+        const fromEl = document.getElementById(name + '-from');
+        const toEl   = document.getElementById(name + '-to');
+        const fromDate = fromEl?.value ? new Date(fromEl.value) : null;
+        const toDate   = toEl?.value   ? new Date(toEl.value)   : null;
+
         const extraIds = {
-            donors:    ['donors-blood', 'donors-eligibility'],
+            donors:    ['donors-blood',    'donors-eligibility'],
             stock:     ['stock-level'],
-            requests:  ['requests-blood', 'requests-status'],
+            requests:  ['requests-blood',  'requests-status'],
             staff:     ['staff-status'],
             hospitals: ['hospitals-status'],
-            history:   ['history-blood'],
         };
         const extras = (extraIds[name] || []).map(id => {
             const el = document.getElementById(id);
@@ -994,7 +1111,19 @@
             const text = row.textContent.toLowerCase();
             const matchSearch = !search || text.includes(search);
             const matchExtras = extras.every(v => !v || text.includes(v));
-            return matchSearch && matchExtras;
+
+            // Date range (only for requests table)
+            let matchDate = true;
+            if (name === 'requests' && (fromDate || toDate)) {
+                const rowDateStr = row.dataset.date;
+                if (rowDateStr) {
+                    const rowDate = new Date(rowDateStr);
+                    if (fromDate && rowDate < fromDate) matchDate = false;
+                    if (toDate   && rowDate > toDate)   matchDate = false;
+                }
+            }
+
+            return matchSearch && matchExtras && matchDate;
         });
 
         state.currentPage = 1;
@@ -1002,19 +1131,10 @@
     }
 
     function clearFilter(name) {
-        const inputs  = document.querySelectorAll(`#pag-${name}`);
-        // Clear all inputs in the filter bar above this table
-        const card = document.getElementById('section-' + name) ||
-                     document.getElementById('pag-' + name)?.closest('.report-card');
-
-        // Find filter bar inside same report-card
         const sections = {
-            donors:    'section-donors',
-            stock:     'section-stock',
-            requests:  'section-requests',
-            staff:     'section-staff',
+            donors: 'section-donors', stock: 'section-stock',
+            requests: 'section-requests', staff: 'section-staff',
             hospitals: 'section-hospitals',
-            history:   'section-history',
         };
         const sec = document.getElementById(sections[name]);
         if (sec) {
@@ -1023,13 +1143,12 @@
                 else el.value = '';
             });
         }
-
         tableState[name].filteredRows = tableState[name].allRows;
         tableState[name].currentPage  = 1;
         renderPage(name);
     }
 
-    // Allow pressing Enter to search
+    // Enter key triggers search
     document.addEventListener('keydown', function(e) {
         if (e.key !== 'Enter') return;
         tables.forEach(name => {
@@ -1038,14 +1157,11 @@
         });
     });
 
-    // ── INIT ALL TABLES ──────────────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-        tables.forEach(initTable);
-    });
+    document.addEventListener('DOMContentLoaded', () => { tables.forEach(initTable); });
 
-    // ══════════════════════════════════════════════════════
-    // PDF ENGINE (unchanged from original)
-    // ══════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════
+    // PDF ENGINE  — reads from tableState (ignores pagination)
+    // ════════════════════════════════════════════════════
     const { jsPDF } = window.jspdf;
     const DARK_RED  = [139, 0, 0];
     const LIGHT_RED = [255, 240, 240];
@@ -1054,79 +1170,64 @@
     const TEXT_GRAY = [120, 120, 120];
     const WHITE     = [255, 255, 255];
 
+    // Map section IDs → tableState keys
+    const sectionTableMap = {
+        'section-donors':    'donors',
+        'section-stock':     'stock',
+        'section-requests':  'requests',
+        'section-staff':     'staff',
+        'section-hospitals': 'hospitals',
+    };
+
     function statusColor(text) {
         const t = text.toLowerCase();
-        if (['active','approved','normal','eligible'].includes(t))  return [26, 138, 74];
-        if (['pending','inactive','low','on leave','deferred'].includes(t)) return [184, 134, 11];
-        if (['rejected','critical'].includes(t))  return [139, 0, 0];
-        if (['processing','urgent'].includes(t))  return [21, 101, 192];
+        if (['active','approved','normal','eligible','sufficient'].includes(t)) return [26, 138, 74];
+        if (['pending','inactive','low','on leave','deferred','pending approval'].includes(t)) return [184, 134, 11];
+        if (['rejected','critical'].includes(t)) return [139, 0, 0];
         return [80, 80, 80];
     }
 
+    // ── Read ALL rows directly from tableState (no DOM visibility tricks) ──
     function buildDocContent(sectionId) {
-        const section = document.getElementById(sectionId);
-        const title   = section.querySelector('.report-card-header h3').innerText.trim();
-        const table   = section.querySelector('table');
-        const headers = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
-        const rows    = [];
+        const section   = document.getElementById(sectionId);
+        const title     = section.querySelector('.report-card-header h3').innerText.trim();
+        const table     = section.querySelector('table');
+        const headers   = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
+        const rows      = [];
         const isSummary = [];
-        table.querySelectorAll('tbody tr').forEach(tr => {
+
+        const tableKey = sectionTableMap[sectionId];
+
+        if (tableKey && tableState[tableKey]) {
+            // Read from allRows (all data, regardless of current page)
+            tableState[tableKey].allRows.forEach(tr => {
+                const cells = [...tr.querySelectorAll('td')].map(td => td.innerText.trim());
+                rows.push(cells);
+                isSummary.push(false);
+            });
+        }
+
+        // Also grab any summary rows directly from the DOM (always visible)
+        table.querySelectorAll('tbody tr.summary-row').forEach(tr => {
             rows.push([...tr.querySelectorAll('td')].map(td => td.innerText.trim()));
-            isSummary.push(tr.classList.contains('summary-row'));
+            isSummary.push(true);
         });
+
         return { title, headers, rows, isSummary };
     }
 
-    function drawSection(doc, { title, headers, rows, isSummary }, startY) {
-        const pageW  = doc.internal.pageSize.getWidth();
-        const margin = 14;
-        const usable = pageW - margin * 2;
-        doc.setFillColor(...DARK_RED);
-        doc.roundedRect(margin, startY, usable, 10, 2, 2, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(...WHITE);
-        doc.text(title, margin + 5, startY + 6.5);
-        doc.autoTable({
-            startY: startY + 12,
-            head: [headers],
-            body: rows,
-            margin: { left: margin, right: margin },
-            tableWidth: usable,
-            styles: { fontSize: 7.5, cellPadding: 3, overflow: 'linebreak', textColor: TEXT_DARK },
-            headStyles: { fillColor: HEADER_BG, textColor: DARK_RED, fontStyle: 'bold', lineWidth: 0.1, lineColor: [240, 224, 224] },
-            bodyStyles: { lineWidth: 0.1, lineColor: [245, 237, 237] },
-            alternateRowStyles: { fillColor: [255, 252, 252] },
-            didParseCell: function(data) {
-                if (data.section === 'body' && isSummary[data.row.index]) {
-                    data.cell.styles.fillColor  = LIGHT_RED;
-                    data.cell.styles.fontStyle  = 'bold';
-                    data.cell.styles.textColor  = DARK_RED;
-                }
-            },
-            willDrawCell: function(data) {
-                if (data.section === 'body') {
-                    const text = data.cell.raw ? data.cell.raw.toString().trim() : '';
-                    const keywords = ['Active','Eligible','Approved','Normal','Inactive','Deferred',
-                                      'Pending','Low','On Leave','Rejected','Critical','Processing','Urgent','Pending Approval'];
-                    if (keywords.includes(text)) { const [r,g,b] = statusColor(text); doc.setTextColor(r,g,b); }
-                }
-            },
-            didDrawCell: function() { doc.setTextColor(...TEXT_DARK); }
-        });
-        return doc.lastAutoTable.finalY + 10;
-    }
-
     function addPageDecor(doc, reportTitle) {
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
+        const pageW  = doc.internal.pageSize.getWidth();
+        const pageH  = doc.internal.pageSize.getHeight();
         const margin = 14;
+        // Header bar
         doc.setFillColor(...DARK_RED);
         doc.rect(0, 0, pageW, 20, 'F');
         doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...WHITE);
         doc.text('Blood Bank Management System', margin, 13);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
         doc.text(reportTitle, pageW - margin, 13, { align: 'right' });
+        // Footer bar
         doc.setFillColor(245, 237, 237);
         doc.rect(0, pageH - 12, pageW, 12, 'F');
         doc.setFontSize(7); doc.setTextColor(...TEXT_GRAY);
@@ -1134,115 +1235,389 @@
         doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber}`, pageW - margin, pageH - 4, { align: 'right' });
     }
 
+    function drawSection(doc, { title, headers, rows, isSummary }, startY) {
+        const pageW  = doc.internal.pageSize.getWidth();
+        const margin = 14;
+        const usable = pageW - margin * 2;
+
+        // Section title bar
+        doc.setFillColor(...DARK_RED);
+        doc.roundedRect(margin, startY, usable, 10, 2, 2, 'F');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...WHITE);
+        doc.text(title, margin + 5, startY + 6.5);
+
+        doc.autoTable({
+            startY: startY + 12,
+            head: [headers],
+            body: rows,
+            margin: { left: margin, right: margin },
+            tableWidth: usable,
+            styles: { fontSize: 7.5, cellPadding: 3, overflow: 'linebreak', textColor: TEXT_DARK },
+            headStyles: {
+                fillColor: HEADER_BG, textColor: DARK_RED,
+                fontStyle: 'bold', lineWidth: 0.1, lineColor: [240, 224, 224]
+            },
+            bodyStyles: { lineWidth: 0.1, lineColor: [245, 237, 237] },
+            alternateRowStyles: { fillColor: [255, 252, 252] },
+            didParseCell: function (data) {
+                if (data.section === 'body' && isSummary[data.row.index]) {
+                    data.cell.styles.fillColor = LIGHT_RED;
+                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.textColor = DARK_RED;
+                }
+            },
+            willDrawCell: function (data) {
+                if (data.section === 'body') {
+                    const text = (data.cell.raw || '').toString().trim();
+                    const keywords = ['Active','Eligible','Approved','Normal','Sufficient',
+                        'Inactive','Deferred','Pending','Low','On Leave',
+                        'Rejected','Critical','Pending Approval'];
+                    if (keywords.includes(text)) {
+                        const [r, g, b] = statusColor(text);
+                        doc.setTextColor(r, g, b);
+                    }
+                }
+            },
+            didDrawCell: function () { doc.setTextColor(...TEXT_DARK); },
+            didDrawPage:  function () { addPageDecor(doc, title); }
+        });
+
+        return doc.lastAutoTable.finalY + 10;
+    }
+
+    // ── Generic single-section PDF (same style as donors) ────────────────
     function downloadPDF(sectionId, filename) {
         const doc     = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageW   = doc.internal.pageSize.getWidth();
+        const pageH   = doc.internal.pageSize.getHeight();
+        const margin  = 14;
         const content = buildDocContent(sectionId);
-        addPageDecor(doc, content.title);
-        drawSection(doc, content, 26);
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let p = 1; p <= totalPages; p++) { doc.setPage(p); addPageDecor(doc, content.title); }
-        doc.save(`${filename}_${new Date().toISOString().slice(0,10)}.pdf`);
-    }
 
-    function downloadAllPDF() {
-        const sections = [
-            { id: 'section-donors',    name: 'Donors Report'          },
-            { id: 'section-stock',     name: 'Blood Stock Report'      },
-            { id: 'section-requests',  name: 'Blood Requests Report'   },
-            { id: 'section-staff',     name: 'Staff Report'            },
-            { id: 'section-hospitals', name: 'Hospital Report'         },
-            { id: 'section-history',   name: 'Donation History Report' },
-        ];
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        let y = 26;
-        sections.forEach((s, idx) => {
-            if (idx > 0) { doc.addPage(); y = 26; }
-            const content = buildDocContent(s.id);
-            addPageDecor(doc, s.name);
-            y = drawSection(doc, content, y);
+        // Full-width header banner (same style as donors PDF)
+        doc.setFillColor(...DARK_RED);
+        doc.rect(0, 0, pageW, 28, 'F');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...WHITE);
+        doc.text('Blood Bank Management System', margin, 12);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+        doc.text(content.title, margin, 20);
+        doc.setFontSize(8);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, pageW - margin, 20, { align: 'right' });
+
+        // Summary stat boxes
+        const tableKey  = sectionTableMap[sectionId];
+        const totalRows = tableState[tableKey]?.allRows.length ?? 0;
+        const boxY      = 34;
+        const boxes     = getSummaryBoxes(sectionId, totalRows);
+
+        boxes.forEach((b, i) => {
+            const bx = margin + i * 63;
+            doc.setFillColor(250, 245, 245);
+            doc.roundedRect(bx, boxY, 55, 18, 2, 2, 'F');
+            doc.setDrawColor(...b.color); doc.setLineWidth(0.5);
+            doc.roundedRect(bx, boxY, 55, 18, 2, 2, 'S');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...b.color);
+            doc.text(String(b.value), bx + 27.5, boxY + 10, { align: 'center' });
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100, 100, 100);
+            doc.text(b.label, bx + 27.5, boxY + 15, { align: 'center' });
         });
-        const total = doc.internal.getNumberOfPages();
-        for (let p = 1; p <= total; p++) {
-            doc.setPage(p);
-            const pageH = doc.internal.pageSize.getHeight();
-            const pageW = doc.internal.pageSize.getWidth();
-            doc.setFillColor(245, 237, 237);
-            doc.rect(0, pageH - 12, pageW, 12, 'F');
-            doc.setFontSize(7); doc.setTextColor(...TEXT_GRAY);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, pageH - 4);
-            doc.text(`Page ${p} of ${total}`, pageW - 14, pageH - 4, { align: 'right' });
-        }
-        doc.save(`Full_Blood_Bank_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+
+        doc.autoTable({
+            startY: boxY + (boxes.length ? 24 : 8),
+            head: [content.headers],
+            body: content.rows,
+            margin: { left: margin, right: margin },
+            styles: { fontSize: 7.5, cellPadding: 3, overflow: 'linebreak', textColor: TEXT_DARK },
+            headStyles: {
+                fillColor: DARK_RED, textColor: WHITE,
+                fontStyle: 'bold', fontSize: 8
+            },
+            alternateRowStyles: { fillColor: [255, 250, 250] },
+            bodyStyles: { lineWidth: 0.1, lineColor: [240, 220, 220] },
+            didParseCell: function (data) {
+                if (data.section === 'body' && content.isSummary[data.row.index]) {
+                    data.cell.styles.fillColor = LIGHT_RED;
+                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.textColor = DARK_RED;
+                }
+            },
+            willDrawCell: function (data) {
+                if (data.section === 'body') {
+                    const text = (data.cell.raw || '').toString().trim();
+                    const keywords = ['Active','Eligible','Approved','Normal','Sufficient',
+                        'Inactive','Deferred','Pending','Low','On Leave',
+                        'Rejected','Critical','Pending Approval'];
+                    if (keywords.includes(text)) {
+                        const [r, g, b] = statusColor(text);
+                        doc.setTextColor(r, g, b);
+                    }
+                }
+            },
+            didDrawCell: function () { doc.setTextColor(...TEXT_DARK); },
+            didDrawPage: function () {
+                doc.setFillColor(245, 237, 237);
+                doc.rect(0, pageH - 10, pageW, 10, 'F');
+                doc.setFontSize(7); doc.setTextColor(...TEXT_GRAY);
+                doc.text('Blood Bank Management System — Confidential', margin, pageH - 3);
+                doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber}`, pageW - margin, pageH - 3, { align: 'right' });
+            }
+        });
+
+        doc.save(`${filename}_${new Date().toISOString().slice(0, 10)}.pdf`);
     }
 
+    // Build summary stat boxes per section
+    function getSummaryBoxes(sectionId, totalRows) {
+        const rows = tableState[sectionTableMap[sectionId]]?.allRows ?? [];
+
+        if (sectionId === 'section-stock') {
+            const sufficient = rows.filter(r => r.innerText.toLowerCase().includes('sufficient')).length;
+            const low        = rows.filter(r => r.innerText.toLowerCase().includes('low')).length;
+            const critical   = rows.filter(r => r.innerText.toLowerCase().includes('critical')).length;
+            return [
+                { label: 'Total Groups',  value: totalRows,  color: DARK_RED        },
+                { label: 'Sufficient',    value: sufficient, color: [26, 138, 74]   },
+                { label: 'Low Stock',     value: low,        color: [184, 134, 11]  },
+                { label: 'Critical',      value: critical,   color: [139, 0, 0]     },
+            ];
+        }
+        if (sectionId === 'section-requests') {
+            const approved = rows.filter(r => r.innerText.includes('Approved')).length;
+            const pending  = rows.filter(r => r.innerText.includes('Pending')).length;
+            const rejected = rows.filter(r => r.innerText.includes('Rejected')).length;
+            return [
+                { label: 'Total Requests', value: totalRows, color: DARK_RED        },
+                { label: 'Approved',       value: approved,  color: [26, 138, 74]   },
+                { label: 'Pending',        value: pending,   color: [184, 134, 11]  },
+                { label: 'Rejected',       value: rejected,  color: [139, 0, 0]     },
+            ];
+        }
+        if (sectionId === 'section-staff') {
+            const active  = rows.filter(r => r.innerText.includes('Active')).length;
+            const onLeave = rows.filter(r => r.innerText.includes('On Leave')).length;
+            return [
+                { label: 'Total Staff', value: totalRows, color: DARK_RED       },
+                { label: 'Active',      value: active,    color: [26, 138, 74]  },
+                { label: 'On Leave',    value: onLeave,   color: [184, 134, 11] },
+            ];
+        }
+        if (sectionId === 'section-hospitals') {
+            const active  = rows.filter(r => r.innerText.includes('Active')).length;
+            const pending = rows.filter(r => r.innerText.includes('Pending')).length;
+            return [
+                { label: 'Total Hospitals', value: totalRows, color: DARK_RED       },
+                { label: 'Active',          value: active,    color: [26, 138, 74]  },
+                { label: 'Pending',         value: pending,   color: [184, 134, 11] },
+            ];
+        }
+        return [{ label: 'Total Records', value: totalRows, color: DARK_RED }];
+    }
+
+    // ── Donors PDF (unchanged — already worked) ──────────────────────────
     function downloadDonorsPDF() {
-        const doc   = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
+        const doc    = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageW  = doc.internal.pageSize.getWidth();
+        const pageH  = doc.internal.pageSize.getHeight();
         const margin = 14;
+
         doc.setFillColor(139, 0, 0);
         doc.rect(0, 0, pageW, 28, 'F');
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(255,255,255);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(255, 255, 255);
         doc.text('Blood Bank Management System', margin, 12);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
         doc.text('Registered Donors Report', margin, 20);
         doc.setFontSize(8);
         doc.text(`Generated: ${new Date().toLocaleString()}`, pageW - margin, 20, { align: 'right' });
-        const boxY = 34;
-        const totalDonors   = document.querySelectorAll('#tbody-donors tr:not(.summary-row)').length;
-        const eligibleCount = [...document.querySelectorAll('#tbody-donors tr:not(.summary-row)')].filter(r => r.innerText.includes('Eligible')).length;
+
+        const boxY      = 34;
+        const allDonorRows = tableState['donors']?.allRows ?? [];
+        const totalDonors   = allDonorRows.length;
+        const eligibleCount = allDonorRows.filter(r => r.innerText.includes('Eligible')).length;
         const deferredCount = totalDonors - eligibleCount;
-        const summaryBoxes  = [
+
+        [
             { label: 'Total Donors', value: totalDonors,   color: [139, 0, 0]    },
             { label: 'Eligible',     value: eligibleCount, color: [26, 138, 74]  },
             { label: 'Deferred',     value: deferredCount, color: [184, 134, 11] },
-        ];
-        const boxW = 55;
-        summaryBoxes.forEach((b, i) => {
-            const bx = margin + i * (boxW + 8);
+        ].forEach((b, i) => {
+            const bx = margin + i * 63;
             doc.setFillColor(250, 245, 245);
-            doc.roundedRect(bx, boxY, boxW, 18, 2, 2, 'F');
+            doc.roundedRect(bx, boxY, 55, 18, 2, 2, 'F');
             doc.setDrawColor(...b.color); doc.setLineWidth(0.5);
-            doc.roundedRect(bx, boxY, boxW, 18, 2, 2, 'S');
+            doc.roundedRect(bx, boxY, 55, 18, 2, 2, 'S');
             doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...b.color);
-            doc.text(String(b.value), bx + boxW / 2, boxY + 10, { align: 'center' });
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100,100,100);
-            doc.text(b.label, bx + boxW / 2, boxY + 15, { align: 'center' });
+            doc.text(String(b.value), bx + 27.5, boxY + 10, { align: 'center' });
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100, 100, 100);
+            doc.text(b.label, bx + 27.5, boxY + 15, { align: 'center' });
         });
-        const headers = ['#','Donor Name','Donor ID','Blood Group','Gender','Age','Contact','Last Donation','Total Donations','Eligibility'];
-        const rows = [];
-        document.querySelectorAll('#tbody-donors tr:not(.summary-row)').forEach((tr, idx) => {
+
+        const headers = ['#', 'Donor Name', 'Donor ID', 'Blood Group', 'Gender', 'Age',
+                         'Contact', 'Last Donation', 'Total Donations', 'Eligibility'];
+        const rows = allDonorRows.map((tr, idx) => {
             const tds = tr.querySelectorAll('td');
-            rows.push([idx+1, tds[1].querySelector('div')?.innerText??tds[1].innerText,
-                tds[1].querySelector('div:last-child')?.innerText??'',
+            return [
+                idx + 1,
+                tds[1].querySelector('div')?.innerText ?? tds[1].innerText,
+                tds[1].querySelectorAll('div')[1]?.innerText ?? '',
                 tds[2].innerText.trim(), tds[3].innerText.trim(), tds[4].innerText.trim(),
-                tds[5].innerText.trim(), tds[6].innerText.trim(), tds[7].innerText.trim(), tds[8].innerText.trim()]);
+                tds[5].innerText.trim(), tds[6].innerText.trim(),
+                tds[7].innerText.trim(), tds[8].innerText.trim()
+            ];
         });
+
         doc.autoTable({
-            startY: boxY + 24, head: [headers], body: rows,
+            startY: boxY + 24,
+            head: [headers], body: rows,
             margin: { left: margin, right: margin },
-            styles: { fontSize: 8, cellPadding: 3.5, textColor: [30,30,30] },
-            headStyles: { fillColor: [139,0,0], textColor: [255,255,255], fontStyle: 'bold', fontSize: 8 },
-            alternateRowStyles: { fillColor: [255,250,250] },
-            bodyStyles: { lineWidth: 0.1, lineColor: [240,220,220] },
-            didParseCell: function(data) {
+            styles: { fontSize: 8, cellPadding: 3.5, textColor: [30, 30, 30] },
+            headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
+            alternateRowStyles: { fillColor: [255, 250, 250] },
+            bodyStyles: { lineWidth: 0.1, lineColor: [240, 220, 220] },
+            didParseCell: function (data) {
                 if (data.section === 'body' && data.column.index === 9) {
-                    const val = data.cell.raw;
-                    if (val === 'Eligible') data.cell.styles.textColor = [26,138,74];
-                    if (val === 'Deferred') data.cell.styles.textColor = [184,134,11];
+                    if (data.cell.raw === 'Eligible') data.cell.styles.textColor = [26, 138, 74];
+                    if (data.cell.raw === 'Deferred') data.cell.styles.textColor = [184, 134, 11];
                     data.cell.styles.fontStyle = 'bold';
                 }
+            },
+            didDrawPage: function () {
+                doc.setFillColor(245, 237, 237);
+                doc.rect(0, pageH - 10, pageW, 10, 'F');
+                doc.setFontSize(7); doc.setTextColor(120, 120, 120);
+                doc.text('Blood Bank Management System — Confidential', margin, pageH - 3);
+                doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber}`, pageW - margin, pageH - 3, { align: 'right' });
             }
         });
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let p = 1; p <= totalPages; p++) {
+
+        doc.save(`Donors_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+    }
+
+    // ── Download All PDF ─────────────────────────────────────────────────
+    function downloadAllPDF() {
+        const sections = [
+            { id: 'section-donors',    name: 'Donors Report',         tableKey: 'donors'    },
+            { id: 'section-stock',     name: 'Blood Stock Report',     tableKey: 'stock'     },
+            { id: 'section-requests',  name: 'Blood Requests Report',  tableKey: 'requests'  },
+            { id: 'section-staff',     name: 'Staff Report',           tableKey: 'staff'     },
+            { id: 'section-hospitals', name: 'Hospital Report',        tableKey: 'hospitals' },
+        ];
+
+        const doc    = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageW  = doc.internal.pageSize.getWidth();
+        const pageH  = doc.internal.pageSize.getHeight();
+        const margin = 14;
+        const generatedAt = new Date().toLocaleString();
+
+        sections.forEach((s, idx) => {
+            if (idx > 0) doc.addPage();
+
+            // ── Banner header for this section ──
+            doc.setFillColor(...DARK_RED);
+            doc.rect(0, 0, pageW, 28, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...WHITE);
+            doc.text('Blood Bank Management System', margin, 12);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+            doc.text(s.name, margin, 20);
+            doc.setFontSize(8);
+            doc.text(`Generated: ${generatedAt}`, pageW - margin, 20, { align: 'right' });
+
+            // ── Stat boxes ──
+            const totalRows = tableState[s.tableKey]?.allRows.length ?? 0;
+            const boxes     = getSummaryBoxes(s.id, totalRows);
+            const boxY      = 34;
+
+            boxes.forEach((b, i) => {
+                const bx = margin + i * 63;
+                doc.setFillColor(250, 245, 245);
+                doc.roundedRect(bx, boxY, 55, 18, 2, 2, 'F');
+                doc.setDrawColor(...b.color); doc.setLineWidth(0.5);
+                doc.roundedRect(bx, boxY, 55, 18, 2, 2, 'S');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...b.color);
+                doc.text(String(b.value), bx + 27.5, boxY + 10, { align: 'center' });
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100, 100, 100);
+                doc.text(b.label, bx + 27.5, boxY + 15, { align: 'center' });
+            });
+
+            // ── Read headers from DOM (always visible) ──
+            const section = document.getElementById(s.id);
+            const headers = [...section.querySelectorAll('thead th')].map(th => th.innerText.trim());
+
+            // ── Read ALL rows from tableState (ignores pagination) ──
+            const rows      = [];
+            const isSummary = [];
+
+            (tableState[s.tableKey]?.allRows ?? []).forEach(tr => {
+                rows.push([...tr.querySelectorAll('td')].map(td => td.innerText.trim()));
+                isSummary.push(false);
+            });
+
+            // Summary rows (always in DOM, always visible)
+            section.querySelectorAll('tbody tr.summary-row').forEach(tr => {
+                rows.push([...tr.querySelectorAll('td')].map(td => td.innerText.trim()));
+                isSummary.push(true);
+            });
+
+            // ── autoTable ──
+            doc.autoTable({
+                startY: boxY + (boxes.length ? 24 : 8),
+                head: [headers],
+                body: rows,
+                margin: { left: margin, right: margin },
+                styles: { fontSize: 7.5, cellPadding: 3, overflow: 'linebreak', textColor: TEXT_DARK },
+                headStyles: {
+                    fillColor: DARK_RED, textColor: WHITE,
+                    fontStyle: 'bold', fontSize: 8
+                },
+                alternateRowStyles: { fillColor: [255, 250, 250] },
+                bodyStyles: { lineWidth: 0.1, lineColor: [240, 220, 220] },
+                didParseCell: function (data) {
+                    if (data.section === 'body' && isSummary[data.row.index]) {
+                        data.cell.styles.fillColor = LIGHT_RED;
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.textColor = DARK_RED;
+                    }
+                },
+                willDrawCell: function (data) {
+                    if (data.section === 'body') {
+                        const text = (data.cell.raw || '').toString().trim();
+                        const keywords = ['Active','Eligible','Approved','Normal','Sufficient',
+                            'Inactive','Deferred','Pending','Low','On Leave',
+                            'Rejected','Critical','Pending Approval'];
+                        if (keywords.includes(text)) {
+                            const [r, g, b] = statusColor(text);
+                            doc.setTextColor(r, g, b);
+                        }
+                    }
+                },
+                didDrawCell: function () { doc.setTextColor(...TEXT_DARK); },
+                didDrawPage: function () {
+                    // Redraw banner on overflow pages
+                    doc.setFillColor(...DARK_RED);
+                    doc.rect(0, 0, pageW, 20, 'F');
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...WHITE);
+                    doc.text('Blood Bank Management System', margin, 13);
+                    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+                    doc.text(s.name, pageW - margin, 13, { align: 'right' });
+                    // Footer
+                    doc.setFillColor(245, 237, 237);
+                    doc.rect(0, pageH - 10, pageW, 10, 'F');
+                    doc.setFontSize(7); doc.setTextColor(...TEXT_GRAY);
+                    doc.text('Blood Bank Management System — Confidential', margin, pageH - 3);
+                    doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber}`, pageW - margin, pageH - 3, { align: 'right' });
+                }
+            });
+        });
+
+        // ── Stamp final "Page X of Y" on every page ──
+        const total = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= total; p++) {
             doc.setPage(p);
-            doc.setFillColor(245,237,237);
-            doc.rect(0, pageH-10, pageW, 10, 'F');
-            doc.setFontSize(7); doc.setTextColor(120,120,120);
-            doc.text('Blood Bank Management System — Confidential', margin, pageH-3);
-            doc.text(`Page ${p} of ${totalPages}`, pageW-margin, pageH-3, { align: 'right' });
+            doc.setFillColor(245, 237, 237);
+            doc.rect(0, pageH - 10, pageW, 10, 'F');
+            doc.setFontSize(7); doc.setTextColor(...TEXT_GRAY);
+            doc.text('Blood Bank Management System — Confidential', margin, pageH - 3);
+            doc.text(`Page ${p} of ${total}`, pageW - margin, pageH - 3, { align: 'right' });
         }
-        doc.save(`Donors_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+
+        doc.save(`Full_Blood_Bank_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
     }
 </script>
