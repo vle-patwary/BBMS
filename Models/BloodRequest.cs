@@ -37,6 +37,7 @@ namespace YourApp.Models
         public string? IdentityUserId { get; set; } // ← add this
         public string? RefundStatus { get; set; }
         public DateTime? RefundRequestedAt { get; set; }
-       
+        public string? RejectionReason { get; set; }
+
     }
 }

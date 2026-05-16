@@ -203,6 +203,7 @@
         font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
+        display: inline-block;
     }
 
     .pill-pending {
@@ -281,15 +282,6 @@
             background: #e1bee7;
         }
 
-    .btn-refund {
-        background: #fff3e0;
-        color: #e65100;
-    }
-
-        .btn-refund:hover {
-            background: #ffe0b2;
-        }
-
     .btn-refund-done {
         background: #e8f5e9;
         color: #2e7d32;
@@ -311,6 +303,274 @@
             color: #ddd;
             display: block;
             margin-bottom: 10px;
+        }
+
+    /* ── Status column fixed width ── */
+    th:nth-child(10), td:nth-child(10) {
+        min-width: 220px;
+        width: 220px;
+    }
+
+    /* ── Premium Status Card (User view for Rejected) ── */
+    .status-card {
+        border-radius: 10px;
+        padding: 10px 13px;
+        font-size: 12px;
+        line-height: 1.55;
+        width: 200px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .status-card-pending {
+        background: linear-gradient(135deg, #fffdf0 0%, #fffbea 100%);
+        border: 1px solid #f0d060;
+    }
+
+    .status-card-done {
+        background: linear-gradient(135deg, #f0fdf6 0%, #e6f7ef 100%);
+        border: 1px solid #7ecba1;
+    }
+
+    .status-card-header {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-weight: 700;
+        font-size: 12px;
+        margin-bottom: 7px;
+        padding-bottom: 7px;
+    }
+
+    .status-card-pending .status-card-header {
+        color: #7d4e00;
+        border-bottom: 1px dashed #e8c840;
+    }
+
+    .status-card-done .status-card-header {
+        color: #145c35;
+        border-bottom: 1px dashed #7ecba1;
+    }
+
+    .status-card-header .icon-circle {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 10px;
+    }
+
+    .status-card-pending .icon-circle {
+        background: #fde68a;
+        color: #92400e;
+    }
+
+    .status-card-done .icon-circle {
+        background: #bbf7d0;
+        color: #065f46;
+    }
+
+    .status-card-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 4px;
+        font-size: 11.5px;
+    }
+
+        .status-card-row i {
+            margin-top: 2px;
+            flex-shrink: 0;
+            width: 13px;
+            text-align: center;
+        }
+
+    .status-card-pending .status-card-row {
+        color: #7d5c00;
+    }
+
+    .status-card-done .status-card-row {
+        color: #1a5c35;
+    }
+
+    .status-card-reason {
+        font-style: italic;
+        opacity: 0.8;
+        margin-top: 5px;
+        padding-top: 5px;
+        font-size: 11px;
+        border-top: 1px dashed rgba(0,0,0,0.1);
+        word-break: break-word;
+    }
+
+    /* ── Rejection Modal ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .modal-box {
+        background: white;
+        border-radius: 12px;
+        width: 420px;
+        padding: 28px 26px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+
+    .modal-header-icon {
+        width: 38px;
+        height: 38px;
+        background: #fde8e8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .modal-header-icon i {
+            color: #b30000;
+            font-size: 16px;
+        }
+
+    .modal-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .modal-sub {
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 16px;
+        margin-left: 48px;
+    }
+
+    .modal-patient-info {
+        background: #fff8f8;
+        border: 1px solid #f5eded;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        color: #555;
+    }
+
+        .modal-patient-info strong {
+            color: #8b0000;
+        }
+
+    .modal-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #444;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .modal-textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'Segoe UI', sans-serif;
+        resize: none;
+        height: 90px;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: #8b0000;
+        }
+
+    .modal-textarea-error {
+        border-color: #e74c3c !important;
+    }
+
+    .modal-error-msg {
+        font-size: 12px;
+        color: #e74c3c;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .refund-info-box {
+        background: #fffbea;
+        border: 1px solid #f6d860;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-top: 12px;
+        font-size: 12px;
+        color: #7d5c00;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+        .refund-info-box i {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+    .modal-btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .modal-cancel-btn {
+        flex: 1;
+        padding: 10px;
+        background: #f0f0f0;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 14px;
+        color: #444;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+        .modal-cancel-btn:hover {
+            background: #e0e0e0;
+        }
+
+    .modal-confirm-btn {
+        flex: 1;
+        padding: 10px;
+        background: #8b0000;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+        .modal-confirm-btn:hover {
+            background: #6b0000;
         }
 
     .refund-date {
@@ -460,26 +720,90 @@
                                         <i class="fa-solid fa-circle-check"></i> Approved
                                     </span>
                                 }
-                                else
+                                else if (r.Status == "Rejected")
                                 {
-                                    <span class="pill pill-rejected">
-                                        <i class="fa-solid fa-circle-xmark"></i> Rejected
-                                    </span>
-
-                                    @* Show refund status under rejected pill *@
-                                    @if (r.RefundStatus == "Requested")
+                                    @* Admin/Staff see simple pill + refund sub-pill *@
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
                                     {
-                                        <br />
-                                        <span class="pill pill-refund-pending" style="margin-top:4px;">
-                                            <i class="fa-solid fa-rotate-left"></i> Refund Pending
+                                        <span class="pill pill-rejected">
+                                            <i class="fa-solid fa-circle-xmark"></i> Rejected
                                         </span>
+                                        @if (r.RefundStatus == "Pending")
+                                        {
+                                            <br />
+                                            <span class="pill pill-refund-pending" style="margin-top:4px;">
+                                                <i class="fa-solid fa-rotate-left"></i> Refund Pending
+                                            </span>
+                                        }
+                                        else if (r.RefundStatus == "Processed")
+                                        {
+                                            <br />
+                                            <span class="pill pill-refund-done" style="margin-top:4px;">
+                                                <i class="fa-solid fa-circle-check"></i> Refunded
+                                            </span>
+                                        }
                                     }
-                                    else if (r.RefundStatus == "Processed")
+
+                                    @* ── FIX 1: User sees premium status card ──
+                                         "else" catches null AND "Pending" — both mean refund not yet done *@
+                                    @if (User.IsInRole("User"))
                                     {
-                                        <br />
-                                        <span class="pill pill-refund-done" style="margin-top:4px;">
-                                            <i class="fa-solid fa-circle-check"></i> Refunded
-                                        </span>
+                                        @if (r.RefundStatus == "Processed")
+                                        {
+                                            <div class="status-card status-card-done">
+                                                <div class="status-card-header">
+                                                    <div class="icon-circle">
+                                                        <i class="fa-solid fa-circle-check"></i>
+                                                    </div>
+                                                    Refund Completed
+                                                </div>
+                                                <div class="status-card-row">
+                                                    <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+                                                    <span>৳@r.TotalCost returned successfully</span>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(r.MobileNumber))
+                                                {
+                                                    <div class="status-card-row">
+                                                        <i class="fa-solid fa-mobile-screen"></i>
+                                                        <span>@r.PaymentMethod · @r.MobileNumber</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @* Covers RefundStatus == "Pending" AND null *@
+                                            <div class="status-card status-card-pending">
+                                                <div class="status-card-header">
+                                                    <div class="icon-circle">
+                                                        <i class="fa-solid fa-circle-xmark"></i>
+                                                    </div>
+                                                    Request Rejected
+                                                </div>
+                                                <div class="status-card-row">
+                                                    <i class="fa-solid fa-rotate-left"></i>
+                                                    <span>Refund of <strong>৳@r.TotalCost</strong> in progress</span>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(r.MobileNumber))
+                                                {
+                                                    <div class="status-card-row">
+                                                        <i class="fa-solid fa-mobile-screen"></i>
+                                                        <span>@r.PaymentMethod · @r.MobileNumber</span>
+                                                    </div>
+                                                }
+                                                <div class="status-card-row">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    <span>Within <strong>3 working days</strong></span>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(r.RejectionReason))
+                                                {
+                                                    <div class="status-card-reason">
+                                                        <i class="fa-solid fa-circle-info"></i>
+                                                        @r.RejectionReason
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
                                     }
                                 }
                             </td>
@@ -487,7 +811,7 @@
                             <!-- ── ACTIONS COLUMN ── -->
                             <td style="white-space:nowrap;">
 
-                                @* ── Invoice: only when Approved ── *@
+                                @* Invoice: Approved only *@
                                 @if (r.Status == "Approved")
                                 {
                                     <a asp-controller="Home"
@@ -499,7 +823,7 @@
                                     </a>
                                 }
 
-                                @* ── Approve / Reject: Admin & Staff, Pending only ── *@
+                                @* Approve + Reject: Admin/Staff, Pending only *@
                                 @if ((User.IsInRole("Admin") || User.IsInRole("Staff")) && r.Status == "Pending")
                                 {
                                     <form method="post"
@@ -509,91 +833,67 @@
                                           style="display:inline;">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="action-btn btn-approve"
-                                                onclick="return confirm('Approve request for @r.RequesterName?')">
+                                                onclick="return confirm('Approve this request for @r.RequesterName?')">
                                             <i class="fa-solid fa-check"></i> Approve
                                         </button>
                                     </form>
 
+                                    @* Reject opens modal instead of direct form *@
+                                    <button type="button"
+                                            class="action-btn btn-reject"
+                                            onclick="openRejectModal(
+                                                                        @r.Id,
+                                                                        '@System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(r.RequesterName)',
+                                                                        '@r.BloodGroup',
+                                                                        @r.TotalCost,
+                                                                        '@r.PaymentMethod',
+                                                                        '@r.MobileNumber'
+                                                                    )">
+                                        <i class="fa-solid fa-xmark"></i> Reject
+                                    </button>
+                                }
+
+                                @* Mark as Refunded: Admin/Staff, Rejected, refund pending *@
+                                @if ((User.IsInRole("Admin") || User.IsInRole("Staff"))
+                                                        && r.Status == "Rejected"
+                                                        && r.RefundStatus == "Pending")
+                                {
                                     <form method="post"
                                           asp-controller="Home"
-                                          asp-action="RejectRequest"
+                                          asp-action="ProcessRefund"
                                           asp-route-id="@r.Id"
                                           style="display:inline;">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="action-btn btn-reject"
-                                                onclick="return confirm('Reject request for @r.RequesterName?')">
-                                            <i class="fa-solid fa-xmark"></i> Reject
+                                        <button type="submit" class="action-btn btn-refund-done"
+                                                onclick="return confirm('Confirm that ৳@r.TotalCost has been refunded to @r.RequesterName?')">
+                                            <i class="fa-solid fa-rotate-left"></i> Mark Refunded
                                         </button>
                                     </form>
+                                    <span class="refund-date">
+                                        Since: @r.RefundRequestedAt?.ToString("dd MMM yyyy")
+                                    </span>
                                 }
 
-                                @* ── Refund Request: User, Rejected, no refund yet ── *@
-                                @if (User.IsInRole("User") && r.Status == "Rejected")
+                                @* Refunded badge for Admin/Staff *@
+                                @if ((User.IsInRole("Admin") || User.IsInRole("Staff"))
+                                                        && r.Status == "Rejected"
+                                                        && r.RefundStatus == "Processed")
                                 {
-                                    @if (r.RefundStatus == null)
-                                    {
-                                        <form method="post"
-                                              asp-controller="Home"
-                                              asp-action="RequestRefund"
-                                              asp-route-id="@r.Id"
-                                              style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="action-btn btn-refund"
-                                                    onclick="return confirm('Request a refund of Tk @r.TotalCost for this rejected request?')">
-                                                <i class="fa-solid fa-money-bill-wave"></i> Request Refund
-                                            </button>
-                                        </form>
-                                    }
-                                    else if (r.RefundStatus == "Requested")
-                                    {
-                                        <span class="pill pill-refund-pending">
-                                            <i class="fa-solid fa-clock"></i> Refund Pending
-                                        </span>
-                                    }
-                                    else if (r.RefundStatus == "Processed")
-                                    {
-                                        <span class="pill pill-refund-done">
-                                            <i class="fa-solid fa-circle-check"></i> Refund Done
-                                        </span>
-                                    }
+                                    <span class="pill pill-refund-done">
+                                        <i class="fa-solid fa-circle-check"></i> Refunded
+                                    </span>
                                 }
 
-                                @* ── Process Refund: Admin & Staff, Rejected with refund requested ── *@
-                                @if ((User.IsInRole("Admin") || User.IsInRole("Staff")) && r.Status == "Rejected")
-                                {
-                                    @if (r.RefundStatus == "Requested")
-                                    {
-                                        <form method="post"
-                                              asp-controller="Home"
-                                              asp-action="ProcessRefund"
-                                              asp-route-id="@r.Id"
-                                              style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="action-btn btn-refund-done"
-                                                    onclick="return confirm('Mark Tk @r.TotalCost refund as processed for @r.RequesterName?')">
-                                                <i class="fa-solid fa-rotate-left"></i> Mark Refunded
-                                            </button>
-                                        </form>
-                                        <span class="refund-date">
-                                            Requested: @r.RefundRequestedAt?.ToString("dd MMM yyyy")
-                                        </span>
-                                    }
-                                    else if (r.RefundStatus == "Processed")
-                                    {
-                                        <span class="pill pill-refund-done">
-                                            <i class="fa-solid fa-circle-check"></i> Refunded
-                                        </span>
-                                    }
-                                    else if (r.RefundStatus == null)
-                                    {
-                                        <span style="font-size:12px;color:#bbb;">No refund yet</span>
-                                    }
-                                }
-
-                                @* ── Pending with User role: no actions ── *@
+                                @* Pending with User role — awaiting review *@
                                 @if (r.Status == "Pending" && User.IsInRole("User"))
                                 {
                                     <span style="font-size:12px;color:#bbb;">— Awaiting review —</span>
+                                }
+
+                                @* ── FIX 2: Rejected with User role — no actions available *@
+                                @if (r.Status == "Rejected" && User.IsInRole("User"))
+                                {
+                                    <span style="font-size:12px;color:#bbb;">— No actions available —</span>
                                 }
 
                             </td>
@@ -613,5 +913,127 @@
             </tbody>
         </table>
     </div>
-
 </div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ── REJECTION MODAL ─────────────────────── -->
+<!-- ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="reject-modal">
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <div class="modal-header-icon">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div class="modal-title">Reject Blood Request</div>
+        </div>
+        <div class="modal-sub">Please provide a reason before rejecting.</div>
+
+        <!-- Patient info summary -->
+        <div class="modal-patient-info">
+            <i class="fa-solid fa-user"></i>
+            Patient: <strong id="modal-patient-name">—</strong> &nbsp;|&nbsp;
+            <i class="fa-solid fa-droplet"></i>
+            Blood: <strong id="modal-blood-group">—</strong> &nbsp;|&nbsp;
+            <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+            Paid: <strong id="modal-total-cost">—</strong>
+        </div>
+
+        <!-- Rejection form -->
+        <form method="post"
+              asp-controller="Home"
+              asp-action="RejectRequest"
+              id="reject-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="modal-request-id" value="" />
+
+            <label class="modal-label">
+                Rejection Reason <span style="color:#b30000;">*</span>
+            </label>
+            <textarea class="modal-textarea"
+                      name="rejectionReason"
+                      id="modal-reason"
+                      placeholder="e.g. Blood type not currently available, request details incomplete..."
+                      oninput="clearModalError()"></textarea>
+            <div class="modal-error-msg" id="modal-error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Please enter a rejection reason.
+            </div>
+
+            <!-- Refund info notice -->
+            <div class="refund-info-box" id="modal-refund-info" style="display:none;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    Rejecting this request will automatically mark a refund of
+                    <strong id="modal-refund-amount">৳0</strong> as pending
+                    <span>
+                        for <strong id="modal-payment-method-display"></strong>
+                        number <strong id="modal-mobile-display"></strong>
+                    </span>
+                </div>
+            </div>
+
+            <div class="modal-btn-row">
+                <button type="button" class="modal-cancel-btn" onclick="closeRejectModal()">
+                    <i class="fa-solid fa-arrow-left"></i> Cancel
+                </button>
+                <button type="button" class="modal-confirm-btn" onclick="submitRejectForm()">
+                    <i class="fa-solid fa-circle-xmark"></i> Confirm Reject
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openRejectModal(id, name, bloodGroup, totalCost, paymentMethod, mobile) {
+        document.getElementById('modal-request-id').value      = id;
+        document.getElementById('modal-patient-name').textContent  = name;
+        document.getElementById('modal-blood-group').textContent   = bloodGroup;
+        document.getElementById('modal-total-cost').textContent    = '৳' + totalCost;
+        document.getElementById('modal-reason').value             = '';
+        document.getElementById('modal-error').style.display      = 'none';
+        document.getElementById('modal-reason').classList.remove('modal-textarea-error');
+
+        // Show refund notice only if payment method is not cash
+        const cashMethods = ['Cash on site', 'Bank transfer'];
+        const refundBox   = document.getElementById('modal-refund-info');
+
+        if (paymentMethod && !cashMethods.includes(paymentMethod)) {
+            document.getElementById('modal-refund-amount').textContent          = '৳' + totalCost;
+            document.getElementById('modal-payment-method-display').textContent = paymentMethod;
+            document.getElementById('modal-mobile-display').textContent         = mobile || '—';
+            refundBox.style.display = 'flex';
+        } else {
+            refundBox.style.display = 'none';
+        }
+
+        document.getElementById('reject-modal').classList.add('open');
+        setTimeout(() => document.getElementById('modal-reason').focus(), 100);
+    }
+
+    function closeRejectModal() {
+        document.getElementById('reject-modal').classList.remove('open');
+    }
+
+    function clearModalError() {
+        document.getElementById('modal-error').style.display = 'none';
+        document.getElementById('modal-reason').classList.remove('modal-textarea-error');
+    }
+
+    function submitRejectForm() {
+        const reason = document.getElementById('modal-reason').value.trim();
+        if (!reason) {
+            document.getElementById('modal-error').style.display = 'block';
+            document.getElementById('modal-reason').classList.add('modal-textarea-error');
+            document.getElementById('modal-reason').focus();
+            return;
+        }
+        document.getElementById('reject-form').submit();
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('reject-modal').addEventListener('click', function (e) {
+        if (e.target === this) closeRejectModal();
+    });
+</script>
