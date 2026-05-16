@@ -220,6 +220,16 @@
         color: #b30000;
     }
 
+    .pill-refund-pending {
+        background: #fff8e1;
+        color: #f57f17;
+    }
+
+    .pill-refund-done {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
     .blood-badge {
         display: inline-block;
         background: #fdecea;
@@ -271,6 +281,24 @@
             background: #e1bee7;
         }
 
+    .btn-refund {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+        .btn-refund:hover {
+            background: #ffe0b2;
+        }
+
+    .btn-refund-done {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+        .btn-refund-done:hover {
+            background: #c8e6c9;
+        }
+
     .no-data {
         text-align: center;
         padding: 30px 20px;
@@ -284,6 +312,13 @@
             display: block;
             margin-bottom: 10px;
         }
+
+    .refund-date {
+        font-size: 11px;
+        color: #999;
+        display: block;
+        margin-top: 3px;
+    }
 </style>
 
 <div class="dashboard">
@@ -309,18 +344,15 @@
         @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
         {
             <div class="stat-card">
-            <h3>@ViewBag.Approved</h3>
-            <p><i class="fa-solid fa-circle-check"></i> Approved</p>
-        </div>
-        <div class="stat-card">
-            <h3>@ViewBag.Rejected</h3>
-            <p><i class="fa-solid fa-circle-xmark"></i> Rejected</p>
-        </div>
+                <h3>@ViewBag.Approved</h3>
+                <p><i class="fa-solid fa-circle-check"></i> Approved</p>
+            </div>
+            <div class="stat-card">
+                <h3>@ViewBag.Rejected</h3>
+                <p><i class="fa-solid fa-circle-xmark"></i> Rejected</p>
+            </div>
         }
     </div>
-
-   
-        
 
     <!-- ALERTS -->
     @if (TempData["SuccessMessage"] != null)
@@ -336,7 +368,6 @@
         </div>
     }
 
-    <!-- FILTER -->
     <!-- FILTER — Admin/Staff only -->
     @if (ViewBag.IsAdminOrStaff == true)
     {
@@ -411,10 +442,11 @@
                                 @if (!string.IsNullOrEmpty(r.MobileNumber))
                                 {
                                     <br />
-                        
                                     <span style="font-size:11px;color:#888;">@r.MobileNumber</span>
                                 }
                             </td>
+
+                            <!-- ── STATUS COLUMN ── -->
                             <td>
                                 @if (r.Status == "Pending")
                                 {
@@ -433,20 +465,41 @@
                                     <span class="pill pill-rejected">
                                         <i class="fa-solid fa-circle-xmark"></i> Rejected
                                     </span>
+
+                                    @* Show refund status under rejected pill *@
+                                    @if (r.RefundStatus == "Requested")
+                                    {
+                                        <br />
+                                        <span class="pill pill-refund-pending" style="margin-top:4px;">
+                                            <i class="fa-solid fa-rotate-left"></i> Refund Pending
+                                        </span>
+                                    }
+                                    else if (r.RefundStatus == "Processed")
+                                    {
+                                        <br />
+                                        <span class="pill pill-refund-done" style="margin-top:4px;">
+                                            <i class="fa-solid fa-circle-check"></i> Refunded
+                                        </span>
+                                    }
                                 }
                             </td>
+
+                            <!-- ── ACTIONS COLUMN ── -->
                             <td style="white-space:nowrap;">
 
-                                <!-- Invoice — visible to all -->
-                                <a asp-controller="Home"
-                                   asp-action="DownloadInvoice"
-                                   asp-route-id="@r.Id"
-                                   class="action-btn btn-invoice"
-                                   target="_blank">
-                                    <i class="fa-solid fa-file-pdf"></i> Invoice
-                                </a>
+                                @* ── Invoice: only when Approved ── *@
+                                @if (r.Status == "Approved")
+                                {
+                                    <a asp-controller="Home"
+                                       asp-action="DownloadInvoice"
+                                       asp-route-id="@r.Id"
+                                       class="action-btn btn-invoice"
+                                       target="_blank">
+                                        <i class="fa-solid fa-file-pdf"></i> Invoice
+                                    </a>
+                                }
 
-                                <!-- Approve/Reject — Admin & Staff only -->
+                                @* ── Approve / Reject: Admin & Staff, Pending only ── *@
                                 @if ((User.IsInRole("Admin") || User.IsInRole("Staff")) && r.Status == "Pending")
                                 {
                                     <form method="post"
@@ -473,10 +526,76 @@
                                         </button>
                                     </form>
                                 }
-                                else if (r.Status != "Pending")
+
+                                @* ── Refund Request: User, Rejected, no refund yet ── *@
+                                @if (User.IsInRole("User") && r.Status == "Rejected")
                                 {
-                                    <span style="font-size:12px;color:#bbb;">— No actions —</span>
+                                    @if (r.RefundStatus == null)
+                                    {
+                                        <form method="post"
+                                              asp-controller="Home"
+                                              asp-action="RequestRefund"
+                                              asp-route-id="@r.Id"
+                                              style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="action-btn btn-refund"
+                                                    onclick="return confirm('Request a refund of Tk @r.TotalCost for this rejected request?')">
+                                                <i class="fa-solid fa-money-bill-wave"></i> Request Refund
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (r.RefundStatus == "Requested")
+                                    {
+                                        <span class="pill pill-refund-pending">
+                                            <i class="fa-solid fa-clock"></i> Refund Pending
+                                        </span>
+                                    }
+                                    else if (r.RefundStatus == "Processed")
+                                    {
+                                        <span class="pill pill-refund-done">
+                                            <i class="fa-solid fa-circle-check"></i> Refund Done
+                                        </span>
+                                    }
                                 }
+
+                                @* ── Process Refund: Admin & Staff, Rejected with refund requested ── *@
+                                @if ((User.IsInRole("Admin") || User.IsInRole("Staff")) && r.Status == "Rejected")
+                                {
+                                    @if (r.RefundStatus == "Requested")
+                                    {
+                                        <form method="post"
+                                              asp-controller="Home"
+                                              asp-action="ProcessRefund"
+                                              asp-route-id="@r.Id"
+                                              style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="action-btn btn-refund-done"
+                                                    onclick="return confirm('Mark Tk @r.TotalCost refund as processed for @r.RequesterName?')">
+                                                <i class="fa-solid fa-rotate-left"></i> Mark Refunded
+                                            </button>
+                                        </form>
+                                        <span class="refund-date">
+                                            Requested: @r.RefundRequestedAt?.ToString("dd MMM yyyy")
+                                        </span>
+                                    }
+                                    else if (r.RefundStatus == "Processed")
+                                    {
+                                        <span class="pill pill-refund-done">
+                                            <i class="fa-solid fa-circle-check"></i> Refunded
+                                        </span>
+                                    }
+                                    else if (r.RefundStatus == null)
+                                    {
+                                        <span style="font-size:12px;color:#bbb;">No refund yet</span>
+                                    }
+                                }
+
+                                @* ── Pending with User role: no actions ── *@
+                                @if (r.Status == "Pending" && User.IsInRole("User"))
+                                {
+                                    <span style="font-size:12px;color:#bbb;">— Awaiting review —</span>
+                                }
+
                             </td>
                         </tr>
                         rowNum++;

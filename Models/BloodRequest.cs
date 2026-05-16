@@ -35,5 +35,8 @@ namespace YourApp.Models
         // Total cost = Quantity * 165
         public int TotalCost { get; set; } = 165;
         public string? IdentityUserId { get; set; } // ← add this
+        public string? RefundStatus { get; set; }
+        public DateTime? RefundRequestedAt { get; set; }
+       
     }
 }

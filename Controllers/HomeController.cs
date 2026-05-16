@@ -57,7 +57,7 @@ namespace BBMS.Controllers
         // ─── BLOOD REQUEST POST ───────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult RequestBlood(BloodRequest model)
+        public async Task<IActionResult> RequestBlood(BloodRequest model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -72,11 +72,19 @@ namespace BBMS.Controllers
 
             model.TotalCost = model.Quantity * 165;
 
+            // ── Save the logged-in user's ID if authenticated ──
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var identityUser = await _userManager.GetUserAsync(User);
+                if (identityUser != null)
+                    model.IdentityUserId = identityUser.Id;
+            }
+
             _db.BloodRequests.Add(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Your blood request has been submitted successfully!";
-            return RedirectToAction("BloodRequests"); // ← goes to the shared page
+            return RedirectToAction("BloodRequests");
         }
 
         [HttpGet]
@@ -89,22 +97,16 @@ namespace BBMS.Controllers
 
         // ─── BLOOD REQUESTS LIST ──────────────────────────────
         [HttpGet]
-        [Authorize] // ← any logged-in user (Admin, Staff, or User)
-        public IActionResult BloodRequests(string search, string status)
+        [Authorize]
+        public async Task<IActionResult> BloodRequests(string search, string status)
         {
             IQueryable<BloodRequest> query = _db.BloodRequests.AsQueryable();
 
-            // Regular users only see their own requests
+            // Regular users only see their own requests by IdentityUserId
             if (User.IsInRole("User"))
             {
-                var userName = _userManager.GetUserAsync(User).Result;
-                var profile = _db.UserProfiles
-                    .FirstOrDefault(p => p.IdentityUserId == userName.Id);
-
-                if (profile != null)
-                    query = query.Where(r => r.RequesterName == profile.Name);
-                else
-                    query = query.Where(r => false); // show nothing if no profile
+                var identityUser = await _userManager.GetUserAsync(User);
+                query = query.Where(r => r.IdentityUserId == identityUser.Id);
             }
 
             // Admin/Staff can search and filter
@@ -132,6 +134,7 @@ namespace BBMS.Controllers
             return View(list);
         }
 
+        // ─── APPROVE REQUEST ─────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Staff")]
@@ -142,6 +145,7 @@ namespace BBMS.Controllers
             return RedirectToAction("BloodRequests");
         }
 
+        // ─── REJECT REQUEST ──────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Staff")]
@@ -152,6 +156,40 @@ namespace BBMS.Controllers
             return RedirectToAction("BloodRequests");
         }
 
+        // ─── REQUEST REFUND (User) ────────────────────────────
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "User")]
+        public IActionResult RequestRefund(int id)
+        {
+            var r = _db.BloodRequests.Find(id);
+            if (r != null && r.Status == "Rejected" && r.RefundStatus == null)
+            {
+                r.RefundStatus = "Requested";
+                r.RefundRequestedAt = DateTime.Now;
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Refund requested. Staff will process it shortly.";
+            }
+            return RedirectToAction("BloodRequests");
+        }
+
+        // ─── PROCESS REFUND (Admin/Staff) ─────────────────────
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
+        public IActionResult ProcessRefund(int id)
+        {
+            var r = _db.BloodRequests.Find(id);
+            if (r != null && r.RefundStatus == "Requested")
+            {
+                r.RefundStatus = "Processed";
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Refund marked as processed.";
+            }
+            return RedirectToAction("BloodRequests");
+        }
+
+        // ─── EDIT REQUEST ─────────────────────────────────────
         [HttpGet]
         [Authorize(Roles = "Admin,Staff")]
         public IActionResult EditRequest(int id)
@@ -193,6 +231,7 @@ namespace BBMS.Controllers
             return RedirectToAction("BloodRequests");
         }
 
+        // ─── DELETE REQUEST ───────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Staff")]
@@ -212,8 +251,9 @@ namespace BBMS.Controllers
             return RedirectToAction("BloodRequests");
         }
 
+        // ─── DOWNLOAD INVOICE ─────────────────────────────────
         [HttpGet]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize]
         public IActionResult DownloadInvoice(int id)
         {
             var request = _db.BloodRequests.Find(id);
@@ -673,7 +713,7 @@ namespace BBMS.Controllers
                 return RedirectToAction("LogIn", "Auth");
 
             var myRequests = _db.BloodRequests
-                .Where(r => r.RequesterName == profile.Name)
+                .Where(r => r.IdentityUserId == identityUser.Id)
                 .OrderByDescending(r => r.RequestDate)
                 .Take(5)
                 .ToList();
@@ -722,25 +762,11 @@ namespace BBMS.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult AdminReports()
         {
-            var donors = _db.DonateBloods
-                .OrderByDescending(d => d.CreatedAt)
-                .ToList();
-
-            var bloodStocks = _db.BloodStocks
-                .OrderBy(s => s.BloodGroup)
-                .ToList();
-
-            var bloodRequests = _db.BloodRequests
-                .OrderByDescending(r => r.RequestDate)
-                .ToList();
-
-            var staffList = _db.Staffs
-                .OrderByDescending(s => s.JoinDate)
-                .ToList();
-
-            var hospitalList = _db.Hospitals
-                .OrderBy(h => h.Name)
-                .ToList();
+            var donors = _db.DonateBloods.OrderByDescending(d => d.CreatedAt).ToList();
+            var bloodStocks = _db.BloodStocks.OrderBy(s => s.BloodGroup).ToList();
+            var bloodRequests = _db.BloodRequests.OrderByDescending(r => r.RequestDate).ToList();
+            var staffList = _db.Staffs.OrderByDescending(s => s.JoinDate).ToList();
+            var hospitalList = _db.Hospitals.OrderBy(h => h.Name).ToList();
 
             ViewBag.DonorList = donors;
             ViewBag.BloodStockList = bloodStocks;
