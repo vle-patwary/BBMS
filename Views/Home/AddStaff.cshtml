@@ -6,140 +6,293 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-    .dashboard { width: 92%; max-width: 720px; margin: 32px auto 50px; }
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    .dashboard {
+        width: 92%;
+        max-width: 720px;
+        margin: 32px auto 50px;
+    }
 
     .header {
-        background: #8b0000; color: white;
-        padding: 28px 32px; border-radius: 12px;
-        display: flex; justify-content: space-between; align-items: center;
-        position: relative; overflow: hidden; margin-bottom: 28px;
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 28px;
     }
-    .header::before {
-        content: ''; position: absolute; right: -40px; top: -50px;
-        width: 200px; height: 200px; border-radius: 50%;
-        background: rgba(255,255,255,0.05);
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
     }
-    .header::after {
-        content: ''; position: absolute; right: 120px; bottom: -60px;
-        width: 140px; height: 140px; border-radius: 50%;
-        background: rgba(255,255,255,0.05);
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
     }
-    .header-left h2 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 5px; }
-    .header-left p  { font-size: 13px; color: #ffb3b3; }
-    .header-right   { z-index: 1; }
+
+    .header-right {
+        z-index: 1;
+    }
 
     .btn-ghost {
-        display: inline-flex; align-items: center; gap: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         background: rgba(255,255,255,0.08);
         border: 1px solid rgba(255,255,255,0.2);
-        color: #ffb3b3; padding: 9px 18px; border-radius: 8px;
-        font-size: 13px; font-weight: 600; text-decoration: none;
+        color: #ffb3b3;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
         transition: background 0.2s;
     }
-    .btn-ghost:hover { background: rgba(255,255,255,0.18); }
 
-    /* alerts */
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
     .alert {
-        padding: 12px 18px; border-radius: 8px;
-        font-size: 13px; font-weight: 600;
-        display: flex; align-items: center; gap: 10px;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         margin-bottom: 18px;
     }
-    .alert-success { background: #e6f9ef; color: #1a8a4a; border: 1px solid #b7ecd0; }
-    .alert-danger  { background: #fff0f0; color: #8b0000; border: 1px solid #f5c0c0; }
 
-    .form-card { background: white; border: 1px solid #f0e0e0; border-radius: 10px; overflow: hidden; }
-    .form-card-header {
-        background: #8b0000; color: white;
-        padding: 14px 22px; display: flex;
-        align-items: center; gap: 10px;
-        font-size: 14px; font-weight: 700;
+    .alert-success {
+        background: #e6f9ef;
+        color: #1a8a4a;
+        border: 1px solid #b7ecd0;
     }
-    .form-body { padding: 28px; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group.full { grid-column: 1 / -1; }
+    .alert-danger {
+        background: #fff0f0;
+        color: #8b0000;
+        border: 1px solid #f5c0c0;
+    }
 
-    label { font-size: 12px; font-weight: 700; color: #555; display: flex; align-items: center; gap: 6px; }
-    label i   { color: #8b0000; font-size: 11px; }
-    label .req { color: #8b0000; }
+    .form-card {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        background: #8b0000;
+        color: white;
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .form-body {
+        padding: 28px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+    label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        label i {
+            color: #8b0000;
+            font-size: 11px;
+        }
+
+        label .req {
+            color: #8b0000;
+        }
 
     input[type="text"], input[type="email"], input[type="tel"],
     input[type="date"], input[type="password"], select {
-        padding: 10px 13px; border: 1px solid #ddd; border-radius: 7px;
-        font-size: 13px; color: #333; background: #fafafa;
-        outline: none; font-family: inherit; width: 100%;
+        padding: 10px 13px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        outline: none;
+        font-family: inherit;
+        width: 100%;
         transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, select:focus {
-        border-color: #8b0000;
-        box-shadow: 0 0 0 3px rgba(139,0,0,0.07);
-        background: white;
-    }
-    input.input-validation-error,
-    select.input-validation-error {
-        border-color: #e53935;
-        box-shadow: 0 0 0 3px rgba(229,57,53,0.08);
-    }
+
+        input:focus, select:focus {
+            border-color: #8b0000;
+            box-shadow: 0 0 0 3px rgba(139,0,0,0.07);
+            background: white;
+        }
+
     .field-validation-error {
-        font-size: 11px; color: #e53935;
-        display: flex; align-items: center; gap: 4px;
+        font-size: 11px;
+        color: #e53935;
+        display: flex;
+        align-items: center;
+        gap: 4px;
         margin-top: 2px;
     }
-    .field-validation-error::before {
-        content: '\f06a';
-        font-family: 'Font Awesome 6 Free'; font-weight: 900;
-        font-size: 10px;
+
+    .pw-wrap {
+        position: relative;
     }
 
-    .pw-wrap { position: relative; }
-    .pw-wrap input { padding-right: 40px; }
+        .pw-wrap input {
+            padding-right: 40px;
+        }
+
     .pw-toggle {
-        position: absolute; right: 12px; top: 50%;
+        position: absolute;
+        right: 12px;
+        top: 50%;
         transform: translateY(-50%);
-        color: #aaa; cursor: pointer; font-size: 13px;
-        background: none; border: none;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 13px;
+        background: none;
+        border: none;
     }
-    .pw-toggle:hover { color: #8b0000; }
 
-    .divider { border: none; border-top: 1px solid #f5eded; margin: 24px 0; }
+        .pw-toggle:hover {
+            color: #8b0000;
+        }
+
+    .divider {
+        border: none;
+        border-top: 1px solid #f5eded;
+        margin: 24px 0;
+    }
 
     .form-actions {
-        display: flex; align-items: center;
-        justify-content: flex-end; gap: 12px;
-        padding: 20px 28px; border-top: 1px solid #f5eded;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 20px 28px;
+        border-top: 1px solid #f5eded;
         background: #fffafa;
     }
+
     .btn-cancel {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 22px; border-radius: 8px;
-        border: 1px solid #ddd; background: white;
-        color: #555; font-size: 13px; font-weight: 600;
-        cursor: pointer; text-decoration: none; font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: inherit;
         transition: all 0.2s;
     }
-    .btn-cancel:hover { border-color: #8b0000; color: #8b0000; }
+
+        .btn-cancel:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
     .btn-submit {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 26px; border-radius: 8px;
-        border: none; background: #8b0000; color: white;
-        font-size: 13px; font-weight: 700; cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 26px;
+        border-radius: 8px;
+        border: none;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
         font-family: inherit;
         box-shadow: 0 4px 12px rgba(139,0,0,0.25);
         transition: all 0.2s;
     }
-    .btn-submit:hover { background: #6e0000; }
 
-    @@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        .btn-submit:hover {
+            background: #6e0000;
+        }
+
+    @@media (max-width: 600px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <div class="dashboard">
 
-    <!-- HEADER -->
     <div class="header">
         <div class="header-left">
             <h2><i class="fa-solid fa-user-plus" style="margin-right:10px"></i>Add New Staff</h2>
@@ -152,7 +305,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS / ERROR ALERTS -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">
@@ -166,7 +318,6 @@
         </div>
     }
 
-    <!-- FORM -->
     <div class="form-card">
         <div class="form-card-header">
             <i class="fa-solid fa-id-card"></i> Staff Details
@@ -176,11 +327,20 @@
             @Html.AntiForgeryToken()
 
             <div class="form-body">
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Please fix the errors below before submitting.
+                    </div>
+                }
+
                 <div class="form-grid">
 
                     <!-- Full Name -->
                     <div class="form-group full">
-                        <label for="Name">
+                        <label>
                             <i class="fa-solid fa-user"></i> Full Name <span class="req">*</span>
                         </label>
                         <input asp-for="Name" type="text" placeholder="e.g. Dr. Mahbub Alam" />
@@ -189,7 +349,7 @@
 
                     <!-- Email -->
                     <div class="form-group">
-                        <label for="Email">
+                        <label>
                             <i class="fa-solid fa-envelope"></i> Email <span class="req">*</span>
                         </label>
                         <input asp-for="Email" type="email" placeholder="e.g. mahbub@bloodbank.org" />
@@ -198,42 +358,38 @@
 
                     <!-- Contact -->
                     <div class="form-group">
-                        <label for="Contact">
+                        <label>
                             <i class="fa-solid fa-phone"></i> Contact Number <span class="req">*</span>
                         </label>
                         <input asp-for="Contact" type="tel" placeholder="e.g. 017XXXXXXXX" />
                         <span asp-validation-for="Contact" class="field-validation-error"></span>
                     </div>
 
-                    <!-- Role -->
+                    <!-- Role — Only Admin and Staff allowed -->
                     <div class="form-group">
-                        <label for="Role">
+                        <label>
                             <i class="fa-solid fa-user-tie"></i> Role <span class="req">*</span>
                         </label>
                         <select asp-for="Role">
                             <option value="">— Select Role —</option>
-                            <option>Admin</option>
-                            <option>Blood Bank Officer</option>
-                            <option>Lab Technician</option>
-                            <option>Nurse</option>
-                            <option>Data Entry Operator</option>
-                            <option>Staff</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Staff">Staff</option>
                         </select>
                         <span asp-validation-for="Role" class="field-validation-error"></span>
                     </div>
 
                     <!-- Join Date -->
                     <div class="form-group">
-                        <label for="JoinDate">
+                        <label>
                             <i class="fa-solid fa-calendar-day"></i> Join Date <span class="req">*</span>
                         </label>
-                        <input asp-for="JoinDate" type="date" />
+                        <input asp-for="JoinDate" type="date" id="JoinDate" />
                         <span asp-validation-for="JoinDate" class="field-validation-error"></span>
                     </div>
 
                     <!-- Status -->
                     <div class="form-group">
-                        <label for="Status">
+                        <label>
                             <i class="fa-solid fa-toggle-on"></i> Status
                         </label>
                         <select asp-for="Status">
@@ -247,27 +403,28 @@
 
                 <hr class="divider">
 
-                <!-- Passwords -->
+                <!-- Passwords — plain name="" fields, NOT asp-for -->
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="Password">
+                        <label>
                             <i class="fa-solid fa-lock"></i> Password <span class="req">*</span>
                         </label>
                         <div class="pw-wrap">
-                            <input asp-for="Password" type="password" id="Password" placeholder="Min. 8 characters" />
+                            <input type="password" id="Password" name="Password"
+                                   placeholder="Minimum 6 characters" required />
                             <button type="button" class="pw-toggle" onclick="togglePw('Password', this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
-                        <span asp-validation-for="Password" class="field-validation-error"></span>
                     </div>
+
                     <div class="form-group">
-                        <label for="ConfirmPassword">
+                        <label>
                             <i class="fa-solid fa-lock"></i> Confirm Password <span class="req">*</span>
                         </label>
                         <div class="pw-wrap">
                             <input type="password" id="ConfirmPassword" name="ConfirmPassword"
-                                   placeholder="Re-enter password" />
+                                   placeholder="Re-enter password" required />
                             <button type="button" class="pw-toggle" onclick="togglePw('ConfirmPassword', this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
@@ -275,6 +432,7 @@
                         <span class="field-validation-error" id="err-confirm"></span>
                     </div>
                 </div>
+
             </div>
 
             <div class="form-actions">
@@ -290,16 +448,16 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-        // Set today as default join date if empty
+        // Set today as default join date
         const jd = document.getElementById('JoinDate');
         if (jd && !jd.value) {
-            const today = new Date().toISOString().split('T')[0];
-            jd.value = today;
+            jd.value = new Date().toISOString().split('T')[0];
         }
 
-        // Password show/hide
         function togglePw(id, btn) {
             const input = document.getElementById(id);
             const icon  = btn.querySelector('i');
@@ -312,17 +470,16 @@
             }
         }
 
-        // Confirm password client-side check
         document.querySelector('form').addEventListener('submit', function (e) {
             const pw  = document.getElementById('Password').value;
             const cpw = document.getElementById('ConfirmPassword').value;
             const err = document.getElementById('err-confirm');
             if (pw !== cpw) {
                 e.preventDefault();
-                document.getElementById('ConfirmPassword').classList.add('input-validation-error');
+                document.getElementById('ConfirmPassword').style.borderColor = '#e53935';
                 err.textContent = 'Passwords do not match';
             } else {
-                document.getElementById('ConfirmPassword').classList.remove('input-validation-error');
+                document.getElementById('ConfirmPassword').style.borderColor = '';
                 err.textContent = '';
             }
         });

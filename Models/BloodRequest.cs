@@ -34,5 +34,6 @@ namespace YourApp.Models
 
         // Total cost = Quantity * 165
         public int TotalCost { get; set; } = 165;
+        public string? IdentityUserId { get; set; } // ← add this
     }
 }

@@ -815,188 +815,7 @@
         </div>
     </div>
 
-    @* ─────────────────────────────────────────────────────────
-       4. STAFF
-    ───────────────────────────────────────────────────────── *@
-    <div class="section-title">Staff Report</div>
-    <div class="report-card" id="section-staff">
-        <div class="report-card-header">
-            <h3><i class="fa-solid fa-user-tie"></i> Staff Directory</h3>
-            <button class="download-btn" onclick="downloadPDF('section-staff','Staff_Report')">
-                <i class="fa-solid fa-file-pdf"></i> Download PDF
-            </button>
-        </div>
-        <div class="table-filter-bar">
-            <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
-            <input type="text" id="staff-search" placeholder="Search name, role, email…">
-            <label>Status:</label>
-            <select id="staff-status">
-                <option value="">All Status</option>
-                <option>Active</option>
-                <option>Inactive</option>
-                <option>On Leave</option>
-            </select>
-            <button class="btn-search" onclick="filterTable('staff')">
-                <i class="fa-solid fa-magnifying-glass"></i> Search
-            </button>
-            <button class="btn-clear" onclick="clearFilter('staff')">
-                <i class="fa-solid fa-xmark"></i> Clear
-            </button>
-        </div>
-        <div class="report-table-wrap">
-            <table id="tbl-staff">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Staff Name</th>
-                        <th>Role</th>
-                        <th>Email</th>
-                        <th>Contact</th>
-                        <th>Join Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-staff">
-                    @{
-                        int staffSerial = 1;
-                        var staffList = ViewBag.StaffList as List<BBMS.Models.Staff>;
-                    }
-                    @if (staffList != null && staffList.Any())
-                    {
-                        foreach (var s in staffList)
-                        {
-                            string sBadge = s.Status switch
-                            {
-                                "Active" => "badge-green",
-                                "On Leave" => "badge-yellow",
-                                _ => "badge-gray"
-                            };
-                            <tr>
-                                <td>@(staffSerial++)</td>
-                                <td>@s.Name</td>
-                                <td>@s.Role</td>
-                                <td>@s.Email</td>
-                                <td>@s.Contact</td>
-                                <td>@s.JoinDate.ToString("dd MMM yyyy")</td>
-                                <td><span class="badge @sBadge">@s.Status</span></td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7">
-                                <div class="empty-state">
-                                    <i class="fa-solid fa-user-tie"></i>
-                                    <p>No staff records found.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination-bar" id="pag-staff">
-            <span class="page-info" id="info-staff"></span>
-            <div class="page-btns" id="btns-staff"></div>
-        </div>
-    </div>
-
-    @* ─────────────────────────────────────────────────────────
-       5. HOSPITALS
-    ───────────────────────────────────────────────────────── *@
-    <div class="section-title">Hospital Report</div>
-    <div class="report-card" id="section-hospitals">
-        <div class="report-card-header">
-            <h3><i class="fa-solid fa-building"></i> Partner Hospitals</h3>
-            <button class="download-btn" onclick="downloadPDF('section-hospitals','Hospital_Report')">
-                <i class="fa-solid fa-file-pdf"></i> Download PDF
-            </button>
-        </div>
-        <div class="table-filter-bar">
-            <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
-            <input type="text" id="hospitals-search" placeholder="Search hospital name, location…">
-            <label>Status:</label>
-            <select id="hospitals-status">
-                <option value="">All Status</option>
-                <option>Active</option>
-                <option>Pending Approval</option>
-                <option>Inactive</option>
-            </select>
-            <button class="btn-search" onclick="filterTable('hospitals')">
-                <i class="fa-solid fa-magnifying-glass"></i> Search
-            </button>
-            <button class="btn-clear" onclick="clearFilter('hospitals')">
-                <i class="fa-solid fa-xmark"></i> Clear
-            </button>
-        </div>
-        <div class="report-table-wrap">
-            <table id="tbl-hospitals">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Hospital Name</th>
-                        <th>Location</th>
-                        <th>Contact Person</th>
-                        <th>Phone</th>
-                        <th>Total Requests</th>
-                        <th>Units Received</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-hospitals">
-                    @{
-                        int hospSerial = 1;
-                        var hospitalList = ViewBag.HospitalList as List<BBMS.Models.Hospital>;
-                    }
-                    @if (hospitalList != null && hospitalList.Any())
-                    {
-                        foreach (var h in hospitalList)
-                        {
-                            string hBadge = h.Status switch
-                            {
-                                "Active" => "badge-green",
-                                "Pending Approval" => "badge-yellow",
-                                _ => "badge-gray"
-                            };
-                            <tr>
-                                <td>@(hospSerial++)</td>
-                                <td>@h.Name</td>
-                                <td>@h.Location</td>
-                                <td>@h.ContactPerson</td>
-                                <td>@h.Phone</td>
-                                <td>@h.Requests</td>
-                                <td>@h.UnitsSupplied</td>
-                                <td><span class="badge @hBadge">@h.Status</span></td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="8">
-                                <div class="empty-state">
-                                    <i class="fa-solid fa-building"></i>
-                                    <p>No hospital records found.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="pagination-bar" id="pag-hospitals">
-            <span class="page-info" id="info-hospitals"></span>
-            <div class="page-btns" id="btns-hospitals"></div>
-        </div>
-    </div>
-
-    <!-- DOWNLOAD ALL -->
-    <div class="download-all-wrap">
-        <button class="btn-download-all" onclick="downloadAllPDF()">
-            <i class="fa-solid fa-file-pdf"></i> Download Full Report (All Sections)
-        </button>
-    </div>
+    
 
 </div>
 
@@ -1006,7 +825,7 @@
     // ════════════════════════════════════════════════════
     const PAGE_SIZE  = 10;
     const tableState = {};
-    const tables     = ['donors','stock','requests','staff','hospitals'];
+    const tables     = ['donors','stock','requests'];
 
     function initTable(name) {
         const tbody = document.getElementById('tbody-' + name);
@@ -1175,8 +994,7 @@
         'section-donors':    'donors',
         'section-stock':     'stock',
         'section-requests':  'requests',
-        'section-staff':     'staff',
-        'section-hospitals': 'hospitals',
+       
     };
 
     function statusColor(text) {
@@ -1497,8 +1315,7 @@
             { id: 'section-donors',    name: 'Donors Report',         tableKey: 'donors'    },
             { id: 'section-stock',     name: 'Blood Stock Report',     tableKey: 'stock'     },
             { id: 'section-requests',  name: 'Blood Requests Report',  tableKey: 'requests'  },
-            { id: 'section-staff',     name: 'Staff Report',           tableKey: 'staff'     },
-            { id: 'section-hospitals', name: 'Hospital Report',        tableKey: 'hospitals' },
+           
         ];
 
         const doc    = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });

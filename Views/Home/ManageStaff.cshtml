@@ -22,6 +22,7 @@
         margin: 32px auto;
     }
 
+    /* HEADER */
     .header {
         background: #8b0000;
         color: white;
@@ -76,21 +77,17 @@
         z-index: 1;
     }
 
-    .header-stat {
-        text-align: center;
+    .header-stat .val {
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
     }
 
-        .header-stat .val {
-            font-size: 20px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .header-stat .lbl {
-            font-size: 11px;
-            color: #ffb3b3;
-            margin-top: 2px;
-        }
+    .header-stat .lbl {
+        font-size: 11px;
+        color: #ffb3b3;
+        margin-top: 2px;
+    }
 
     .h-divider {
         width: 1px;
@@ -117,31 +114,27 @@
             background: rgba(255,255,255,0.18);
         }
 
-    /* alerts */
-    .alert {
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
+    /* SECTION TITLE */
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
+        gap: 8px;
+        margin-bottom: 14px;
     }
 
-    .alert-success {
-        background: #e6f9ef;
-        color: #1a8a4a;
-        border: 1px solid #b7ecd0;
-    }
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
 
-    .alert-danger {
-        background: #fff0f0;
-        color: #8b0000;
-        border: 1px solid #f5c0c0;
-    }
-
-    /* stat cards */
+    /* STAT CARDS */
     .stat-row {
         display: flex;
         gap: 16px;
@@ -190,7 +183,7 @@
         margin-top: 2px;
     }
 
-    /* toolbar */
+    /* TOOLBAR */
     .toolbar {
         background: white;
         border: 1px solid #f0e0e0;
@@ -267,7 +260,7 @@
             background: #6e0000;
         }
 
-    /* table */
+    /* TABLE */
     .table-section {
         background: white;
         border: 1px solid #f0e0e0;
@@ -420,6 +413,7 @@
         color: #b8860b;
     }
 
+    /* ACTIONS */
     .actions {
         display: flex;
         gap: 6px;
@@ -442,26 +436,26 @@
     }
 
     .btn-edit {
-        background: #e8f4fd;
-        color: #1565c0;
+        background: #1565c0;
+        color: white;
     }
 
         .btn-edit:hover {
-            background: #1565c0;
+            background: #0d47a1;
             color: white;
         }
 
     .btn-delete {
-        background: #fff0f0;
-        color: #8b0000;
+        background: #8b0000;
+        color: white;
     }
 
         .btn-delete:hover {
-            background: #8b0000;
+            background: #6e0000;
             color: white;
         }
 
-    /* empty state */
+    /* EMPTY STATE */
     .empty-state {
         text-align: center;
         padding: 50px 20px;
@@ -475,7 +469,7 @@
             display: block;
         }
 
-    /* pagination */
+    /* PAGINATION */
     .pagination {
         display: flex;
         align-items: center;
@@ -486,104 +480,131 @@
         color: #888;
     }
 
-    /* delete modal */
-    .modal-backdrop {
+    /* ── DELETE MODAL (matching ManageBloodStock style) ── */
+    .bs-modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.45);
-        z-index: 999;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.82);
+        z-index: 999999;
         align-items: center;
         justify-content: center;
     }
 
-        .modal-backdrop.show {
+        .bs-modal-overlay.show {
             display: flex;
+            pointer-events: all;
         }
 
-    .modal-box {
-        background: white;
+    .delete-modal-box {
+        background: #ffffff;
+        isolation: isolate;
         border-radius: 12px;
-        padding: 32px 28px;
-        width: 360px;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        width: 420px;
+        max-width: 95vw;
+        overflow: hidden;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+        position: relative;
+        z-index: 1000000;
+        animation: modalSlideIn 0.25s ease;
     }
 
-    .modal-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: #fff0f0;
-        margin: 0 auto 16px;
+    @@keyframes modalSlideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .delete-modal-header {
+        background: #8b0000;
+        color: white;
+        padding: 16px 22px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
     }
 
-        .modal-icon i {
+    .delete-modal-body {
+        padding: 24px;
+        font-size: 13px;
+        color: #444;
+        line-height: 1.6;
+        background: #ffffff;
+    }
+
+        .delete-modal-body strong {
             color: #8b0000;
-            font-size: 22px;
         }
 
-    .modal-box h3 {
-        font-size: 17px;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-    }
-
-    .modal-box p {
-        font-size: 13px;
-        color: #777;
-        margin-bottom: 24px;
-    }
-
-    .modal-actions {
+    .delete-modal-footer {
         display: flex;
+        justify-content: flex-end;
         gap: 10px;
-        justify-content: center;
+        padding: 16px 24px;
+        border-top: 1px solid #f5eded;
+        background: #ffffff;
     }
 
-    .btn-modal-cancel {
-        padding: 9px 22px;
-        border-radius: 7px;
+    .btn-cancel-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 8px;
         border: 1px solid #ddd;
         background: white;
+        color: #555;
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        color: #555;
+        font-family: inherit;
+        transition: all 0.2s;
     }
 
-    .btn-modal-delete {
+        .btn-cancel-modal:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-confirm-delete {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         padding: 9px 22px;
-        border-radius: 7px;
+        border-radius: 8px;
         border: none;
         background: #8b0000;
         color: white;
         font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .section-title {
-        font-size: 15px;
         font-weight: 700;
-        color: #1a1a1a;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 14px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
     }
 
-        .section-title::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 16px;
-            background: #8b0000;
-            border-radius: 2px;
+        .btn-confirm-delete:hover {
+            background: #6e0000;
         }
+
+    @@media (max-width: 700px) {
+        .stat-row {
+            flex-direction: column;
+        }
+
+        .actions {
+            flex-wrap: wrap;
+        }
+    }
 </style>
 
 <div class="dashboard">
@@ -615,20 +636,6 @@
             </a>
         </div>
     </div>
-
-    <!-- ALERTS -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            <i class="fa-solid fa-circle-check"></i> @TempData["SuccessMessage"]
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            <i class="fa-solid fa-triangle-exclamation"></i> @TempData["ErrorMessage"]
-        </div>
-    }
 
     <!-- STAT CARDS -->
     <div class="section-title">Overview</div>
@@ -740,7 +747,7 @@
                             var initials = string.Concat(s.Name.Split(' ').Take(2).Select(w => w[0])).ToUpper();
                             var roleClass = s.Role == "Admin" ? "role-admin"
                             : s.Role == "Nurse" ? "role-nurse"
-                            : (s.Role == "Lab Technician") ? "role-lab"
+                            : s.Role == "Lab Technician" ? "role-lab"
                             : "role-staff";
                             var statusClass = s.Status == "Active" ? "status-active"
                             : s.Status == "On Leave" ? "status-leave"
@@ -767,7 +774,7 @@
                                             <i class="fa-solid fa-pen"></i> Edit
                                         </a>
                                         <button type="button" class="action-btn btn-delete"
-                                                onclick="openDelete(@s.Id, '@s.Name')">
+                                                onclick="openDeleteModal(@s.Id, '@s.Name.Replace("'", "\\'")')">
                                             <i class="fa-solid fa-trash"></i> Delete
                                         </button>
                                     </div>
@@ -785,43 +792,102 @@
     </div>
 </div>
 
-<!-- DELETE MODAL -->
-<div class="modal-backdrop" id="deleteModal">
-    <div class="modal-box">
-        <div class="modal-icon">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+<!-- ═══════════════════════════════
+     DELETE CONFIRM MODAL
+═══════════════════════════════ -->
+<div class="bs-modal-overlay" id="deleteModal">
+    <div class="delete-modal-box">
+        <div class="delete-modal-header">
+            <i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete
         </div>
-        <h3>Delete Staff Member?</h3>
-        <p id="deleteMsg">This action cannot be undone.</p>
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
-            <!-- Real POST form for delete -->
-            <form id="deleteForm" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" id="deleteId" />
-                <button type="submit" class="btn-modal-delete">
-                    <i class="fa-solid fa-trash"></i> Yes, Delete
-                </button>
-            </form>
+        <div class="delete-modal-body">
+            Are you sure you want to delete
+            <strong id="deleteStaffLabel"></strong>?
+            This action <strong>cannot be undone</strong>.
+        </div>
+        <div class="delete-modal-footer">
+            <button class="btn-cancel-modal" onclick="closeDeleteModal()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <button class="btn-confirm-delete" onclick="confirmDelete()">
+                <i class="fa-solid fa-trash"></i> Yes, Delete
+            </button>
         </div>
     </div>
 </div>
 
+<!-- Hidden delete form -->
+<form id="deleteForm" asp-action="DeleteStaff" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="delete-form-id" />
+</form>
+
 <script>
-    function openDelete(id, name) {
-        document.getElementById('deleteId').value = id;
-        document.getElementById('deleteMsg').textContent =
-            'Are you sure you want to delete "' + name + '"?';
-        document.getElementById('deleteForm').action =
-            '/Home/DeleteStaff';
-        document.getElementById('deleteModal').classList.add('show');
-    }
-
-    function closeModal() {
-        document.getElementById('deleteModal').classList.remove('show');
-    }
-
-    document.getElementById('deleteModal').addEventListener('click', function (e) {
-        if (e.target === this) closeModal();
+    // ── Move modal to <body> so no parent clips it ──
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('deleteModal');
+        if (modal) document.body.appendChild(modal);
     });
+
+    // ── Close on backdrop click ──
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteModal();
+        });
+    });
+
+    // ── DELETE MODAL ──
+    function openDeleteModal(id, name) {
+        document.getElementById('delete-form-id').value      = id;
+        document.getElementById('deleteStaffLabel').innerText = name;
+        document.getElementById('deleteModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function confirmDelete() {
+        document.getElementById('deleteForm').submit();
+    }
+
+    // ── TOAST ──
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => showToast('@TempData["SuccessMessage"]', 'success'));
+            </text>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => showToast('@TempData["ErrorMessage"]', 'error'));
+            </text>
+    }
+
+    function showToast(msg, type) {
+        let t = document.getElementById('globalToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'globalToast';
+            t.style.cssText = [
+                'position:fixed','bottom:28px','right:28px','color:white',
+                'padding:14px 22px','border-radius:10px','font-size:13px','font-weight:600',
+                'display:flex','align-items:center','gap:10px',
+                'box-shadow:0 8px 28px rgba(0,0,0,0.18)',
+                "font-family:'Segoe UI',sans-serif",
+                'transform:translateY(80px)','opacity:0',
+                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)',
+                'z-index:9999999'
+            ].join(';');
+            document.body.appendChild(t);
+        }
+        t.style.background = type === 'error' ? '#8b0000' : '#1a8a4a';
+        const icon = type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-check';
+        t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
+        setTimeout(() => { t.style.transform = 'translateY(0)';    t.style.opacity = '1'; }, 10);
+        setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3200);
+    }
 </script>

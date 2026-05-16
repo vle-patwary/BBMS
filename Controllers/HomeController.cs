@@ -3,10 +3,7 @@ using BBMS.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Rotativa.AspNetCore;
-using System.Diagnostics;
-using System.Linq;
 using YourApp.Models;
 
 namespace BBMS.Controllers
@@ -22,18 +19,16 @@ namespace BBMS.Controllers
             _userManager = userManager;
         }
 
-        // ─── Home Page ───────────────────────────────────────────
+        // ─── HOME PAGE ────────────────────────────────────────
         public IActionResult Index()
         {
             var bloodStocks = _db.BloodStocks.OrderBy(s => s.BloodGroup).ToList();
-
             ViewBag.TotalDonors = _db.DonateBloods.Count();
             ViewBag.TotalGroups = _db.BloodStocks.Count();
-
             return View(bloodStocks);
         }
 
-        // ─── DONATE ───────────────────────────────────────────
+        // ─── DONATE ──────────────────────────────────────────
         [HttpGet]
         public IActionResult Donate() => View();
 
@@ -59,6 +54,7 @@ namespace BBMS.Controllers
         [HttpGet]
         public IActionResult RequestBlood() => View(new BloodRequest());
 
+        // ─── BLOOD REQUEST POST ───────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RequestBlood(BloodRequest model)
@@ -80,7 +76,7 @@ namespace BBMS.Controllers
             _db.SaveChanges();
 
             TempData["SuccessMessage"] = "Your blood request has been submitted successfully!";
-            return RedirectToAction("BloodRequests");
+            return RedirectToAction("BloodRequests"); // ← goes to the shared page
         }
 
         [HttpGet]
@@ -93,32 +89,52 @@ namespace BBMS.Controllers
 
         // ─── BLOOD REQUESTS LIST ──────────────────────────────
         [HttpGet]
+        [Authorize] // ← any logged-in user (Admin, Staff, or User)
         public IActionResult BloodRequests(string search, string status)
         {
-            var query = _db.BloodRequests.AsQueryable();
+            IQueryable<BloodRequest> query = _db.BloodRequests.AsQueryable();
 
-            if (!string.IsNullOrEmpty(search))
-                query = query.Where(r =>
-                    r.RequesterName.Contains(search) ||
-                    r.BloodGroup.Contains(search));
+            // Regular users only see their own requests
+            if (User.IsInRole("User"))
+            {
+                var userName = _userManager.GetUserAsync(User).Result;
+                var profile = _db.UserProfiles
+                    .FirstOrDefault(p => p.IdentityUserId == userName.Id);
 
-            if (!string.IsNullOrEmpty(status))
-                query = query.Where(r => r.Status == status);
+                if (profile != null)
+                    query = query.Where(r => r.RequesterName == profile.Name);
+                else
+                    query = query.Where(r => false); // show nothing if no profile
+            }
+
+            // Admin/Staff can search and filter
+            if (!User.IsInRole("User"))
+            {
+                if (!string.IsNullOrEmpty(search))
+                    query = query.Where(r =>
+                        r.RequesterName.Contains(search) ||
+                        r.BloodGroup.Contains(search));
+
+                if (!string.IsNullOrEmpty(status))
+                    query = query.Where(r => r.Status == status);
+            }
 
             var list = query.OrderByDescending(r => r.RequestDate).ToList();
 
-            ViewBag.TotalRequests = _db.BloodRequests.Count();
-            ViewBag.Pending = _db.BloodRequests.Count(r => r.Status == "Pending");
-            ViewBag.Approved = _db.BloodRequests.Count(r => r.Status == "Approved");
-            ViewBag.Rejected = _db.BloodRequests.Count(r => r.Status == "Rejected");
+            ViewBag.TotalRequests = list.Count;
+            ViewBag.Pending = list.Count(r => r.Status == "Pending");
+            ViewBag.Approved = list.Count(r => r.Status == "Approved");
+            ViewBag.Rejected = list.Count(r => r.Status == "Rejected");
             ViewBag.Search = search;
             ViewBag.Status = status;
+            ViewBag.IsAdminOrStaff = User.IsInRole("Admin") || User.IsInRole("Staff");
 
             return View(list);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult ApproveRequest(int id)
         {
             var r = _db.BloodRequests.Find(id);
@@ -128,6 +144,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult RejectRequest(int id)
         {
             var r = _db.BloodRequests.Find(id);
@@ -136,6 +153,7 @@ namespace BBMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult EditRequest(int id)
         {
             var r = _db.BloodRequests.Find(id);
@@ -150,6 +168,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult EditRequest(BloodRequest model)
         {
             var r = _db.BloodRequests.Find(model.Id);
@@ -176,6 +195,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult DeleteRequest(int id)
         {
             var r = _db.BloodRequests.Find(id);
@@ -193,6 +213,7 @@ namespace BBMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult DownloadInvoice(int id)
         {
             var request = _db.BloodRequests.Find(id);
@@ -211,6 +232,7 @@ namespace BBMS.Controllers
         // ═══════════════════════════════════════════════════════
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult ManageStaff(string search, string role, string status)
         {
             var query = _db.Staffs.AsQueryable();
@@ -239,32 +261,73 @@ namespace BBMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddStaff() => View(new Staff());
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult AddStaff(Staff model)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddStaff(
+            Staff model,
+            string Password,
+            [FromServices] UserManager<IdentityUser> userManager,
+            [FromServices] RoleManager<IdentityRole> roleManager)
         {
+            ModelState.Remove("Password");
+            ModelState.Remove("IdentityUserId");
+
+            if (!ModelState.IsValid) return View(model);
+
             if (_db.Staffs.Any(s => s.Email == model.Email))
             {
-                ModelState.AddModelError("Email", "This email is already registered.");
+                ModelState.AddModelError("Email", "A staff member with this email already exists.");
                 return View(model);
             }
 
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(Password) || Password.Length < 6)
+            {
+                ModelState.AddModelError("", "Password must be at least 6 characters.");
                 return View(model);
+            }
+
+            if (model.Role != "Admin" && model.Role != "Staff")
+            {
+                ModelState.AddModelError("Role", "Role must be Admin or Staff.");
+                return View(model);
+            }
+
+            var identityUser = new IdentityUser
+            {
+                UserName = model.Email,
+                Email = model.Email
+            };
+
+            var result = await userManager.CreateAsync(identityUser, Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+                return View(model);
+            }
+
+            if (!await roleManager.RoleExistsAsync(model.Role))
+                await roleManager.CreateAsync(new IdentityRole(model.Role));
+
+            await userManager.AddToRoleAsync(identityUser, model.Role);
+
+            model.IdentityUserId = identityUser.Id;
 
             if (model.JoinDate == default)
                 model.JoinDate = DateTime.Now;
 
             _db.Staffs.Add(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Staff member added successfully!";
             return RedirectToAction("ManageStaff");
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult EditStaff(int id)
         {
             var staff = _db.Staffs.Find(id);
@@ -273,51 +336,110 @@ namespace BBMS.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditStaff(Staff model)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditStaff(
+            Staff model,
+            string? NewPassword,
+            [FromServices] UserManager<IdentityUser> userManager,
+            [FromServices] RoleManager<IdentityRole> roleManager)
         {
+            ModelState.Remove("NewPassword");
+            ModelState.Remove("IdentityUserId");
+
+            if (!ModelState.IsValid) return View(model);
+
             var staff = _db.Staffs.Find(model.Id);
             if (staff == null) return NotFound();
 
             if (_db.Staffs.Any(s => s.Email == model.Email && s.Id != model.Id))
             {
-                ModelState.AddModelError("Email", "This email is already registered.");
+                ModelState.AddModelError("Email", "Another staff member already has this email.");
                 return View(model);
             }
 
-            if (!ModelState.IsValid)
+            if (model.Role != "Admin" && model.Role != "Staff")
+            {
+                ModelState.AddModelError("Role", "Role must be Admin or Staff.");
                 return View(model);
+            }
 
+            string oldRole = staff.Role;
             staff.Name = model.Name;
             staff.Email = model.Email;
             staff.Contact = model.Contact;
             staff.Role = model.Role;
             staff.Status = model.Status;
-            staff.JoinDate = model.JoinDate;
 
-            if (!string.IsNullOrWhiteSpace(model.Password))
-                staff.Password = model.Password;
+            if (!string.IsNullOrEmpty(staff.IdentityUserId))
+            {
+                var identityUser = await userManager.FindByIdAsync(staff.IdentityUserId);
+                if (identityUser != null)
+                {
+                    if (identityUser.Email != model.Email)
+                    {
+                        identityUser.UserName = model.Email;
+                        identityUser.Email = model.Email;
+                        await userManager.UpdateAsync(identityUser);
+                    }
 
-            _db.SaveChanges();
+                    if (oldRole != model.Role)
+                    {
+                        await userManager.RemoveFromRoleAsync(identityUser, oldRole);
+
+                        if (!await roleManager.RoleExistsAsync(model.Role))
+                            await roleManager.CreateAsync(new IdentityRole(model.Role));
+
+                        await userManager.AddToRoleAsync(identityUser, model.Role);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(NewPassword) && NewPassword.Length >= 6)
+                    {
+                        var token = await userManager.GeneratePasswordResetTokenAsync(identityUser);
+                        await userManager.ResetPasswordAsync(identityUser, token, NewPassword);
+                    }
+                }
+            }
+
+            await _db.SaveChangesAsync();
             TempData["SuccessMessage"] = "Staff member updated successfully!";
             return RedirectToAction("ManageStaff");
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteStaff(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteStaff(
+            int id,
+            [FromServices] UserManager<IdentityUser> userManager)
         {
             var staff = _db.Staffs.Find(id);
             if (staff != null)
             {
+                if (!string.IsNullOrEmpty(staff.IdentityUserId))
+                {
+                    var identityUser = await userManager.FindByIdAsync(staff.IdentityUserId);
+                    if (identityUser != null)
+                        await userManager.DeleteAsync(identityUser);
+                }
+
                 _db.Staffs.Remove(staff);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Staff member deleted.";
             }
             return RedirectToAction("ManageStaff");
         }
 
+        // ─── VIEW COLLECTION ──────────────────────────────────
+        [Authorize(Roles = "Admin,Staff")]
+        public IActionResult ViewCollection()
+        {
+            var donors = _db.DonateBloods
+                .OrderByDescending(d => d.CreatedAt)
+                .ToList();
+            return View(donors);
+        }
+
         // ─── STAFF DASHBOARD ──────────────────────────────────
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult Staff()
         {
             var recentDonations = _db.RecordDonations
@@ -334,6 +456,7 @@ namespace BBMS.Controllers
         // ═══════════════════════════════════════════════════════
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult ManageHospital(string search, string type, string status)
         {
             var query = _db.Hospitals.AsQueryable();
@@ -364,10 +487,12 @@ namespace BBMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult AddHospital() => View(new Hospital());
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult AddHospital(Hospital model)
         {
             if (!ModelState.IsValid)
@@ -393,6 +518,7 @@ namespace BBMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult EditHospital(int id)
         {
             var hospital = _db.Hospitals.Find(id);
@@ -402,6 +528,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult EditHospital(Hospital model)
         {
             var hospital = _db.Hospitals.Find(model.Id);
@@ -435,6 +562,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult DeleteHospital(int id)
         {
             var hospital = _db.Hospitals.Find(id);
@@ -454,10 +582,12 @@ namespace BBMS.Controllers
         // ─── BLOOD STOCK ──────────────────────────────────────
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult AddBloodStock() => View(new BloodStock());
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult AddBloodStock(BloodStock model)
         {
             if (!ModelState.IsValid)
@@ -472,6 +602,7 @@ namespace BBMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult ManageBloodStock(string search, string status)
         {
             var query = _db.BloodStocks.AsQueryable();
@@ -497,6 +628,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult UpdateBloodStock(int id, int units, string status)
         {
             var stock = _db.BloodStocks.Find(id);
@@ -513,6 +645,7 @@ namespace BBMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public IActionResult DeleteBloodStock(int id)
         {
             var stock = _db.BloodStocks.Find(id);
@@ -557,7 +690,7 @@ namespace BBMS.Controllers
                 Name = profile.Name,
                 BloodGroup = profile.BloodGroup,
                 DonorStatus = profile.DonorStatus,
-                Email = identityUser.Email,
+                Email = identityUser.Email ?? string.Empty,
                 Phone = profile.Phone,
                 Address = profile.Address,
                 TotalDonations = myDonations.Count,
@@ -570,15 +703,13 @@ namespace BBMS.Controllers
         }
 
         // ─── OTHER PAGES ──────────────────────────────────────
-
         public IActionResult Privacy() => View();
-
         public IActionResult AddCollection() => View();
-      
         public IActionResult ViewDonation() => View();
         public IActionResult CheckRequest() => View();
 
-        // ─── Admin Dashboard ──────────────────────────────────────
+        // ─── ADMIN DASHBOARD ──────────────────────────────────
+        [Authorize(Roles = "Admin")]
         public IActionResult Admin()
         {
             var bloodStocks = _db.BloodStocks
@@ -588,8 +719,7 @@ namespace BBMS.Controllers
         }
 
         // ─── ADMIN REPORTS ────────────────────────────────────
-        // Replace your existing AdminReports() action with this one:
-
+        [Authorize(Roles = "Admin")]
         public IActionResult AdminReports()
         {
             var donors = _db.DonateBloods
@@ -612,14 +742,12 @@ namespace BBMS.Controllers
                 .OrderBy(h => h.Name)
                 .ToList();
 
-            // ── ViewBag data for all tables ──
             ViewBag.DonorList = donors;
             ViewBag.BloodStockList = bloodStocks;
             ViewBag.BloodRequestList = bloodRequests;
             ViewBag.StaffList = staffList;
             ViewBag.HospitalList = hospitalList;
 
-            // ── Quick stat cards ──
             ViewBag.TotalDonors = donors.Count;
             ViewBag.TotalBloodUnits = bloodStocks.Sum(s => s.Units);
             ViewBag.PendingRequests = _db.BloodRequests.Count(r => r.Status == "Pending");

@@ -433,133 +433,142 @@
     }
 
     .btn-edit {
-        background: #e8f4fd;
-        color: #1565c0;
+        background: #1565c0;
+        color: white;
     }
 
         .btn-edit:hover {
-            background: #1565c0;
+            background: #0d47a1;
             color: white;
         }
 
     .btn-delete {
-        background: #fff0f0;
-        color: #8b0000;
+        background: #8b0000;
+        color: white;
     }
 
         .btn-delete:hover {
-            background: #8b0000;
+            background: #6e0000;
             color: white;
         }
 
-    /* ALERTS */
-    .alert {
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
-    }
-
-    .alert-success {
-        background: #e6f9ef;
-        color: #1a8a4a;
-        border: 1px solid #b2dfcc;
-    }
-
-    .alert-danger {
-        background: #fff0f0;
-        color: #8b0000;
-        border: 1px solid #f5c0c0;
-    }
-
-    /* DELETE MODAL */
-    .del-modal-backdrop {
+    /* ── DELETE MODAL (matching ManageBloodStock style) ── */
+    .bs-modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.45);
-        z-index: 1000;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.82);
+        z-index: 999999;
         align-items: center;
         justify-content: center;
     }
 
-        .del-modal-backdrop.show {
+        .bs-modal-overlay.show {
             display: flex;
+            pointer-events: all;
         }
 
-    .del-modal-box {
-        background: white;
+    .delete-modal-box {
+        background: #ffffff;
+        isolation: isolate;
         border-radius: 12px;
-        padding: 32px 28px;
-        width: 360px;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        width: 420px;
+        max-width: 95vw;
+        overflow: hidden;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+        position: relative;
+        z-index: 1000000;
+        animation: modalSlideIn 0.25s ease;
     }
 
-    .del-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: #fff0f0;
-        margin: 0 auto 16px;
+    @@keyframes modalSlideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .delete-modal-header {
+        background: #8b0000;
+        color: white;
+        padding: 16px 22px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
     }
 
-        .del-icon i {
+    .delete-modal-body {
+        padding: 24px;
+        font-size: 13px;
+        color: #444;
+        line-height: 1.6;
+        background: #ffffff;
+    }
+
+        .delete-modal-body strong {
             color: #8b0000;
-            font-size: 22px;
         }
 
-    .del-modal-box h3 {
-        font-size: 17px;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-    }
-
-    .del-modal-box p {
-        font-size: 13px;
-        color: #777;
-        margin-bottom: 24px;
-    }
-
-    .del-actions {
+    .delete-modal-footer {
         display: flex;
+        justify-content: flex-end;
         gap: 10px;
-        justify-content: center;
+        padding: 16px 24px;
+        border-top: 1px solid #f5eded;
+        background: #ffffff;
     }
 
-    .btn-del-cancel {
-        padding: 9px 22px;
-        border-radius: 7px;
+    .btn-cancel-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 8px;
         border: 1px solid #ddd;
         background: white;
+        color: #555;
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        color: #555;
+        font-family: inherit;
+        transition: all 0.2s;
     }
 
-    .btn-del-confirm {
+        .btn-cancel-modal:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-confirm-delete {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
+        gap: 8px;
         padding: 9px 22px;
-        border-radius: 7px;
+        border-radius: 8px;
         border: none;
         background: #8b0000;
         color: white;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
     }
 
-    @@media (max-width:700px) {
+        .btn-confirm-delete:hover {
+            background: #6e0000;
+        }
+
+    @@media (max-width: 700px) {
         .stat-row {
             flex-direction: column;
         }
@@ -571,20 +580,6 @@
 </style>
 
 <div class="dashboard">
-
-    <!-- ALERTS -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            <i class="fa-solid fa-circle-check"></i> @TempData["SuccessMessage"]
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            <i class="fa-solid fa-triangle-exclamation"></i> @TempData["ErrorMessage"]
-        </div>
-    }
 
     <!-- HEADER -->
     <div class="header">
@@ -639,7 +634,7 @@
         </div>
     </div>
 
-    <!-- TOOLBAR (server-side filter form) -->
+    <!-- TOOLBAR -->
     <form method="get" asp-action="ManageHospital" asp-controller="Home">
         <div class="toolbar">
             <div class="search-wrap">
@@ -704,16 +699,13 @@
                         int i = 1;
                         foreach (var h in Model)
                         {
-                            // Avatar: first letters of each word, max 2
                             var words = h.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                             var avatar = words.Length >= 2
                             ? $"{words[0][0]}{words[1][0]}"
                             : h.Name.Substring(0, Math.Min(2, h.Name.Length));
                             avatar = avatar.ToUpper();
 
-                            var typeCss = h.Type == "Government" ? "type-govt"
-                            : h.Type == "NGO" ? "type-ngo"
-                            : "type-private";
+                            var typeCss = h.Type == "Government" ? "type-govt" : h.Type == "NGO" ? "type-ngo" : "type-private";
                             var typeIcon = h.Type == "Government" ? "fa-landmark" : "fa-building";
 
                             var statusCss = h.Status == "Active" ? "status-active"
@@ -764,35 +756,99 @@
     </div>
 </div>
 
-<!-- DELETE MODAL -->
-<div class="del-modal-backdrop" id="deleteModal">
-    <div class="del-modal-box">
-        <div class="del-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <h3>Delete Hospital?</h3>
-        <p id="del-msg">This action cannot be undone.</p>
-        <div class="del-actions">
-            <button class="btn-del-cancel" onclick="closeDeleteModal()">Cancel</button>
-            <form id="deleteForm" method="post">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn-del-confirm">
-                    <i class="fa-solid fa-trash"></i> Yes, Delete
-                </button>
-            </form>
+<!-- ═══════════════════════════════
+     DELETE CONFIRM MODAL
+═══════════════════════════════ -->
+<div class="bs-modal-overlay" id="deleteModal">
+    <div class="delete-modal-box">
+        <div class="delete-modal-header">
+            <i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete
+        </div>
+        <div class="delete-modal-body">
+            Are you sure you want to delete the hospital
+            <strong id="deleteHospitalLabel"></strong>?
+            This action <strong>cannot be undone</strong>.
+        </div>
+        <div class="delete-modal-footer">
+            <button class="btn-cancel-modal" onclick="closeDeleteModal()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <button class="btn-confirm-delete" onclick="confirmDelete()">
+                <i class="fa-solid fa-trash"></i> Yes, Delete
+            </button>
         </div>
     </div>
 </div>
 
+<!-- Hidden delete form -->
+<form id="deleteForm" asp-action="DeleteHospital" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="delete-form-id" />
+</form>
+
 <script>
+    // ── Move modal to <body> so no parent container clips it ──
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('deleteModal');
+        if (modal) document.body.appendChild(modal);
+    });
+
+    // ── Close on backdrop click ──
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteModal();
+        });
+    });
+
+    // ── DELETE MODAL ──────────────────────────────
     function openDeleteModal(id, name) {
-        document.getElementById('del-msg').innerText =
-            'Are you sure you want to remove "' + name + '"? This action cannot be undone.';
-        document.getElementById('deleteForm').action = '/Home/DeleteHospital/' + id;
+        document.getElementById('delete-form-id').value         = id;
+        document.getElementById('deleteHospitalLabel').innerText = name;
         document.getElementById('deleteModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
     }
+
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.remove('show');
+        document.body.style.overflow = '';
     }
-    document.getElementById('deleteModal').addEventListener('click', function (e) {
-        if (e.target === this) this.classList.remove('show');
-    });
+
+    function confirmDelete() {
+        document.getElementById('deleteForm').submit();
+    }
+
+    // ── TOAST ─────────────────────────────────────
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => showToast('@TempData["SuccessMessage"]', 'success'));
+            </text>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => showToast('@TempData["ErrorMessage"]', 'error'));
+            </text>
+    }
+
+    function showToast(msg, type) {
+        let t = document.getElementById('globalToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'globalToast';
+            t.style.cssText = [
+                'position:fixed','bottom:28px','right:28px','color:white',
+                'padding:14px 22px','border-radius:10px','font-size:13px','font-weight:600',
+                'display:flex','align-items:center','gap:10px','box-shadow:0 8px 28px rgba(0,0,0,0.18)',
+                "font-family:'Segoe UI',sans-serif",'transform:translateY(80px)','opacity:0',
+                'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)','z-index:9999999'
+            ].join(';');
+            document.body.appendChild(t);
+        }
+        t.style.background = type === 'error' ? '#8b0000' : '#1a8a4a';
+        const icon = type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-check';
+        t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
+        setTimeout(() => { t.style.transform = 'translateY(0)';    t.style.opacity = '1'; }, 10);
+        setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3200);
+    }
 </script>
