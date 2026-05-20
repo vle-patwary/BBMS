@@ -107,8 +107,8 @@
         </div>
     </div>
 
-    <!-- BLOOD COLLECTION -->
-    <div class="section-title">Blood Collection</div>
+    <!-- BLOOD COLLECTION / DISTRIBUTION -->
+    <div class="section-title">Blood Collection / Distribution</div>
     <div class="card-container">
         <div class="card">
             <div class="card-icon"><i class="fa-solid fa-plus"></i></div>
@@ -119,6 +119,11 @@
             <div class="card-icon"><i class="fa-solid fa-clipboard-list"></i></div>
             <a asp-controller="Home" asp-action="ViewCollection">View Collections</a>
             <p>Browse all collection records</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-truck-medical"></i></div>
+            <a asp-controller="Home" asp-action="BloodDistribution">Blood Distribution</a>
+            <p>Deliver allocated blood bags</p>
         </div>
     </div>
 
@@ -135,7 +140,11 @@
             <a asp-controller="Home" asp-action="BloodRequests">Blood Requests</a>
             <p>Review &amp; approve requests</p>
         </div>
-       
+        <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+            <a asp-controller="Home" asp-action="ManageBloodBags">Blood Bag Inventory</a>
+            <p>Track individual bags &amp; expiry</p>
+        </div>
     </div>
 
     <!-- TABLE -->

@@ -140,19 +140,74 @@ namespace BBMS.Controllers
         [Authorize(Roles = "Admin,Staff")]
         public IActionResult ApproveRequest(int id)
         {
-            var r = _db.BloodRequests.Find(id);
-            if (r != null) { r.Status = "Approved"; _db.SaveChanges(); }
-            return RedirectToAction("BloodRequests");
-        }
+            var request = _db.BloodRequests.Find(id);
+            if (request == null)
+                return RedirectToAction("BloodRequests");
 
-        // ─── REJECT REQUEST ──────────────────────────────────────────
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Staff")]
-        public IActionResult RejectRequest(int id)
-        {
-            var r = _db.BloodRequests.Find(id);
-            if (r != null) { r.Status = "Rejected"; _db.SaveChanges(); }
+            request.Status = "Approved";
+
+            // ── Find matching available bags (FEFO) ──
+            var availableBags = _db.BloodBags
+                .Where(b => b.BloodGroup == request.BloodGroup
+                         && b.Status == "Available"
+                         && b.ExpiryDate >= DateTime.Today)
+                .OrderBy(b => b.ExpiryDate)
+                .Take(request.Quantity)
+                .ToList();
+
+            foreach (var bag in availableBags)
+                bag.Status = "Used";
+
+            // ── Update BloodStock ──
+            var stock = _db.BloodStocks
+                .FirstOrDefault(s => s.BloodGroup == request.BloodGroup);
+
+            if (stock != null)
+            {
+                stock.Units = _db.BloodBags
+                    .Count(b => b.BloodGroup == request.BloodGroup
+                             && b.Status == "Available");
+                stock.Status = stock.Units >= 30 ? "sufficient"
+                             : stock.Units >= 15 ? "low"
+                             : "critical";
+                stock.LastUpdated = DateTime.Now;
+            }
+
+            // ── Create BloodAllocation record ──
+            var bagCodes = availableBags.Any()
+                ? string.Join(", ", availableBags.Select(b => b.BagCode))
+                : "No bags available";
+
+            var allocation = new BloodAllocation
+            {
+                BloodRequestId = request.Id,
+                InvoiceNumber = request.InvoiceNumber,
+                RequesterName = request.RequesterName,
+                BloodGroup = request.BloodGroup,
+                Hospital = request.Hospital ?? "—",
+                ContactNumber = request.ContactNumber,
+                AllocatedBagCodes = bagCodes,
+                QuantityAllocated = availableBags.Count,
+                Status = "Ready for Delivery",
+                AllocatedAt = DateTime.Now
+            };
+
+            _db.BloodAllocations.Add(allocation);
+
+            if (availableBags.Count < request.Quantity)
+            {
+                TempData["WarningMessage"] =
+                    $"Approved but only {availableBags.Count} of " +
+                    $"{request.Quantity} bag(s) available for {request.BloodGroup}.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] =
+                    $"Request approved. {availableBags.Count} bag(s) allocated. " +
+                    $"Allocation created for delivery.";
+            }
+
+            _db.SaveChanges();
             return RedirectToAction("BloodRequests");
         }
 
@@ -265,6 +320,80 @@ namespace BBMS.Controllers
                 PageSize = Rotativa.AspNetCore.Options.Size.A4,
                 PageMargins = new Rotativa.AspNetCore.Options.Margins(15, 15, 15, 15)
             };
+        }
+
+
+        // ─── BLOOD DISTRIBUTION ───────────────────────────────
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
+        public IActionResult BloodDistribution(string search, string status)
+        {
+            var query = _db.BloodAllocations.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(a =>
+                    a.InvoiceNumber.Contains(search) ||
+                    a.RequesterName.Contains(search) ||
+                    a.BloodGroup.Contains(search) ||
+                    a.AllocatedBagCodes.Contains(search));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(a => a.Status == status);
+
+            var list = query.OrderByDescending(a => a.AllocatedAt).ToList();
+
+            ViewBag.TotalAllocations = _db.BloodAllocations.Count();
+            ViewBag.ReadyCount = _db.BloodAllocations
+                                        .Count(a => a.Status == "Ready for Delivery");
+            ViewBag.DeliveredCount = _db.BloodAllocations
+                                        .Count(a => a.Status == "Delivered");
+            ViewBag.CancelledCount = _db.BloodAllocations
+                                        .Count(a => a.Status == "Cancelled");
+
+            return View(list);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> MarkDelivered(int id, string? notes)
+        {
+            var allocation = _db.BloodAllocations.Find(id);
+            if (allocation != null && allocation.Status == "Ready for Delivery")
+            {
+                // Auto-detect logged-in staff name
+                var identityUser = await _userManager.GetUserAsync(User);
+                var staffName = _db.Staffs
+                    .FirstOrDefault(s => s.IdentityUserId == identityUser.Id)?.Name
+                    ?? identityUser.Email;
+
+                allocation.Status = "Delivered";
+                allocation.DeliveredAt = DateTime.Now;
+                allocation.DeliveredBy = staffName;
+                allocation.Notes = notes;
+
+                _db.SaveChanges();
+                TempData["SuccessMessage"] =
+                    $"Invoice {allocation.InvoiceNumber} marked as delivered by {staffName}.";
+            }
+            return RedirectToAction("BloodDistribution");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
+        public IActionResult CancelAllocation(int id)
+        {
+            var allocation = _db.BloodAllocations.Find(id);
+            if (allocation != null && allocation.Status == "Ready for Delivery")
+            {
+                allocation.Status = "Cancelled";
+                _db.SaveChanges();
+                TempData["SuccessMessage"] =
+                    $"Allocation for {allocation.InvoiceNumber} cancelled.";
+            }
+            return RedirectToAction("BloodDistribution");
         }
 
         // ═══════════════════════════════════════════════════════
@@ -489,6 +618,73 @@ namespace BBMS.Controllers
 
             ViewBag.RecentDonations = recentDonations;
             return View();
+        }
+        [HttpGet]
+        [Authorize(Roles = "Admin,Staff")]
+        public IActionResult ManageBloodBags(string search, string group, string status, string component)
+        {
+            // ── Auto-expire bags ──
+            var now = DateTime.Now;
+            var today = DateTime.Today;
+            var sevenDaysLater = today.AddDays(7);
+
+            var expiredBags = _db.BloodBags
+                .Where(b => b.Status == "Available" && b.ExpiryDate < now)
+                .ToList();
+
+            foreach (var bag in expiredBags)
+                bag.Status = "Expired";
+
+            if (expiredBags.Any())
+            {
+                _db.SaveChanges();
+
+                var affectedGroups = expiredBags.Select(b => b.BloodGroup).Distinct();
+                foreach (var grp in affectedGroups)
+                {
+                    var stock = _db.BloodStocks.FirstOrDefault(s => s.BloodGroup == grp);
+                    if (stock != null)
+                    {
+                        stock.Units = _db.BloodBags
+                            .Count(b => b.BloodGroup == grp && b.Status == "Available");
+                        stock.Status = stock.Units >= 30 ? "sufficient"
+                                     : stock.Units >= 15 ? "low" : "critical";
+                        stock.LastUpdated = today;
+                    }
+                }
+                _db.SaveChanges();
+            }
+
+            // ── Query ──
+            var query = _db.BloodBags.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(b => b.BagCode.Contains(search)
+                                      || b.BloodGroup.Contains(search)
+                                      || b.DonorId.Contains(search));
+
+            if (!string.IsNullOrEmpty(group))
+                query = query.Where(b => b.BloodGroup == group);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(b => b.Status == status);
+
+            if (!string.IsNullOrEmpty(component))
+                query = query.Where(b => b.Component == component);
+
+            var list = query.OrderBy(b => b.ExpiryDate).ToList();
+
+            // ── ViewBag stats — all calculated with plain DateTime comparisons ──
+            ViewBag.TotalBags = _db.BloodBags.Count();
+            ViewBag.Available = _db.BloodBags.Count(b => b.Status == "Available");
+            ViewBag.ExpiringSoon = _db.BloodBags.Count(b => b.Status == "Available"
+                                        && b.ExpiryDate >= today
+                                        && b.ExpiryDate <= sevenDaysLater);
+            ViewBag.ExpiredCount = _db.BloodBags.Count(b => b.Status == "Expired");
+            ViewBag.UsedCount = _db.BloodBags.Count(b => b.Status == "Used");
+            ViewBag.AutoExpired = expiredBags.Count;
+
+            return View(list);
         }
 
         // ═══════════════════════════════════════════════════════
@@ -755,6 +951,44 @@ namespace BBMS.Controllers
             var bloodStocks = _db.BloodStocks
                 .OrderBy(s => s.BloodGroup)
                 .ToList();
+
+            var today = DateTime.Today;
+            var sevenDaysLater = today.AddDays(7);
+            var threeDaysLater = today.AddDays(3);
+
+            // Per-group bag summary for the dashboard table
+            var bagSummary = _db.BloodBags
+                .Where(b => b.Status == "Available")
+                .GroupBy(b => b.BloodGroup)
+                .Select(g => new
+                {
+                    BloodGroup = g.Key,
+                    TotalBags = g.Count(),
+                    ExpiringSoon = g.Count(b => b.ExpiryDate >= today
+                                             && b.ExpiryDate <= sevenDaysLater),
+                    Critical = g.Count(b => b.ExpiryDate >= today
+                                             && b.ExpiryDate <= threeDaysLater),
+                    NearestExpiry = g.Min(b => b.ExpiryDate)
+                })
+                .ToList();
+
+            ViewBag.BagSummary = bagSummary;
+            ViewBag.TotalExpiringSoon = _db.BloodBags.Count(b =>
+                b.Status == "Available" &&
+                b.ExpiryDate >= today &&
+                b.ExpiryDate <= sevenDaysLater);
+            ViewBag.TotalDonors = _db.DonateBloods.Count();
+            ViewBag.TotalRequests = _db.BloodRequests.Count();
+            ViewBag.PendingRequests = _db.BloodRequests.Count(r => r.Status == "Pending");
+           
+
+            ViewBag.CriticalBags = _db.BloodBags.Count(b =>
+                b.Status == "Available" &&
+                b.ExpiryDate >= today &&
+                b.ExpiryDate <= threeDaysLater);
+
+            ViewBag.ExpiredUnhandled = _db.BloodBags.Count(b =>
+                b.Status == "Expired");
             return View(bloodStocks);
         }
 
@@ -768,6 +1002,11 @@ namespace BBMS.Controllers
             var staffList = _db.Staffs.OrderByDescending(s => s.JoinDate).ToList();
             var hospitalList = _db.Hospitals.OrderBy(h => h.Name).ToList();
 
+          
+            // With this:
+            ViewBag.BloodBagList = _db.BloodBags
+                .OrderBy(b => b.ExpiryDate)
+                .ToList();
             ViewBag.DonorList = donors;
             ViewBag.BloodStockList = bloodStocks;
             ViewBag.BloodRequestList = bloodRequests;

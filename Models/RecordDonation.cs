@@ -49,5 +49,8 @@ namespace BBMS.Models
         public string Remarks { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        // Add this field — links the donation to the bag created
+        public string? BagCode { get; set; }
     }
 }

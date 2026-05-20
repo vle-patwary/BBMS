@@ -1,6 +1,7 @@
 ﻿// Controllers/DonationController.cs
 using BBMS.Data;
 using BBMS.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BBMS.Controllers
@@ -46,34 +47,86 @@ namespace BBMS.Controllers
 
             return View(record);
         }
-
-        // ─── CREATE RECORD POST (Save to DB) ──────────────────
+        // record donation----connected with blood bag
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateRecord(RecordDonation record)
+        [Authorize(Roles = "Admin,Staff")]
+        public IActionResult CreateRecord(RecordDonation model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // ── 1. Set metadata ──
+            model.CreatedAt = DateTime.Now;
+
+            // ── 2. Calculate expiry ──
+            DateTime expiryDate = model.DonationType switch
             {
-                record.CreatedAt = DateTime.Now;
-                _db.RecordDonations.Add(record);
+                "Whole Blood" => model.DonationDate.AddDays(42),
+                "Red Blood Cells" => model.DonationDate.AddDays(42),
+                "Platelets" => model.DonationDate.AddDays(5),
+                "Fresh Frozen Plasma" => model.DonationDate.AddMonths(12),
+                "Granulocytes" => model.DonationDate.AddHours(24),
+                _ => model.DonationDate.AddDays(42)
+            };
 
-                // Update LastDonationDate and TotalDonations in DonateBloods table
-                var donor = _db.DonateBloods
-                    .FirstOrDefault(d => d.DonorId == record.DonorId);
+            // ── 3. Generate BagCode ──
+            int bagCount = _db.BloodBags.Count();
+            string bagCode = "BAG-" + (bagCount + 1).ToString("D4");
 
-                if (donor != null)
-                {
-                    donor.LastDonationDate = record.DonationDate;
-                    donor.TotalDonations += 1; // ← increment total donations
-                    _db.DonateBloods.Update(donor);
-                }
+            // ── 4. Create BloodBag ──
+            var bag = new BloodBag
+            {
+                BagCode = bagCode,
+                BloodGroup = model.BloodGroup,
+                Component = model.DonationType,
+                VolumeML = model.Quantity,
+                CollectionDate = model.DonationDate,
+                ExpiryDate = expiryDate,
+                DonorId = model.DonorId,
+                Status = "Available",
+                Notes = model.Remarks,
+                CreatedAt = DateTime.Now
+            };
 
-                _db.SaveChanges();
-                return RedirectToAction("DonationHistory");
+            _db.BloodBags.Add(bag);
+            model.BagCode = bagCode;
+
+            // ── 5. Save donation ──
+            _db.RecordDonations.Add(model);
+            _db.SaveChanges();
+
+            // ── 6. Update BloodStock ──
+            var stock = _db.BloodStocks
+                .FirstOrDefault(s => s.BloodGroup == model.BloodGroup);
+
+            if (stock != null)
+            {
+                stock.Units = _db.BloodBags
+                    .Count(b => b.BloodGroup == model.BloodGroup
+                             && b.Status == "Available");
+                stock.Status = stock.Units >= 30 ? "sufficient"
+                             : stock.Units >= 15 ? "low"
+                             : "critical";
+                stock.LastUpdated = DateTime.Now;
             }
-            return View(record);
-        }
+            else
+            {
+                _db.BloodStocks.Add(new BloodStock
+                {
+                    BloodGroup = model.BloodGroup,
+                    Units = 1,
+                    Status = "critical",
+                    CollectionDate = model.DonationDate,
+                    LastUpdated = DateTime.Now
+                });
+            }
 
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Donation recorded! Bag ID: {bagCode}";
+            return RedirectToAction("Staff", "Home");
+        }
         // ─── DONATION HISTORY ─────────────────────────────────
         public IActionResult DonationHistory(
             string search, string bloodGroup,

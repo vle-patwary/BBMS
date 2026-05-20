@@ -20,5 +20,7 @@ namespace BBMS.Data
         public DbSet<Hospital> Hospitals { get; set; }
         public DbSet<BloodStock> BloodStocks { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<BloodBag> BloodBags { get; set; }
+        public DbSet<BloodAllocation> BloodAllocations { get; set; }
     }
 }

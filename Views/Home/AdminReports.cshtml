@@ -636,6 +636,7 @@
                         <th>#</th>
                         <th>Blood Group</th>
                         <th>Available Units</th>
+    
                         <th>Last Updated</th>
                         <th>Stock Level</th>
                     </tr>
@@ -814,7 +815,200 @@
             <div class="page-btns" id="btns-requests"></div>
         </div>
     </div>
+    @* ─────────────────────────────────────────────────────────
+   4. BLOOD BAGS
+───────────────────────────────────────────────────────── *@
+    <div class="section-title">Blood Bags Report</div>
+    <div class="report-card" id="section-bags">
+        <div class="report-card-header">
+            <h3><i class="fa-solid fa-bag-shopping"></i> Blood Bag Inventory</h3>
+            <button class="download-btn" onclick="downloadPDF('section-bags','Blood_Bags_Report')">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
 
+        <!-- FILTER BAR — same style as Blood Requests with date range -->
+        <div class="table-filter-bar">
+            <i class="fa-solid fa-filter" style="color:#8b0000;font-size:13px"></i>
+            <input type="text" id="bags-search" placeholder="Search bag code, donor ID, notes…">
+
+            <label>Blood Group:</label>
+            <select id="bags-blood">
+                <option value="">All Groups</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+            </select>
+
+            <label>Component:</label>
+            <select id="bags-component">
+                <option value="">All</option>
+                <option>Whole Blood</option>
+                <option>Red Blood Cells</option>
+                <option>Platelets</option>
+                <option>Fresh Frozen Plasma</option>
+                <option>Granulocytes</option>
+            </select>
+
+            <label>Status:</label>
+            <select id="bags-status">
+                <option value="">All Status</option>
+                <option>Available</option>
+                <option>Used</option>
+                <option>Expired</option>
+                <option>Discarded</option>
+            </select>
+
+            <label>Collected From:</label>
+            <input type="date" id="bags-from">
+            <label>To:</label>
+            <input type="date" id="bags-to">
+
+            <button class="btn-search" onclick="filterTable('bags')">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+            <button class="btn-clear" onclick="clearFilter('bags')">
+                <i class="fa-solid fa-xmark"></i> Clear
+            </button>
+        </div>
+
+        <div class="report-table-wrap">
+            <table id="tbl-bags">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Bag Code</th>
+                        <th>Blood Group</th>
+                        <th>Component</th>
+                        <th>Volume (mL)</th>
+                        <th>Donor ID</th>
+                        <th>Collection Date</th>
+                        <th>Expiry Date</th>
+                        <th>Days Until Expiry</th>
+                        <th>Expiry Status</th>
+                        <th>Bag Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-bags">
+                    @{
+                        int bagSerial = 1;
+                        var bagList = ViewBag.BloodBagList as List<BBMS.Models.BloodBag>;
+                    }
+                    @if (bagList != null && bagList.Any())
+                    {
+                        foreach (var b in bagList)
+                        {
+                            string expiryBadgeClass = b.ExpiryStatus switch
+                            {
+                                "Expired" => "badge-red",
+                                "Critical" => "badge-red",
+                                "Expiring Soon" => "badge-yellow",
+                                _ => "badge-green"
+                            };
+
+                            string statusBadgeClass = b.Status switch
+                            {
+                                "Available" => "badge-green",
+                                "Used" => "badge-blue",
+                                "Expired" => "badge-red",
+                                "Discarded" => "badge-gray",
+                                _ => "badge-gray"
+                            };
+
+                            <tr data-date="@b.CollectionDate.ToString("yyyy-MM-dd")">
+                                <td>@(bagSerial++)</td>
+                                <td>
+                                    <span style="font-family:'Courier New',monospace;
+                                                     font-size:12px;font-weight:700;color:#8b0000;">
+                                        @b.BagCode
+                                    </span>
+                                </td>
+                                <td><strong>@b.BloodGroup</strong></td>
+                                <td>@b.Component</td>
+                                <td style="text-align:center;">@b.VolumeML</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(b.DonorId))
+                                    {
+                                        <span style="font-size:12px;color:#8b0000;font-weight:600;">
+                                            @b.DonorId
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#bbb;">—</span>
+                                    }
+                                </td>
+                                <td style="white-space:nowrap;">
+                                    @b.CollectionDate.ToString("dd MMM yyyy")
+                                </td>
+                                <td style="white-space:nowrap;">
+                                    @b.ExpiryDate.ToString("dd MMM yyyy")
+                                </td>
+                                <td style="text-align:center;">
+                                    @if (b.DaysUntilExpiry <= 0)
+                                    {
+                                        <span style="color:#b30000;font-weight:700;">Expired</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="font-weight:600;
+                                                      color:@(b.DaysUntilExpiry <= 3 ? "#b30000" :
+                                                                                                b.DaysUntilExpiry <= 7 ? "#b8860b" : "#1a8a4a")">
+                                            @b.DaysUntilExpiry days
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @expiryBadgeClass">@b.ExpiryStatus</span>
+                                </td>
+                                <td>
+                                    <span class="badge @statusBadgeClass">@b.Status</span>
+                                </td>
+                                <td style="font-size:12px;color:#888;max-width:120px;">
+                                    @(string.IsNullOrEmpty(b.Notes) ? "—" : b.Notes)
+                                </td>
+                            </tr>
+                        }
+
+                        <!-- Summary row -->
+                        <tr class="summary-row">
+                            <td colspan="4" style="text-align:right">Total Bags:</td>
+                            <td style="text-align:center">
+                                <strong>@bagList.Count</strong>
+                            </td>
+                            <td colspan="5" style="text-align:right">Available:</td>
+                            <td>
+                                <strong>@bagList.Count(b => b.Status == "Available")</strong>
+                            </td>
+                            <td></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="12">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-droplet-slash"></i>
+                                    <p>No blood bags found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar" id="pag-bags">
+            <span class="page-info" id="info-bags"></span>
+            <div class="page-btns" id="btns-bags"></div>
+        </div>
+    </div>
     
 
 </div>
@@ -825,7 +1019,7 @@
     // ════════════════════════════════════════════════════
     const PAGE_SIZE  = 10;
     const tableState = {};
-    const tables     = ['donors','stock','requests'];
+    const tables = ['donors','stock','requests','bags'];
 
     function initTable(name) {
         const tbody = document.getElementById('tbody-' + name);
@@ -915,12 +1109,13 @@
         const toDate   = toEl?.value   ? new Date(toEl.value)   : null;
 
         const extraIds = {
-            donors:    ['donors-blood',    'donors-eligibility'],
-            stock:     ['stock-level'],
-            requests:  ['requests-blood',  'requests-status'],
-            staff:     ['staff-status'],
-            hospitals: ['hospitals-status'],
-        };
+        donors:    ['donors-blood',    'donors-eligibility'],
+        stock:     ['stock-level'],
+        requests:  ['requests-blood',  'requests-status'],
+        bags:      ['bags-blood',      'bags-component',    'bags-status'],
+        staff:     ['staff-status'],
+        hospitals: ['hospitals-status'],
+    };
         const extras = (extraIds[name] || []).map(id => {
             const el = document.getElementById(id);
             return el ? el.value.toLowerCase() : '';
@@ -933,7 +1128,7 @@
 
             // Date range (only for requests table)
             let matchDate = true;
-            if (name === 'requests' && (fromDate || toDate)) {
+            if ((name === 'requests' || name === 'bags') && (fromDate || toDate)) {
                 const rowDateStr = row.dataset.date;
                 if (rowDateStr) {
                     const rowDate = new Date(rowDateStr);
@@ -990,11 +1185,11 @@
     const WHITE     = [255, 255, 255];
 
     // Map section IDs → tableState keys
-    const sectionTableMap = {
+        const sectionTableMap = {
         'section-donors':    'donors',
         'section-stock':     'stock',
         'section-requests':  'requests',
-       
+        'section-bags':      'bags',
     };
 
     function statusColor(text) {
@@ -1227,6 +1422,19 @@
                 { label: 'Pending',         value: pending,   color: [184, 134, 11] },
             ];
         }
+            if (sectionId === 'section-bags') {
+        const available  = rows.filter(r => r.innerText.includes('Available')).length;
+        const expiring   = rows.filter(r => r.innerText.includes('Expiring Soon')).length;
+        const critical   = rows.filter(r => r.innerText.includes('Critical')).length;
+        const expired    = rows.filter(r => r.innerText.includes('Expired')).length;
+        return [
+            { label: 'Total Bags',    value: totalRows, color: DARK_RED        },
+            { label: 'Available',     value: available, color: [26, 138, 74]   },
+            { label: 'Expiring Soon', value: expiring,  color: [184, 134, 11]  },
+            { label: 'Critical',      value: critical,  color: [139, 0, 0]     },
+            { label: 'Expired',       value: expired,   color: [80, 80, 80]    },
+        ];
+    }
         return [{ label: 'Total Records', value: totalRows, color: DARK_RED }];
     }
 
@@ -1311,13 +1519,12 @@
 
     // ── Download All PDF ─────────────────────────────────────────────────
     function downloadAllPDF() {
-        const sections = [
-            { id: 'section-donors',    name: 'Donors Report',         tableKey: 'donors'    },
-            { id: 'section-stock',     name: 'Blood Stock Report',     tableKey: 'stock'     },
-            { id: 'section-requests',  name: 'Blood Requests Report',  tableKey: 'requests'  },
-           
-        ];
-
+          const sections = [
+        { id: 'section-donors',    name: 'Donors Report',         tableKey: 'donors'    },
+        { id: 'section-stock',     name: 'Blood Stock Report',    tableKey: 'stock'     },
+        { id: 'section-requests',  name: 'Blood Requests Report', tableKey: 'requests'  },
+        { id: 'section-bags',      name: 'Blood Bags Report',     tableKey: 'bags'      },
+    ];
         const doc    = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW  = doc.internal.pageSize.getWidth();
         const pageH  = doc.internal.pageSize.getHeight();

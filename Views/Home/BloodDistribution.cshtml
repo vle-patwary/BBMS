@@ -1,0 +1,1110 @@
+﻿@model List<BBMS.Models.BloodAllocation>
+@{
+    ViewData["Title"] = "Blood Distribution";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    .dashboard {
+        width: 92%;
+        margin: 32px auto 50px;
+    }
+
+    /* HEADER */
+    .header {
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 26px;
+    }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 1;
+    }
+
+    .header-stat {
+        text-align: center;
+    }
+
+        .header-stat .val {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .header-stat .lbl {
+            font-size: 11px;
+            color: #ffb3b3;
+            margin-top: 2px;
+        }
+
+    .h-divider {
+        width: 1px;
+        height: 40px;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffb3b3;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+    /* INVOICE LOOKUP */
+    .lookup-box {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-left: 5px solid #8b0000;
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+        .lookup-box i {
+            color: #8b0000;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .lookup-box input {
+            flex: 1;
+            min-width: 220px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+
+            .lookup-box input:focus {
+                border-color: #8b0000;
+            }
+
+    .btn-lookup {
+        background: #8b0000;
+        color: white;
+        padding: 10px 22px;
+        border-radius: 7px;
+        border: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .btn-lookup:hover {
+            background: #6e0000;
+        }
+
+    .lookup-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a1a1a;
+        white-space: nowrap;
+    }
+
+    /* STAT CARDS */
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
+
+    .stat-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 130px;
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-top: 4px solid #8b0000;
+        border-radius: 10px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+        .stat-card.ready {
+            border-top-color: #b8860b;
+        }
+
+            .stat-card.ready .sc-icon {
+                background: #fff8e1;
+            }
+
+                .stat-card.ready .sc-icon i {
+                    color: #b8860b;
+                }
+
+            .stat-card.ready .sc-val {
+                color: #b8860b;
+            }
+
+        .stat-card.delivered {
+            border-top-color: #1a8a4a;
+        }
+
+            .stat-card.delivered .sc-icon {
+                background: #e6f9ef;
+            }
+
+                .stat-card.delivered .sc-icon i {
+                    color: #1a8a4a;
+                }
+
+            .stat-card.delivered .sc-val {
+                color: #1a8a4a;
+            }
+
+        .stat-card.cancelled {
+            border-top-color: #888;
+        }
+
+            .stat-card.cancelled .sc-icon {
+                background: #f5f5f5;
+            }
+
+                .stat-card.cancelled .sc-icon i {
+                    color: #888;
+                }
+
+            .stat-card.cancelled .sc-val {
+                color: #888;
+            }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        background: #fff0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .sc-icon i {
+            color: #8b0000;
+            font-size: 17px;
+        }
+
+    .sc-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: #8b0000;
+    }
+
+    .sc-lbl {
+        font-size: 12px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .search-wrap {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 9px 12px 9px 34px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+            font-family: inherit;
+        }
+
+            .search-wrap input:focus {
+                border-color: #8b0000;
+            }
+
+    .toolbar select {
+        padding: 9px 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        outline: none;
+        font-family: inherit;
+    }
+
+    /* TABLE */
+    .table-section {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+
+    .table-section-header {
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f5eded;
+    }
+
+        .table-section-header span {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+    .record-count {
+        font-size: 12px;
+        background: #fff0f0;
+        color: #8b0000;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        background: #8b0000;
+        color: white;
+        padding: 12px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 13px 16px;
+        border-bottom: 1px solid #f5eded;
+        font-size: 13px;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fff8f8;
+    }
+
+    /* INVOICE CELL */
+    .invoice-code {
+        font-family: monospace;
+        font-size: 12px;
+        font-weight: 700;
+        color: #8b0000;
+        background: #fff0f0;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    /* BAG CODES */
+    .bag-codes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .bag-pill {
+        font-family: monospace;
+        font-size: 11px;
+        font-weight: 700;
+        background: #e8f4fd;
+        color: #1565c0;
+        padding: 3px 8px;
+        border-radius: 5px;
+        display: inline-block;
+    }
+
+    /* BLOOD BADGE */
+    .blood-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #8b0000;
+        color: white;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* STATUS BADGE */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .s-ready {
+        background: #fff8e1;
+        color: #b8860b;
+    }
+
+    .s-delivered {
+        background: #e6f9ef;
+        color: #1a8a4a;
+    }
+
+    .s-cancelled {
+        background: #f5f5f5;
+        color: #888;
+    }
+
+    /* ACTIONS */
+    .actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition: all 0.15s;
+    }
+
+    .btn-deliver {
+        background: #1a8a4a;
+        color: white;
+    }
+
+        .btn-deliver:hover {
+            background: #146b3a;
+        }
+
+    .btn-cancel-alloc {
+        background: #888;
+        color: white;
+    }
+
+        .btn-cancel-alloc:hover {
+            background: #666;
+        }
+
+    /* MODAL */
+    .bs-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.82);
+        z-index: 999999;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .bs-modal-overlay.show {
+            display: flex;
+            pointer-events: all;
+        }
+
+    .modal-box {
+        background: #ffffff;
+        border-radius: 12px;
+        width: 480px;
+        max-width: 95vw;
+        overflow: hidden;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+        isolation: isolate;
+        animation: slideIn 0.25s ease;
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        background: #1a8a4a;
+        color: white;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 24px;
+        background: #ffffff;
+    }
+
+    .modal-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 13px;
+    }
+
+        .modal-info-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .modal-info-row .lbl {
+            color: #888;
+            font-weight: 600;
+        }
+
+        .modal-info-row .val {
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+    .modal-notes-group {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .modal-notes-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+        }
+
+        .modal-notes-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 70px;
+            outline: none;
+        }
+
+            .modal-notes-group textarea:focus {
+                border-color: #1a8a4a;
+            }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #f5f5f5;
+        background: #ffffff;
+    }
+
+    .btn-cancel-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .btn-cancel-modal:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-confirm-deliver {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 22px;
+        border-radius: 8px;
+        border: none;
+        background: #1a8a4a;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .btn-confirm-deliver:hover {
+            background: #146b3a;
+        }
+
+    /* EMPTY STATE */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #bbb;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 14px;
+            display: block;
+            color: #f0c0c0;
+        }
+
+    @@media (max-width: 700px) {
+        .stat-row {
+            flex-direction: column;
+        }
+
+        .header-right {
+            display: none;
+        }
+    }
+</style>
+
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h2><i class="fa-solid fa-truck-medical" style="margin-right:10px"></i>Blood Distribution</h2>
+            <p>Manage blood bag delivery to approved requesters</p>
+        </div>
+        <div class="header-right">
+            <div class="header-stat">
+                <div class="val">@ViewBag.ReadyCount</div>
+                <div class="lbl">Ready</div>
+            </div>
+            <div class="h-divider"></div>
+            <div class="header-stat">
+                <div class="val">@ViewBag.DeliveredCount</div>
+                <div class="lbl">Delivered</div>
+            </div>
+            <div class="h-divider"></div>
+            <div class="header-stat">
+                <div class="val">@ViewBag.TotalAllocations</div>
+                <div class="lbl">Total</div>
+            </div>
+            <div class="h-divider"></div>
+            <a asp-controller="Home" asp-action="Staff" class="btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- INVOICE LOOKUP -->
+    <div class="lookup-box">
+        <i class="fa-solid fa-file-invoice"></i>
+        <span class="lookup-label">Invoice Lookup:</span>
+        <input type="text" id="invoiceLookup"
+               placeholder="Enter invoice number e.g. INV-000001"
+               oninput="lookupInvoice()">
+        <button class="btn-lookup" onclick="lookupInvoice()">
+            <i class="fa-solid fa-magnifying-glass"></i> Find
+        </button>
+        <span id="lookupResult" style="font-size:13px;color:#888;"></span>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="section-title">Overview</div>
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div><div class="sc-val">@ViewBag.TotalAllocations</div><div class="sc-lbl">Total Allocations</div></div>
+        </div>
+        <div class="stat-card ready">
+            <div class="sc-icon"><i class="fa-solid fa-clock"></i></div>
+            <div><div class="sc-val">@ViewBag.ReadyCount</div><div class="sc-lbl">Ready for Delivery</div></div>
+        </div>
+        <div class="stat-card delivered">
+            <div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div><div class="sc-val">@ViewBag.DeliveredCount</div><div class="sc-lbl">Delivered</div></div>
+        </div>
+        <div class="stat-card cancelled">
+            <div class="sc-icon"><i class="fa-solid fa-ban"></i></div>
+            <div><div class="sc-val">@ViewBag.CancelledCount</div><div class="sc-lbl">Cancelled</div></div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput"
+                   placeholder="Search invoice, requester, blood group, bag code…"
+                   oninput="filterTable()">
+        </div>
+        <select id="statusFilter" onchange="filterTable()">
+            <option value="">All Status</option>
+            <option value="Ready for Delivery">Ready for Delivery</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+        <div class="table-section-header">
+            <span>
+                <i class="fa-solid fa-list" style="color:#8b0000;margin-right:8px"></i>
+                Allocation Records
+            </span>
+            <span class="record-count" id="recordCount">@Model.Count records</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Invoice No.</th>
+                        <th>Requester</th>
+                        <th>Blood Group</th>
+                        <th>Hospital</th>
+                        <th>Allocated Bags</th>
+                        <th>Qty</th>
+                        <th>Allocated At</th>
+                        <th>Status</th>
+                        <th>Delivered By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="allocationBody">
+                    @if (Model != null && Model.Any())
+                    {
+                        int i = 1;
+                        @foreach (var alloc in Model)
+                        {
+                            var statusClass = alloc.Status == "Ready for Delivery" ? "s-ready"
+                            : alloc.Status == "Delivered" ? "s-delivered"
+                            : "s-cancelled";
+                            var statusIcon = alloc.Status == "Ready for Delivery" ? "fa-clock"
+                            : alloc.Status == "Delivered" ? "fa-circle-check"
+                            : "fa-ban";
+                            var bagList = alloc.AllocatedBagCodes
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(b => b.Trim())
+                            .ToList();
+
+                            <tr data-search="@((alloc.InvoiceNumber + " " + alloc.RequesterName + " " + alloc.BloodGroup + " " + alloc.AllocatedBagCodes).ToLower())"
+                                data-status="@alloc.Status"
+                                data-invoice="@alloc.InvoiceNumber.ToLower()">
+                                <td style="color:#aaa;font-size:12px;">@i</td>
+                                <td><span class="invoice-code">@alloc.InvoiceNumber</span></td>
+                                <td>
+                                    <div style="font-weight:700;color:#1a1a1a;">@alloc.RequesterName</div>
+                                    <div style="font-size:11px;color:#aaa;">@alloc.ContactNumber</div>
+                                </td>
+                                <td><div class="blood-badge">@alloc.BloodGroup</div></td>
+                                <td style="font-size:12px;">@alloc.Hospital</td>
+                                <td>
+                                    <div class="bag-codes">
+                                        @foreach (var bagCode in bagList)
+                                        {
+                                            <span class="bag-pill">@bagCode</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td style="font-weight:700;">@alloc.QuantityAllocated</td>
+                                <td style="font-size:12px;">@alloc.AllocatedAt.ToString("dd MMM yyyy HH:mm")</td>
+                                <td>
+                                    <span class="status-badge @statusClass">
+                                        <i class="fa-solid @statusIcon"></i> @alloc.Status
+                                    </span>
+                                    @if (alloc.Status == "Delivered" && alloc.DeliveredAt.HasValue)
+                                    {
+                                        <div style="font-size:11px;color:#aaa;margin-top:4px;">
+                                            @alloc.DeliveredAt.Value.ToString("dd MMM yyyy HH:mm")
+                                        </div>
+                                    }
+                                </td>
+                                <td style="font-size:12px;color:#555;">
+                                    @(alloc.DeliveredBy ?? "—")
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        @if (alloc.Status == "Ready for Delivery")
+                                        {
+                                            <button class="action-btn btn-deliver"
+                                                    onclick="openDeliverModal(@alloc.Id,
+                                                                    '@alloc.InvoiceNumber',
+                                                                    '@alloc.RequesterName',
+                                                                    '@alloc.BloodGroup',
+                                                                    '@alloc.AllocatedBagCodes',
+                                                                    '@alloc.Hospital')">
+                                                <i class="fa-solid fa-truck-medical"></i> Deliver
+                                            </button>
+                                            <button class="action-btn btn-cancel-alloc"
+                                                    onclick="cancelAlloc(@alloc.Id)">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:#aaa;font-size:12px;">
+                                                @(alloc.Status == "Delivered" ? "✓ Done" : "Cancelled")
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-truck-medical"></i>
+                                    <p>No allocations yet. They are created automatically when requests are approved.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:14px 22px;border-top:1px solid #f5eded;font-size:13px;color:#888;">
+            Showing <span id="pageInfo">@Model.Count</span> allocation entries
+        </div>
+    </div>
+</div>
+
+<!-- DELIVER CONFIRM MODAL -->
+<div class="bs-modal-overlay" id="deliverModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <i class="fa-solid fa-truck-medical"></i>
+            Confirm Delivery
+        </div>
+        <div class="modal-body">
+            <div class="modal-info-row">
+                <span class="lbl">Invoice No.</span>
+                <span class="val" id="m-invoice"></span>
+            </div>
+            <div class="modal-info-row">
+                <span class="lbl">Requester</span>
+                <span class="val" id="m-requester"></span>
+            </div>
+            <div class="modal-info-row">
+                <span class="lbl">Blood Group</span>
+                <span class="val" id="m-group"></span>
+            </div>
+            <div class="modal-info-row">
+                <span class="lbl">Hospital</span>
+                <span class="val" id="m-hospital"></span>
+            </div>
+            <div class="modal-info-row">
+                <span class="lbl">Allocated Bags</span>
+                <span class="val" id="m-bags"></span>
+            </div>
+            <div class="modal-notes-group">
+                <label><i class="fa-solid fa-note-sticky" style="color:#8b0000"></i> Delivery Notes (optional)</label>
+                <textarea id="m-notes" placeholder="Any notes about this delivery…"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel-modal" onclick="closeDeliverModal()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <button class="btn-confirm-deliver" onclick="confirmDeliver()">
+                <i class="fa-solid fa-truck-medical"></i> Confirm Delivery
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden forms -->
+<form id="deliverForm" asp-action="MarkDelivered" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deliver-form-id" />
+    <input type="hidden" name="notes" id="deliver-form-notes" />
+</form>
+
+<form id="cancelAllocForm" asp-action="CancelAllocation" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="cancel-alloc-id" />
+</form>
+
+<script>
+    // ── FILTER ──────────────────────────────────────────
+    function filterTable() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        const rows   = document.querySelectorAll('#allocationBody tr[data-search]');
+        let visible  = 0;
+
+        rows.forEach(row => {
+            const ok = (!search || row.dataset.search.includes(search))
+                    && (!status || row.dataset.status === status);
+            row.style.display = ok ? '' : 'none';
+            if (ok) visible++;
+        });
+
+        document.getElementById('recordCount').innerText =
+            visible + ' record' + (visible !== 1 ? 's' : '');
+        document.getElementById('pageInfo').innerText = visible;
+    }
+
+    // ── INVOICE LOOKUP ───────────────────────────────────
+    function lookupInvoice() {
+        const val  = document.getElementById('invoiceLookup').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('#allocationBody tr[data-invoice]');
+        const resultEl = document.getElementById('lookupResult');
+
+        if (!val) {
+            rows.forEach(r => r.style.display = '');
+            resultEl.textContent = '';
+            document.getElementById('recordCount').innerText =
+                rows.length + ' record' + (rows.length !== 1 ? 's' : '');
+            document.getElementById('pageInfo').innerText = rows.length;
+            return;
+        }
+
+        let found = 0;
+        rows.forEach(row => {
+            const match = row.dataset.invoice.includes(val);
+            row.style.display = match ? '' : 'none';
+            if (match) found++;
+        });
+
+        resultEl.textContent = found > 0
+            ? `✓ ${found} result(s) found`
+            : '✗ No matching invoice found';
+        resultEl.style.color = found > 0 ? '#1a8a4a' : '#8b0000';
+        resultEl.style.fontWeight = '700';
+
+        document.getElementById('recordCount').innerText =
+            found + ' record' + (found !== 1 ? 's' : '');
+        document.getElementById('pageInfo').innerText = found;
+    }
+
+    // ── DELIVER MODAL ────────────────────────────────────
+    function openDeliverModal(id, invoice, requester, group, bags, hospital) {
+        document.getElementById('deliver-form-id').value = id;
+        document.getElementById('m-invoice').innerText   = invoice;
+        document.getElementById('m-requester').innerText = requester;
+        document.getElementById('m-group').innerText     = group;
+        document.getElementById('m-hospital').innerText  = hospital;
+        document.getElementById('m-bags').innerText      = bags;
+        document.getElementById('m-notes').value         = '';
+        document.getElementById('deliverModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeliverModal() {
+        document.getElementById('deliverModal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function confirmDeliver() {
+        document.getElementById('deliver-form-notes').value =
+            document.getElementById('m-notes').value;
+        document.getElementById('deliverForm').submit();
+    }
+
+    // ── CANCEL ALLOCATION ────────────────────────────────
+    function cancelAlloc(id) {
+        if (!confirm('Cancel this allocation? This cannot be undone.')) return;
+        document.getElementById('cancel-alloc-id').value = id;
+        document.getElementById('cancelAllocForm').submit();
+    }
+
+    // ── MOVE MODALS TO BODY ──────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        var m = document.getElementById('deliverModal');
+        if (m) document.body.appendChild(m);
+
+        document.getElementById('deliverModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeliverModal();
+        });
+    });
+
+    // ── TOAST ────────────────────────────────────────────
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded',
+                () => showToast('@TempData["SuccessMessage"]', 'success'));
+            </text>
+    }
+    @if (TempData["WarningMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded',
+                () => showToast('@TempData["WarningMessage"]', 'warning'));
+            </text>
+    }
+
+    function showToast(msg, type) {
+        const bg   = type === 'warning' ? '#b8860b' : '#1a8a4a';
+        const icon = type === 'warning'
+            ? 'fa-triangle-exclamation' : 'fa-circle-check';
+        let t = document.createElement('div');
+        t.style.cssText = [
+            'position:fixed','bottom:28px','right:28px',
+            `background:${bg}`,'color:white',
+            'padding:14px 22px','border-radius:10px',
+            'font-size:13px','font-weight:600',
+            'display:flex','align-items:center','gap:10px',
+            'box-shadow:0 8px 28px rgba(0,0,0,0.18)',
+            "font-family:'Segoe UI',sans-serif",
+            'transform:translateY(80px)','opacity:0',
+            'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)',
+            'z-index:9999999','max-width:380px'
+        ].join(';');
+        t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
+        document.body.appendChild(t);
+        setTimeout(() => {
+            t.style.transform = 'translateY(0)';
+            t.style.opacity   = '1';
+        }, 10);
+        setTimeout(() => {
+            t.style.transform = 'translateY(80px)';
+            t.style.opacity   = '0';
+        }, 4000);
+    }
+</script>

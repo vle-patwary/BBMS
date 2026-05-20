@@ -1,0 +1,984 @@
+﻿@model List<BBMS.Models.BloodBag>
+@{
+    ViewData["Title"] = "Manage Blood Bags";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    .dashboard {
+        width: 92%;
+        margin: 32px auto 50px;
+    }
+
+    /* HEADER */
+    .header {
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 26px;
+    }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 1;
+    }
+
+    .header-stat {
+        text-align: center;
+    }
+
+        .header-stat .val {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .header-stat .lbl {
+            font-size: 11px;
+            color: #ffb3b3;
+            margin-top: 2px;
+        }
+
+    .h-divider {
+        width: 1px;
+        height: 40px;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffb3b3;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+    /* AUTO-EXPIRE ALERT */
+    .alert-expired {
+        background: #fff0f0;
+        border: 1px solid #f0c0c0;
+        border-left: 4px solid #8b0000;
+        border-radius: 10px;
+        padding: 12px 18px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #8b0000;
+        font-weight: 600;
+    }
+
+    /* STAT CARDS */
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
+
+    .stat-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 130px;
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-top: 4px solid #8b0000;
+        border-radius: 10px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+        .stat-card.warn {
+            border-top-color: #b8860b;
+        }
+
+            .stat-card.warn .sc-icon {
+                background: #fff8e1;
+            }
+
+                .stat-card.warn .sc-icon i {
+                    color: #b8860b;
+                }
+
+            .stat-card.warn .sc-val {
+                color: #b8860b;
+            }
+
+        .stat-card.danger {
+            border-top-color: #6e0000;
+        }
+
+            .stat-card.danger .sc-icon {
+                background: #fff0f0;
+            }
+
+                .stat-card.danger .sc-icon i {
+                    color: #6e0000;
+                }
+
+            .stat-card.danger .sc-val {
+                color: #6e0000;
+            }
+
+        .stat-card.good {
+            border-top-color: #1a8a4a;
+        }
+
+            .stat-card.good .sc-icon {
+                background: #e6f9ef;
+            }
+
+                .stat-card.good .sc-icon i {
+                    color: #1a8a4a;
+                }
+
+            .stat-card.good .sc-val {
+                color: #1a8a4a;
+            }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        background: #fff0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .sc-icon i {
+            color: #8b0000;
+            font-size: 17px;
+        }
+
+    .sc-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: #8b0000;
+    }
+
+    .sc-lbl {
+        font-size: 12px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .search-wrap {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 9px 12px 9px 34px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+            font-family: inherit;
+        }
+
+            .search-wrap input:focus {
+                border-color: #8b0000;
+            }
+
+    .toolbar select {
+        padding: 9px 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        outline: none;
+        font-family: inherit;
+    }
+
+    /* TABLE */
+    .table-section {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+
+    .table-section-header {
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f5eded;
+    }
+
+        .table-section-header span {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+    .record-count {
+        font-size: 12px;
+        background: #fff0f0;
+        color: #8b0000;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        background: #8b0000;
+        color: white;
+        padding: 12px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 13px 16px;
+        border-bottom: 1px solid #f5eded;
+        font-size: 13px;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fff8f8;
+    }
+
+    /* BAG CODE CELL */
+    .bag-code {
+        font-family: monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: #8b0000;
+        background: #fff0f0;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    /* BLOOD BADGE */
+    .blood-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #8b0000;
+        color: white;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* EXPIRY BADGE */
+    .expiry-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .exp-good {
+        background: #e6f9ef;
+        color: #1a8a4a;
+    }
+
+    .exp-soon {
+        background: #fff8e1;
+        color: #b8860b;
+    }
+
+    .exp-critical {
+        background: #ffe8e8;
+        color: #c0392b;
+    }
+
+    .exp-expired {
+        background: #f5f5f5;
+        color: #888;
+    }
+
+    /* STATUS BADGE */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .s-available {
+        background: #e6f9ef;
+        color: #1a8a4a;
+    }
+
+    .s-expired {
+        background: #f5f5f5;
+        color: #888;
+    }
+
+    .s-used {
+        background: #e8f4fd;
+        color: #1565c0;
+    }
+
+    .s-discarded {
+        background: #fff0f0;
+        color: #8b0000;
+    }
+
+    /* PROGRESS BAR */
+    .expiry-bar-wrap {
+        height: 5px;
+        background: #f0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 5px;
+        width: 100px;
+    }
+
+    .expiry-bar {
+        height: 100%;
+        border-radius: 3px;
+    }
+
+    /* ACTIONS */
+    .actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition: all 0.15s;
+    }
+
+    .btn-discard {
+        background: #8b0000;
+        color: white;
+    }
+
+        .btn-discard:hover {
+            background: #6e0000;
+        }
+
+    .btn-view {
+        background: #1565c0;
+        color: white;
+    }
+
+        .btn-view:hover {
+            background: #0d47a1;
+        }
+
+    /* EMPTY STATE */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #bbb;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 14px;
+            display: block;
+            color: #f0c0c0;
+        }
+
+    /* DISCARD MODAL */
+    .bs-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.82);
+        z-index: 999999;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .bs-modal-overlay.show {
+            display: flex;
+            pointer-events: all;
+        }
+
+    .discard-modal-box {
+        background: #ffffff;
+        border-radius: 12px;
+        width: 420px;
+        max-width: 95vw;
+        overflow: hidden;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+        isolation: isolate;
+        z-index: 1000000;
+        animation: slideIn 0.25s ease;
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .discard-modal-header {
+        background: #8b0000;
+        color: white;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .discard-modal-body {
+        padding: 24px;
+        font-size: 13px;
+        color: #444;
+        line-height: 1.6;
+        background: #ffffff;
+    }
+
+        .discard-modal-body strong {
+            color: #8b0000;
+        }
+
+    .discard-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #f5eded;
+        background: #ffffff;
+    }
+
+    .btn-cancel-modal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel-modal:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-confirm-discard {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 22px;
+        border-radius: 8px;
+        border: none;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+
+        .btn-confirm-discard:hover {
+            background: #6e0000;
+        }
+
+    @@media (max-width: 700px) {
+        .stat-row {
+            flex-direction: column;
+        }
+
+        .header-right {
+            display: none;
+        }
+    }
+</style>
+
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h2><i class="fa-solid fa-bag-shopping" style="margin-right:10px"></i>Blood Bag Inventory</h2>
+            <p>Track individual blood bags, expiry dates and component types</p>
+        </div>
+        <div class="header-right">
+            <div class="header-stat">
+                <div class="val">@ViewBag.Available</div>
+                <div class="lbl">Available</div>
+            </div>
+            <div class="h-divider"></div>
+            <div class="header-stat">
+                <div class="val">@ViewBag.ExpiringSoon</div>
+                <div class="lbl">Expiring Soon</div>
+            </div>
+            <div class="h-divider"></div>
+            <div class="header-stat">
+                <div class="val">@ViewBag.ExpiredCount</div>
+                <div class="lbl">Expired</div>
+            </div>
+            <div class="h-divider"></div>
+            <a asp-controller="Home" asp-action="Staff" class="btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- AUTO-EXPIRE ALERT -->
+    @if (ViewBag.AutoExpired > 0)
+    {
+        <div class="alert-expired">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span><strong>@ViewBag.AutoExpired bag(s)</strong> were automatically marked as Expired on this page load.</span>
+        </div>
+    }
+
+    <!-- STAT CARDS -->
+    <div class="section-title">Overview</div>
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div><div class="sc-val">@ViewBag.TotalBags</div><div class="sc-lbl">Total Bags</div></div>
+        </div>
+        <div class="stat-card good">
+            <div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div><div class="sc-val">@ViewBag.Available</div><div class="sc-lbl">Available</div></div>
+        </div>
+        <div class="stat-card warn">
+            <div class="sc-icon"><i class="fa-solid fa-clock"></i></div>
+            <div><div class="sc-val">@ViewBag.ExpiringSoon</div><div class="sc-lbl">Expiring ≤7 Days</div></div>
+        </div>
+        <div class="stat-card danger">
+            <div class="sc-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div><div class="sc-val">@ViewBag.ExpiredCount</div><div class="sc-lbl">Expired</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-icon"><i class="fa-solid fa-check-double"></i></div>
+            <div><div class="sc-val">@ViewBag.UsedCount</div><div class="sc-lbl">Used</div></div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput"
+                   placeholder="Search bag code, blood group, donor ID…"
+                   oninput="filterTable()">
+        </div>
+        <select id="groupFilter" onchange="filterTable()">
+            <option value="">All Blood Groups</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+        </select>
+        <select id="componentFilter" onchange="filterTable()">
+            <option value="">All Components</option>
+            <option>Whole Blood</option>
+            <option>Red Blood Cells</option>
+            <option>Platelets</option>
+            <option>Fresh Frozen Plasma</option>
+            <option>Granulocytes</option>
+        </select>
+        <select id="statusFilter" onchange="filterTable()">
+            <option value="">All Status</option>
+            <option value="Available">Available</option>
+            <option value="Expiring Soon">Expiring Soon</option>
+            <option value="Expired">Expired</option>
+            <option value="Used">Used</option>
+            <option value="Discarded">Discarded</option>
+        </select>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+        <div class="table-section-header">
+            <span><i class="fa-solid fa-list" style="color:#8b0000;margin-right:8px"></i>Blood Bag Records</span>
+            <span class="record-count" id="recordCount">@Model.Count records</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Bag Code</th>
+                        <th>Blood Group</th>
+                        <th>Component</th>
+                        <th>Volume</th>
+                        <th>Donor ID</th>
+                        <th>Collection Date</th>
+                        <th>Expiry Date</th>
+                        <th>Days Left</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bagBody">
+                    @if (Model != null && Model.Any())
+                    {
+                        int i = 1;
+                        @foreach (var bag in Model)
+                        {
+                            var daysLeft = (bag.ExpiryDate.Date - DateTime.Today).Days;
+                            var expiryClass = daysLeft <= 0 ? "exp-expired"
+                            : daysLeft <= 3 ? "exp-critical"
+                            : daysLeft <= 7 ? "exp-soon"
+                            : "exp-good";
+                            var expiryIcon = daysLeft <= 0 ? "fa-ban"
+                            : daysLeft <= 7 ? "fa-clock"
+                            : "fa-circle-check";
+                            var expiryLabel = daysLeft <= 0 ? "Expired"
+                            : daysLeft <= 3 ? daysLeft + "d — Critical"
+                            : daysLeft <= 7 ? daysLeft + "d — Soon"
+                            : daysLeft + " days";
+
+                            // Progress bar: percentage of shelf life remaining
+                            var totalShelf = (bag.ExpiryDate - bag.CollectionDate).Days;
+                            var barPct = totalShelf > 0
+                            ? Math.Max(0, Math.Min(100, (daysLeft * 100) / totalShelf))
+                            : 0;
+                            var barColor = daysLeft <= 0 ? "#aaa"
+                            : daysLeft <= 3 ? "#c0392b"
+                            : daysLeft <= 7 ? "#b8860b"
+                            : "#1a8a4a";
+
+                            var statusClass = bag.Status == "Available" ? "s-available"
+                            : bag.Status == "Used" ? "s-used"
+                            : bag.Status == "Expired" ? "s-expired"
+                            : "s-discarded";
+
+                            // For filter
+                            var filterStatus = bag.Status == "Available" && daysLeft <= 7 && daysLeft > 0
+                            ? "Expiring Soon"
+                            : bag.Status;
+
+                            <tr data-search="@((bag.BagCode + " " + bag.BloodGroup + " " + bag.DonorId).ToLower())"
+                                data-group="@bag.BloodGroup"
+                                data-component="@bag.Component"
+                                data-status="@filterStatus">
+                                <td style="color:#aaa;font-size:12px;">@i</td>
+                                <td><span class="bag-code">@bag.BagCode</span></td>
+                                <td><div class="blood-badge">@bag.BloodGroup</div></td>
+                                <td>@bag.Component</td>
+                                <td>@bag.VolumeML ml</td>
+                                <td style="font-size:12px;color:#888;">@(bag.DonorId ?? "—")</td>
+                                <td>@bag.CollectionDate.ToString("dd MMM yyyy")</td>
+                                <td>@bag.ExpiryDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    <span class="expiry-badge @expiryClass">
+                                        <i class="fa-solid @expiryIcon"></i> @expiryLabel
+                                    </span>
+                                    <div class="expiry-bar-wrap">
+                                        <div class="expiry-bar"
+                                             style="width:@barPct%;background:@barColor"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge @statusClass">@bag.Status</span>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        @if (bag.Status == "Available" || bag.Status == "Expired")
+                                        {
+                                            <button class="action-btn btn-discard"
+                                                    onclick="openDiscardModal(@bag.Id, '@bag.BagCode')">
+                                                <i class="fa-solid fa-trash"></i> Discard
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:#aaa;font-size:12px;">No actions</span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-droplet-slash"></i>
+                                    <p>No blood bags found. Bags are created automatically when donations are recorded.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:14px 22px;border-top:1px solid #f5eded;font-size:13px;color:#888;">
+            Showing <span id="pageInfo">@Model.Count</span> bag entries
+        </div>
+    </div>
+</div>
+
+<!-- DISCARD MODAL -->
+<div class="bs-modal-overlay" id="discardModal">
+    <div class="discard-modal-box">
+        <div class="discard-modal-header">
+            <i class="fa-solid fa-triangle-exclamation"></i> Confirm Discard
+        </div>
+        <div class="discard-modal-body">
+            Are you sure you want to discard bag
+            <strong id="discardBagLabel"></strong>?
+            This will remove it from available stock and <strong>cannot be undone</strong>.
+        </div>
+        <div class="discard-modal-footer">
+            <button class="btn-cancel-modal" onclick="closeDiscardModal()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+            <button class="btn-confirm-discard" onclick="confirmDiscard()">
+                <i class="fa-solid fa-trash"></i> Yes, Discard
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden discard form -->
+<form id="discardForm" asp-action="DiscardBloodBag" asp-controller="Home" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="discard-form-id" />
+</form>
+
+<script>
+    // ── FILTER ──────────────────────────────────────────
+    function filterTable() {
+        const search    = document.getElementById('searchInput').value.toLowerCase();
+        const group     = document.getElementById('groupFilter').value;
+        const component = document.getElementById('componentFilter').value;
+        const status    = document.getElementById('statusFilter').value;
+        const rows      = document.querySelectorAll('#bagBody tr[data-search]');
+        let visible = 0;
+
+        rows.forEach(row => {
+            const ok = (!search    || row.dataset.search.includes(search))
+                    && (!group     || row.dataset.group     === group)
+                    && (!component || row.dataset.component === component)
+                    && (!status    || row.dataset.status    === status);
+            row.style.display = ok ? '' : 'none';
+            if (ok) visible++;
+        });
+
+        document.getElementById('recordCount').innerText = visible + ' record' + (visible !== 1 ? 's' : '');
+        document.getElementById('pageInfo').innerText    = visible;
+    }
+
+    // ── DISCARD MODAL ────────────────────────────────────
+    function openDiscardModal(id, code) {
+        document.getElementById('discard-form-id').value  = id;
+        document.getElementById('discardBagLabel').innerText = code;
+        document.getElementById('discardModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDiscardModal() {
+        document.getElementById('discardModal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function confirmDiscard() {
+        document.getElementById('discardForm').submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Move modal to body to escape Bootstrap container
+        var m = document.getElementById('discardModal');
+        if (m) document.body.appendChild(m);
+
+        document.getElementById('discardModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDiscardModal();
+        });
+    });
+
+    // ── TOAST ────────────────────────────────────────────
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => showToast('@TempData["SuccessMessage"]'));
+            </text>
+    }
+
+    function showToast(msg) {
+        let t = document.createElement('div');
+        t.style.cssText = [
+            'position:fixed','bottom:28px','right:28px','background:#1a8a4a','color:white',
+            'padding:14px 22px','border-radius:10px','font-size:13px','font-weight:600',
+            'display:flex','align-items:center','gap:10px','box-shadow:0 8px 28px rgba(0,0,0,0.18)',
+            "font-family:'Segoe UI',sans-serif",'transform:translateY(80px)','opacity:0',
+            'transition:all 0.35s cubic-bezier(.34,1.56,.64,1)','z-index:9999999'
+        ].join(';');
+        t.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.transform = 'translateY(0)';   t.style.opacity = '1'; }, 10);
+        setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3200);
+    }
+</script>

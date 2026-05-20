@@ -266,7 +266,110 @@
             <div class="admin-badge"><i class="fa-solid fa-shield-halved"></i></div>
         </div>
     </div>
+    <!-- EXPIRY WARNING BANNERS -->
+    @if (ViewBag.CriticalBags > 0)
+    {
+        <div style="background:#fff0f0;border:1px solid #f0c0c0;
+                    border-left:5px solid #8b0000;border-radius:10px;
+                    padding:14px 20px;margin-top:20px;
+                    display:flex;align-items:center;justify-content:space-between;
+                    flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:50%;
+                            background:#8b0000;display:flex;align-items:center;
+                            justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-triangle-exclamation"
+                       style="color:white;font-size:16px;"></i>
+                </div>
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:#8b0000;">
+                        Critical Expiry Alert
+                    </div>
+                    <div style="font-size:13px;color:#c0392b;margin-top:2px;">
+                        <strong>@ViewBag.CriticalBags bag(s)</strong>
+                        will expire within 3 days. Immediate action required.
+                    </div>
+                </div>
+            </div>
+            <a asp-controller="Home" asp-action="ManageBloodBags"
+               asp-route-status="Available"
+               style="display:inline-flex;align-items:center;gap:8px;
+                      background:#8b0000;color:white;padding:9px 18px;
+                      border-radius:8px;font-size:13px;font-weight:600;
+                      text-decoration:none;">
+                <i class="fa-solid fa-eye"></i> View Critical Bags
+            </a>
+        </div>
+    }
 
+    @if (ViewBag.TotalExpiringSoon > 0)
+    {
+        <div style="background:#fff8e1;border:1px solid #f0d060;
+                    border-left:5px solid #b8860b;border-radius:10px;
+                    padding:14px 20px;margin-top:12px;
+                    display:flex;align-items:center;justify-content:space-between;
+                    flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:50%;
+                            background:#b8860b;display:flex;align-items:center;
+                            justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-clock"
+                       style="color:white;font-size:16px;"></i>
+                </div>
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:#b8860b;">
+                        Expiry Warning
+                    </div>
+                    <div style="font-size:13px;color:#9a7000;margin-top:2px;">
+                        <strong>@ViewBag.TotalExpiringSoon bag(s)</strong>
+                        are expiring within 7 days. Please review soon.
+                    </div>
+                </div>
+            </div>
+            <a asp-controller="Home" asp-action="ManageBloodBags"
+               style="display:inline-flex;align-items:center;gap:8px;
+                      background:#b8860b;color:white;padding:9px 18px;
+                      border-radius:8px;font-size:13px;font-weight:600;
+                      text-decoration:none;">
+                <i class="fa-solid fa-eye"></i> View Expiring Bags
+            </a>
+        </div>
+    }
+
+    @if (ViewBag.ExpiredUnhandled > 0)
+    {
+        <div style="background:#f5f5f5;border:1px solid #ddd;
+                    border-left:5px solid #888;border-radius:10px;
+                    padding:14px 20px;margin-top:12px;
+                    display:flex;align-items:center;justify-content:space-between;
+                    flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:50%;
+                            background:#888;display:flex;align-items:center;
+                            justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-ban"
+                       style="color:white;font-size:16px;"></i>
+                </div>
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:#555;">
+                        Expired Bags
+                    </div>
+                    <div style="font-size:13px;color:#777;margin-top:2px;">
+                        <strong>@ViewBag.ExpiredUnhandled bag(s)</strong>
+                        have expired and should be discarded.
+                    </div>
+                </div>
+            </div>
+            <a asp-controller="Home" asp-action="ManageBloodBags"
+               asp-route-status="Expired"
+               style="display:inline-flex;align-items:center;gap:8px;
+                      background:#888;color:white;padding:9px 18px;
+                      border-radius:8px;font-size:13px;font-weight:600;
+                      text-decoration:none;">
+                <i class="fa-solid fa-trash"></i> Discard Expired
+            </a>
+        </div>
+    }
     <!-- SYSTEM MANAGEMENT -->
     <div class="section-title">System Management</div>
     <div class="card-container">
@@ -309,37 +412,115 @@
 
     <!-- BLOOD STOCK TABLE -->
     <div class="table-section">
-        <h3>Blood Stock Summary</h3>
+        <h3>
+            Blood Stock Summary
+            @if (ViewBag.TotalExpiringSoon > 0)
+            {
+                <span style="margin-left:12px;background:#fff8e1;color:#b8860b;
+                             font-size:12px;padding:4px 12px;border-radius:20px;
+                             font-weight:700;">
+                    <i class="fa-solid fa-clock"></i>
+                    @ViewBag.TotalExpiringSoon bag(s) expiring within 7 days
+                </span>
+            }
+        </h3>
         <table>
             <tr>
                 <th>Blood Group</th>
                 <th>Available Units</th>
-                <th>Status</th>
+                <th>Stock Status</th>
+                <th>Bags Expiring ≤7 Days</th>
+                <th>Nearest Expiry</th>
+                <th>Action</th>
             </tr>
             @if (Model != null && Model.Any())
             {
                 @foreach (var stock in Model)
                 {
-                    var badgeColor = stock.Status == "sufficient" ? "#e6f9ef" : stock.Status == "low" ? "#fff8e1" : "#fff0f0";
-                    var textColor = stock.Status == "sufficient" ? "#1a8a4a" : stock.Status == "low" ? "#b8860b" : "#8b0000";
-                    var label = stock.Status == "sufficient" ? "Sufficient" : stock.Status == "low" ? "Low Stock" : "Critical";
+                    var badgeColor = stock.Status == "sufficient" ? "#e6f9ef"
+                    : stock.Status == "low" ? "#fff8e1"
+                    : "#fff0f0";
+                    var textColor = stock.Status == "sufficient" ? "#1a8a4a"
+                    : stock.Status == "low" ? "#b8860b"
+                    : "#8b0000";
+                    var label = stock.Status == "sufficient" ? "Sufficient"
+                    : stock.Status == "low" ? "Low Stock"
+                    : "Critical";
+
+                    // Match bag summary for this group
+                    var bags = ViewBag.BagSummary as dynamic;
+                    int expiringSoon = 0;
+                    int critical = 0;
+                    string nearestExpiry = "—";
+
+                    if (bags != null)
+                    {
+                        foreach (var b in bags)
+                        {
+                            if (b.BloodGroup == stock.BloodGroup)
+                            {
+                                expiringSoon = b.ExpiringSoon;
+                                critical = b.Critical;
+                                nearestExpiry = ((DateTime)b.NearestExpiry)
+                                .ToString("dd MMM yyyy");
+                                break;
+                            }
+                        }
+                    }
 
                     <tr>
                         <td><strong>@stock.BloodGroup</strong></td>
                         <td><span class="unit-badge">@stock.Units units</span></td>
                         <td>
-                            <span style="background:@badgeColor; color:@textColor;
-                                         padding:3px 10px; border-radius:20px;
-                                         font-size:12px; font-weight:700;">
+                            <span style="background:@badgeColor;color:@textColor;
+                                             padding:3px 10px;border-radius:20px;
+                                             font-size:12px;font-weight:700;">
                                 @label
                             </span>
+                        </td>
+                        <td>
+                            @if (critical > 0)
+                            {
+                                <span style="background:#fff0f0;color:#8b0000;
+                                                     padding:3px 10px;border-radius:20px;
+                                                     font-size:12px;font-weight:700;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    @critical bag(s) ≤3 days
+                                </span>
+                            }
+                            else if (expiringSoon > 0)
+                            {
+                                <span style="background:#fff8e1;color:#b8860b;
+                                                     padding:3px 10px;border-radius:20px;
+                                                     font-size:12px;font-weight:700;">
+                                    <i class="fa-solid fa-clock"></i>
+                                    @expiringSoon bag(s) ≤7 days
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="color:#aaa;font-size:12px;">None</span>
+                            }
+                        </td>
+                        <td style="font-size:13px;">@nearestExpiry</td>
+                        <td>
+                            <a asp-controller="Home" asp-action="ManageBloodBags"
+                               asp-route-group="@stock.BloodGroup"
+                               style="color:#8b0000;font-size:12px;
+                                          font-weight:700;text-decoration:none;">
+                                <i class="fa-solid fa-eye"></i> View Bags
+                            </a>
                         </td>
                     </tr>
                 }
             }
             else
             {
-                <tr><td colspan="3" style="text-align:center; color:#aaa;">No blood stock records found.</td></tr>
+                <tr>
+                    <td colspan="6" style="text-align:center;color:#aaa;">
+                        No blood stock records found.
+                    </td>
+                </tr>
             }
         </table>
     </div>
