@@ -829,11 +829,60 @@ namespace BBMS.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // ── 1. Check if stock entry already exists for this blood group ──
+            var existing = _db.BloodStocks
+                .FirstOrDefault(s => s.BloodGroup == model.BloodGroup);
+
+            if (existing != null)
+            {
+                TempData["ErrorMessage"] =
+                    $"A stock entry for {model.BloodGroup} already exists. " +
+                    $"Use Edit to update it.";
+                return RedirectToAction("ManageBloodStock");
+            }
+
+            // ── 2. Create one BloodBag per unit entered ──
+            for (int i = 0; i < model.Units; i++)
+            {
+                int bagCount = _db.BloodBags.Count();
+                string bagCode = "BAG-" + (bagCount + 1).ToString("D4");
+
+                _db.BloodBags.Add(new BloodBag
+                {
+                    BagCode = bagCode,
+                    BloodGroup = model.BloodGroup,
+                    Component = "Whole Blood",
+                    VolumeML = 450,
+                    CollectionDate = model.CollectionDate,
+                    ExpiryDate = model.CollectionDate.AddDays(42),
+                    DonorId = "MANUAL",
+                    Status = "Available",
+                    Notes = "Manually added by admin",
+                    CreatedAt = DateTime.Now
+                });
+
+                // Save after each bag so Count() is always accurate for BagCode
+                _db.SaveChanges();
+            }
+
+            // ── 3. Recount units from actual bags (single source of truth) ──
+            int actualUnits = _db.BloodBags
+                .Count(b => b.BloodGroup == model.BloodGroup
+                         && b.Status == "Available");
+
+            // ── 4. Save BloodStock with real count ──
+            model.Units = actualUnits;
+            model.Status = actualUnits >= 30 ? "sufficient"
+                              : actualUnits >= 15 ? "low"
+                              : "critical";
             model.LastUpdated = DateTime.Now;
+
             _db.BloodStocks.Add(model);
             _db.SaveChanges();
 
-            TempData["SuccessMessage"] = "Blood stock entry saved successfully!";
+            TempData["SuccessMessage"] =
+                $"{actualUnits} bag(s) created for {model.BloodGroup}. " +
+                $"Stock entry added successfully!";
             return RedirectToAction("ManageBloodStock");
         }
 
@@ -868,14 +917,75 @@ namespace BBMS.Controllers
         public IActionResult UpdateBloodStock(int id, int units, string status)
         {
             var stock = _db.BloodStocks.Find(id);
-            if (stock != null)
+            if (stock == null)
+                return RedirectToAction("ManageBloodStock");
+
+            // ── How many available bags exist right now for this group ──
+            int currentBags = _db.BloodBags
+                .Count(b => b.BloodGroup == stock.BloodGroup
+                         && b.Status == "Available");
+
+            int difference = units - currentBags;
+
+            if (difference > 0)
             {
-                stock.Units = units;
-                stock.Status = status;
-                stock.LastUpdated = DateTime.Now;
-                _db.SaveChanges();
-                TempData["SuccessMessage"] = "Stock updated successfully!";
+                // ── Admin increased units — create extra bags ──
+                for (int i = 0; i < difference; i++)
+                {
+                    int bagCount = _db.BloodBags.Count();
+                    string bagCode = "BAG-" + (bagCount + 1).ToString("D4");
+
+                    _db.BloodBags.Add(new BloodBag
+                    {
+                        BagCode = bagCode,
+                        BloodGroup = stock.BloodGroup,
+                        Component = "Whole Blood",
+                        VolumeML = 450,
+                        CollectionDate = DateTime.Today,
+                        ExpiryDate = DateTime.Today.AddDays(42),
+                        DonorId = "MANUAL",
+                        Status = "Available",
+                        Notes = "Manually adjusted by admin",
+                        CreatedAt = DateTime.Now
+                    });
+
+                    _db.SaveChanges();
+                }
             }
+            else if (difference < 0)
+            {
+                // ── Admin decreased units — discard excess bags (oldest first) ──
+                int toRemove = Math.Abs(difference);
+
+                var bagsToDiscard = _db.BloodBags
+                    .Where(b => b.BloodGroup == stock.BloodGroup
+                             && b.Status == "Available"
+                             && b.DonorId == "MANUAL")
+                    .OrderBy(b => b.CollectionDate)
+                    .Take(toRemove)
+                    .ToList();
+
+                foreach (var bag in bagsToDiscard)
+                    bag.Status = "Discarded";
+
+                _db.SaveChanges();
+            }
+
+            // ── Recount from actual bags — never trust the typed number ──
+            int actualUnits = _db.BloodBags
+                .Count(b => b.BloodGroup == stock.BloodGroup
+                         && b.Status == "Available");
+
+            stock.Units = actualUnits;
+            stock.Status = actualUnits >= 30 ? "sufficient"
+                              : actualUnits >= 15 ? "low"
+                              : "critical";
+            stock.LastUpdated = DateTime.Now;
+
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] =
+                $"Stock updated! {actualUnits} available bag(s) for {stock.BloodGroup}.";
             return RedirectToAction("ManageBloodStock");
         }
 
@@ -887,9 +997,19 @@ namespace BBMS.Controllers
             var stock = _db.BloodStocks.Find(id);
             if (stock != null)
             {
+                // ── Also discard all MANUAL bags for this group ──
+                var manualBags = _db.BloodBags
+                    .Where(b => b.BloodGroup == stock.BloodGroup
+                             && b.Status == "Available"
+                             && b.DonorId == "MANUAL")
+                    .ToList();
+
+                foreach (var bag in manualBags)
+                    bag.Status = "Discarded";
+
                 _db.BloodStocks.Remove(stock);
                 _db.SaveChanges();
-                TempData["SuccessMessage"] = "Blood stock deleted successfully!";
+                TempData["SuccessMessage"] = "Blood stock and associated manual bags deleted!";
             }
             return RedirectToAction("ManageBloodStock");
         }

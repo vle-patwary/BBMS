@@ -1,0 +1,393 @@
+﻿@model BBMS.Models.DonateBlood
+@{
+    ViewData["Title"] = "Edit Donor";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+    }
+
+    .dashboard {
+        width: 72%;
+        margin: 32px auto 50px;
+    }
+
+    /* HEADER */
+    .header {
+        background: #8b0000;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 26px;
+    }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+
+    .header-left h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: #ffb3b3;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1;
+    }
+
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffb3b3;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+    /* SECTION TITLE */
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 16px;
+            background: #8b0000;
+            border-radius: 2px;
+        }
+
+    /* FORM CARD */
+    .form-card {
+        background: white;
+        border: 1px solid #f0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .form-card-header {
+        background: #8b0000;
+        color: white;
+        padding: 14px 22px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-card-body {
+        padding: 24px;
+    }
+
+    /* FORM GRID */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .form-group label i {
+                color: #8b0000;
+                font-size: 11px;
+            }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                border-color: #8b0000;
+                box-shadow: 0 0 0 3px rgba(139,0,0,0.08);
+                background: white;
+            }
+
+            .form-group input[readonly] {
+                background: #f5f5f5;
+                color: #888;
+                cursor: not-allowed;
+            }
+
+    .text-danger {
+        color: #8b0000;
+        font-size: 11px;
+        margin-top: 3px;
+        font-weight: 600;
+    }
+
+    /* FOOTER */
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #f5eded;
+        background: #fffafa;
+    }
+
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel:hover {
+            border-color: #8b0000;
+            color: #8b0000;
+        }
+
+    .btn-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border-radius: 8px;
+        border: none;
+        background: #8b0000;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 4px 12px rgba(139,0,0,0.25);
+        transition: background 0.2s;
+    }
+
+        .btn-save:hover {
+            background: #6e0000;
+        }
+
+    /* NOTE BOX */
+    .note-box {
+        background: #fff5f5;
+        border: 1px solid #f0e0e0;
+        border-left: 3px solid #8b0000;
+        border-radius: 7px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #8b0000;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+</style>
+
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h2><i class="fa-solid fa-pen-to-square" style="margin-right:10px"></i>Edit Donor</h2>
+            <p>@Model.DonorId — Update donor information below</p>
+        </div>
+        <div class="header-right">
+            <a asp-controller="Donor" asp-action="DonorDetails"
+               asp-route-id="@Model.DonorId" class="btn-ghost">
+                <i class="fa-solid fa-eye"></i> View Profile
+            </a>
+            <a asp-controller="Donor" asp-action="ManageDonors" class="btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <form asp-controller="Donor" asp-action="EditDonor" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="DonorId" />
+        <input type="hidden" asp-for="CreatedAt" />
+        <input type="hidden" asp-for="TotalDonations" />
+        <input type="hidden" asp-for="LastDonationDate" />
+        <input type="hidden" asp-for="Location" /> 
+
+
+        <!-- PERSONAL INFO -->
+        <div class="section-title">Personal Information</div>
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fa-solid fa-id-card"></i> Basic Details
+            </div>
+            <div class="form-card-body">
+                <div class="note-box">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Donor ID is read-only and cannot be changed.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-hashtag"></i> Donor ID</label>
+                        <input type="text" value="@Model.DonorId" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> Full Name <span style="color:#8b0000">*</span></label>
+                        <input asp-for="FullName" placeholder="Enter full name" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                        <select asp-for="Gender">
+                            <option value="">-- Select Gender --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-cake-candles"></i> Age</label>
+                        <input asp-for="Age" type="number" min="18" max="65" placeholder="Enter age" />
+                        <span asp-validation-for="Age" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-droplet"></i> Blood Group <span style="color:#8b0000">*</span></label>
+                        <select asp-for="BloodGroup">
+                            <option value="">-- Select Blood Group --</option>
+                            @foreach (var bg in new[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" })
+                            {
+                                <option value="@bg">@bg</option>
+                            }
+                        </select>
+                        <span asp-validation-for="BloodGroup" class="text-danger"></span>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT INFO -->
+        <div class="section-title">Contact Information</div>
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fa-solid fa-address-book"></i> Contact Details
+            </div>
+            <div class="form-card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-phone"></i> Contact Number</label>
+                        <input asp-for="ContactNumber" placeholder="Enter contact number" />
+                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Email</label>
+                        <input asp-for="Email" type="email" placeholder="Enter email address" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <a asp-controller="Donor" asp-action="ManageDonors" class="btn-cancel">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

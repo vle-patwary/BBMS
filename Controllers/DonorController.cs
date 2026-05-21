@@ -1,5 +1,4 @@
-﻿// Controllers/DonorController.cs
-using BBMS.Data;
+﻿using BBMS.Data;
 using BBMS.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +18,7 @@ namespace BBMS.Controllers
             string eligibility, int page = 1)
         {
             int pageSize = 10;
-
-            // Load all from DB first (needed for computed Eligibility property)
             var allDonors = _db.DonateBloods.ToList();
-
-            // Apply filters
             var query = allDonors.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -41,24 +36,18 @@ namespace BBMS.Controllers
             var filtered = query.OrderByDescending(d => d.CreatedAt).ToList();
             int total = filtered.Count;
 
-            // Paginate
             var donors = filtered
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            // Stats
             ViewBag.TotalDonors = allDonors.Count;
             ViewBag.EligibleDonors = allDonors.Count(d => d.Eligibility == "Eligible");
             ViewBag.DeferredDonors = allDonors.Count(d => d.Eligibility == "Deferred");
-
-            // Pagination
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
             ViewBag.From = total == 0 ? 0 : (page - 1) * pageSize + 1;
             ViewBag.To = Math.Min(page * pageSize, total);
-
-            // Filter state
             ViewBag.Search = search;
             ViewBag.BloodGroup = bloodGroup;
             ViewBag.Eligibility = eligibility;
@@ -66,6 +55,7 @@ namespace BBMS.Controllers
             return View(donors);
         }
 
+        // ─── DELETE ───────────────────────────────────────────
         public IActionResult DeleteDonor(string id)
         {
             var donor = _db.DonateBloods.FirstOrDefault(d => d.DonorId == id);
@@ -73,40 +63,58 @@ namespace BBMS.Controllers
             {
                 _db.DonateBloods.Remove(donor);
                 _db.SaveChanges();
+                TempData["SuccessMessage"] = "Donor deleted successfully!";
             }
             return RedirectToAction("ManageDonors");
         }
 
+        // ─── DETAILS ──────────────────────────────────────────
         public IActionResult DonorDetails(string id)
         {
             var donor = _db.DonateBloods.FirstOrDefault(d => d.DonorId == id);
-            if (donor == null)
-                return NotFound();
-
+            if (donor == null) return NotFound();
             return View(donor);
         }
 
+        // ─── EDIT GET ─────────────────────────────────────────
+        [HttpGet]
         public IActionResult EditDonor(string id)
         {
             var donor = _db.DonateBloods.FirstOrDefault(d => d.DonorId == id);
-            if (donor == null)
-                return NotFound();
-
+            if (donor == null) return NotFound();
             return View(donor);
         }
 
+        // ─── EDIT POST ────────────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditDonor(DonateBlood donor)
+        public IActionResult EditDonor(string DonorId, string FullName, string Email,
+                                       string Gender, string BloodGroup,
+                                       string ContactNumber, int Age, string Location)
         {
-            if (ModelState.IsValid)
+            // Find existing record by DonorId
+            var existing = _db.DonateBloods
+                              .FirstOrDefault(d => d.DonorId == DonorId);
+
+            if (existing == null)
             {
-                _db.DonateBloods.Update(donor);
-                _db.SaveChanges();
+                TempData["ErrorMessage"] = $"Donor '{DonorId}' not found.";
                 return RedirectToAction("ManageDonors");
             }
-            return View(donor);
-        }
 
+            // Update only the fields from the form
+            existing.FullName = FullName;
+            existing.Email = Email;
+            existing.Gender = Gender;
+            existing.BloodGroup = BloodGroup;
+            existing.ContactNumber = ContactNumber;
+            existing.Age = Age;
+            existing.Location = Location;
+
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Donor updated successfully!";
+            return RedirectToAction("ManageDonors");
+        }
     }
 }
