@@ -146,7 +146,7 @@ namespace BBMS.Controllers
 
             request.Status = "Approved";
 
-            // ── Find matching available bags (FEFO) ──
+            // ── Find matching available bags (FEFO) but DON'T mark used yet ──
             var availableBags = _db.BloodBags
                 .Where(b => b.BloodGroup == request.BloodGroup
                          && b.Status == "Available"
@@ -155,29 +155,12 @@ namespace BBMS.Controllers
                 .Take(request.Quantity)
                 .ToList();
 
-            foreach (var bag in availableBags)
-                bag.Status = "Used";
-
-            // ── Update BloodStock ──
-            var stock = _db.BloodStocks
-                .FirstOrDefault(s => s.BloodGroup == request.BloodGroup);
-
-            if (stock != null)
-            {
-                stock.Units = _db.BloodBags
-                    .Count(b => b.BloodGroup == request.BloodGroup
-                             && b.Status == "Available");
-                stock.Status = stock.Units >= 30 ? "sufficient"
-                             : stock.Units >= 15 ? "low"
-                             : "critical";
-                stock.LastUpdated = DateTime.Now;
-            }
-
-            // ── Create BloodAllocation record ──
+            // ── Reserve bags (not Used yet — just noted in allocation) ──
             var bagCodes = availableBags.Any()
                 ? string.Join(", ", availableBags.Select(b => b.BagCode))
                 : "No bags available";
 
+            // ── Create BloodAllocation record ──
             var allocation = new BloodAllocation
             {
                 BloodRequestId = request.Id,
@@ -203,8 +186,8 @@ namespace BBMS.Controllers
             else
             {
                 TempData["SuccessMessage"] =
-                    $"Request approved. {availableBags.Count} bag(s) allocated. " +
-                    $"Allocation created for delivery.";
+                    $"Request approved. {availableBags.Count} bag(s) reserved. " +
+                    $"Stock will reduce after delivery confirmation.";
             }
 
             _db.SaveChanges();
@@ -360,23 +343,62 @@ namespace BBMS.Controllers
         public async Task<IActionResult> MarkDelivered(int id, string? notes)
         {
             var allocation = _db.BloodAllocations.Find(id);
-            if (allocation != null && allocation.Status == "Ready for Delivery")
-            {
-                // Auto-detect logged-in staff name
-                var identityUser = await _userManager.GetUserAsync(User);
-                var staffName = _db.Staffs
-                    .FirstOrDefault(s => s.IdentityUserId == identityUser.Id)?.Name
-                    ?? identityUser.Email;
+            if (allocation == null || allocation.Status != "Ready for Delivery")
+                return RedirectToAction("BloodDistribution");
 
-                allocation.Status = "Delivered";
-                allocation.DeliveredAt = DateTime.Now;
-                allocation.DeliveredBy = staffName;
-                allocation.Notes = notes;
+            // ── Auto-detect logged-in staff name ──
+            var identityUser = await _userManager.GetUserAsync(User);
+            var staffName = _db.Staffs
+                .FirstOrDefault(s => s.IdentityUserId == identityUser.Id)?.Name
+                ?? identityUser.Email;
+
+            allocation.Status = "Delivered";
+            allocation.DeliveredAt = DateTime.Now;
+            allocation.DeliveredBy = staffName;
+            allocation.Notes = notes;
+
+            // ── Mark each allocated bag as Used ──
+            if (!string.IsNullOrEmpty(allocation.AllocatedBagCodes) &&
+                allocation.AllocatedBagCodes != "No bags available")
+            {
+                var bagCodes = allocation.AllocatedBagCodes
+                    .Split(',')
+                    .Select(c => c.Trim())
+                    .ToList();
+
+                var bagsToUse = _db.BloodBags
+                    .Where(b => bagCodes.Contains(b.BagCode) && b.Status == "Available")
+                    .ToList();
+
+                foreach (var bag in bagsToUse)
+                    bag.Status = "Used";
 
                 _db.SaveChanges();
-                TempData["SuccessMessage"] =
-                    $"Invoice {allocation.InvoiceNumber} marked as delivered by {staffName}.";
+
+                // ── Recount and update BloodStock ──
+                var stock = _db.BloodStocks
+                    .FirstOrDefault(s => s.BloodGroup == allocation.BloodGroup);
+
+                if (stock != null)
+                {
+                    stock.Units = _db.BloodBags
+                        .Count(b => b.BloodGroup == allocation.BloodGroup
+                                 && b.Status == "Available");
+
+                    stock.Status = stock.Units >= 30 ? "sufficient"
+                                 : stock.Units >= 15 ? "low"
+                                 : "critical";
+
+                    stock.LastUpdated = DateTime.Now;
+                }
             }
+
+            _db.SaveChanges();
+
+            TempData["SuccessMessage"] =
+                $"Invoice {allocation.InvoiceNumber} marked as delivered by {staffName}. " +
+                $"Stock reduced by {allocation.QuantityAllocated} unit(s).";
+
             return RedirectToAction("BloodDistribution");
         }
 

@@ -126,6 +126,24 @@
             background: rgba(255,255,255,0.1);
         }
 
+    @@keyframes statPop {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.3);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .stat-pop {
+        animation: statPop 0.2s ease;
+    }
+
     /* Section */
     .section {
         padding: 50px 40px;
@@ -243,11 +261,20 @@
     <h1>Blood Bank Management System</h1>
     <p>Donate Blood &mdash; Save Lives</p>
     <div class="hero-stats">
-        <div class="stat-box"><div class="num">@ViewBag.TotalDonors</div><div class="lbl">Donors</div></div>
+        <div class="stat-box">
+            <div class="num" id="stat-donors" data-target="@ViewBag.TotalDonors" data-suffix="">0</div>
+            <div class="lbl">Donors</div>
+        </div>
         <div class="hero-divider"></div>
-        <div class="stat-box"><div class="num">200+</div><div class="lbl">Lives Saved</div></div>
+        <div class="stat-box">
+            <div class="num" id="stat-lives" data-target="200" data-suffix="+">0</div>
+            <div class="lbl">Lives Saved</div>
+        </div>
         <div class="hero-divider"></div>
-        <div class="stat-box"><div class="num">@ViewBag.TotalGroups</div><div class="lbl">Blood Groups</div></div>
+        <div class="stat-box">
+            <div class="num" id="stat-groups" data-target="@ViewBag.TotalGroups" data-suffix="">0</div>
+            <div class="lbl">Blood Groups</div>
+        </div>
     </div>
     <div class="hero-btns">
         <a href="/Home/Donate" class="btn-donate">Donate Blood</a>
@@ -320,3 +347,29 @@
         }
     </table>
 </div>
+<script>
+    function countUp(el, target, suffix, duration) {
+        const start = performance.now();
+        function step(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(ease * target) + suffix;
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                el.textContent = target + suffix;
+                el.classList.add('stat-pop');
+                setTimeout(() => el.classList.remove('stat-pop'), 150);
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.hero-stats .num').forEach(function (el, i) {
+            const target = parseInt(el.dataset.target, 10) || 0;
+            const suffix = el.dataset.suffix || '';
+            setTimeout(() => countUp(el, target, suffix, 1300), i * 200);
+        });
+    });
+</script>
