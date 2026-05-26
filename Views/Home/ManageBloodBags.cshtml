@@ -531,7 +531,7 @@
 
     /* DISCARD MODAL */
     .bs-modal-overlay {
-        display: none;
+        display: none; /* changed from using .show to toggle */
         position: fixed;
         inset: 0;
         width: 100vw;
@@ -934,14 +934,18 @@
 
     // ── DISCARD MODAL ────────────────────────────────────
     function openDiscardModal(id, code) {
-        document.getElementById('discard-form-id').value  = id;
+        document.getElementById('discard-form-id').value    = id;
         document.getElementById('discardBagLabel').innerText = code;
-        document.getElementById('discardModal').classList.add('show');
+        var modal = document.getElementById('discardModal');
+        modal.style.display = 'flex';
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
     }
 
     function closeDiscardModal() {
-        document.getElementById('discardModal').classList.remove('show');
+        var modal = document.getElementById('discardModal');
+        modal.style.display = 'none';
+        modal.classList.remove('show');
         document.body.style.overflow = '';
     }
 
@@ -950,7 +954,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Move modal to body to escape Bootstrap container
+        // Move modal to body to escape any stacking context issues
         var m = document.getElementById('discardModal');
         if (m) document.body.appendChild(m);
 

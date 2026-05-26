@@ -149,6 +149,17 @@
             <input asp-for="ConfirmPassword" type="password" />
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
         </div>
+        <div class="form-group">
+            <label>
+                Last Donation Date
+                <span style="color:#999; font-size:12px;">(leave blank if you have never donated)</span>
+            </label>
+            <input asp-for="LastDonationDate"
+                   type="date"
+                   class="form-control"
+                   max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="LastDonationDate" class="text-danger"></span>
+        </div>
 
         <button type="submit" class="register-btn">Register</button>
 

@@ -40,18 +40,32 @@ namespace BBMS.Controllers
                 return View(model);
             }
 
-            var user = new IdentityUser
+            // ✅ Reject future dates
+            if (model.LastDonationDate.HasValue &&
+                model.LastDonationDate.Value.Date > DateTime.Today)
             {
-                UserName = model.Email,
-                Email = model.Email
-            };
+                ModelState.AddModelError("LastDonationDate",
+                    "Last donation date cannot be in the future.");
+                return View(model);
+            }
 
+            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
                 await EnsureRoleExists("User");
                 await _userManager.AddToRoleAsync(user, "User");
+
+                // ✅ Calculate DonorStatus from the date entered at registration
+                string donorStatus;
+                if (model.LastDonationDate == null)
+                    donorStatus = "Available";
+                else
+                {
+                    int daysSince = (DateTime.Today - model.LastDonationDate.Value.Date).Days;
+                    donorStatus = daysSince >= 90 ? "Available" : "Not Available";
+                }
 
                 var profile = new UserProfile
                 {
@@ -60,7 +74,8 @@ namespace BBMS.Controllers
                     Phone = model.Phone,
                     Address = model.Address,
                     BloodGroup = model.BloodGroup,
-                    DonorStatus = "Available"
+                    LastDonationDate = model.LastDonationDate,  // ✅ saved
+                    DonorStatus = donorStatus               // ✅ calculated
                 };
 
                 _db.UserProfiles.Add(profile);

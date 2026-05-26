@@ -621,12 +621,37 @@ namespace BBMS.Controllers
 
         // ─── VIEW COLLECTION ──────────────────────────────────
         [Authorize(Roles = "Admin,Staff")]
-        public IActionResult ViewCollection()
+        public IActionResult ViewCollection(string search, string bloodGroup, string gender, string eligibility, int page = 1)
         {
-            var donors = _db.DonateBloods
-                .OrderByDescending(d => d.CreatedAt)
-                .ToList();
-            return View(donors);
+            var donors = _db.DonateBloods.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim().ToLower();
+                donors = donors.Where(d =>
+                    d.FullName.ToLower().Contains(search) ||
+                    d.Email.ToLower().Contains(search) ||
+                    d.Location.ToLower().Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(bloodGroup))
+                donors = donors.Where(d => d.BloodGroup == bloodGroup);
+
+            if (!string.IsNullOrWhiteSpace(gender))
+                donors = donors.Where(d => d.Gender == gender);
+
+            if (!string.IsNullOrWhiteSpace(eligibility))
+                donors = donors.Where(d => d.Eligibility == eligibility);
+
+            // Pass filter values back to the view for dropdowns + pagination links
+            ViewBag.Search = search;
+            ViewBag.BloodGroup = bloodGroup;
+            ViewBag.Gender = gender;
+            ViewBag.Eligibility = eligibility;
+            ViewBag.PageNumber = page;
+
+            var result = donors.OrderByDescending(d => d.CreatedAt).ToList();
+            return View(result);
         }
 
         // ─── STAFF DASHBOARD ──────────────────────────────────
@@ -707,6 +732,36 @@ namespace BBMS.Controllers
             ViewBag.AutoExpired = expiredBags.Count;
 
             return View(list);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DiscardBloodBag(int id)
+        {
+            var bag = _db.BloodBags.Find(id);
+            if (bag != null)
+            {
+                string bloodGroup = bag.BloodGroup;
+                bag.Status = "Discarded";
+                _db.SaveChanges();
+
+                // ── Recount and update BloodStock ──
+                var stock = _db.BloodStocks.FirstOrDefault(s => s.BloodGroup == bloodGroup);
+                if (stock != null)
+                {
+                    stock.Units = _db.BloodBags
+                        .Count(b => b.BloodGroup == bloodGroup && b.Status == "Available");
+
+                    stock.Status = stock.Units >= 30 ? "sufficient"
+                                 : stock.Units >= 15 ? "low"
+                                 : "critical";
+
+                    stock.LastUpdated = DateTime.Now;
+                    _db.SaveChanges();
+                }
+
+                TempData["SuccessMessage"] = $"Bag {bag.BagCode} has been discarded and removed from stock.";
+            }
+            return RedirectToAction("ManageBloodBags");
         }
 
         // ═══════════════════════════════════════════════════════
@@ -1050,29 +1105,46 @@ namespace BBMS.Controllers
             if (profile == null)
                 return RedirectToAction("LogIn", "Auth");
 
+            // ✅ Recalculate DonorStatus live from profile.LastDonationDate
+            string donorStatus;
+            if (profile.LastDonationDate == null)
+                donorStatus = "Available";
+            else
+            {
+                int daysSince = (DateTime.Today - profile.LastDonationDate.Value.Date).Days;
+                donorStatus = daysSince >= 90 ? "Available" : "Not Available";
+            }
+
+            // ✅ Sync back to DB if status changed (e.g. 90 days passed)
+            if (profile.DonorStatus != donorStatus)
+            {
+                profile.DonorStatus = donorStatus;
+                await _db.SaveChangesAsync();
+            }
+
             var myRequests = _db.BloodRequests
                 .Where(r => r.IdentityUserId == identityUser.Id)
                 .OrderByDescending(r => r.RequestDate)
                 .Take(5)
                 .ToList();
 
+            // ✅ Filter by this user's email (since DonateBlood has no IdentityUserId)
             var myDonations = _db.DonateBloods
+                .Where(d => d.Email == identityUser.Email)
                 .OrderByDescending(d => d.CreatedAt)
                 .Take(5)
                 .ToList();
-
-            var lastDonation = myDonations.FirstOrDefault();
 
             var viewModel = new UserDashboardViewModel
             {
                 Name = profile.Name,
                 BloodGroup = profile.BloodGroup,
-                DonorStatus = profile.DonorStatus,
+                DonorStatus = donorStatus,                                        // ✅ calculated
                 Email = identityUser.Email ?? string.Empty,
                 Phone = profile.Phone,
                 Address = profile.Address,
                 TotalDonations = myDonations.Count,
-                LastDonationDate = lastDonation?.CreatedAt.ToString("dd-MM-yyyy") ?? "N/A",
+                LastDonationDate = profile.LastDonationDate?.ToString("dd-MM-yyyy") ?? "N/A", // ✅ from profile
                 MyRequests = myRequests,
                 MyDonations = myDonations
             };

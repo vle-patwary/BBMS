@@ -10,6 +10,103 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BBMS.styles.css" asp-append-version="true" />
     <style>
+        /* ── Blood Bank Navbar ── */
+        .navbar {
+            background: #fff !important;
+            border-bottom: 2px solid #c0152a !important;
+            box-shadow: 0 2px 12px rgba(192, 21, 42, 0.08);
+            padding-top: 0;
+            padding-bottom: 0;
+            min-height: 60px;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 0.06em;
+            color: #c0152a !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .navbar-brand svg {
+                width: 22px;
+                height: 22px;
+                flex-shrink: 0;
+            }
+
+            .navbar-brand:hover {
+                color: #8b0000 !important;
+            }
+
+        .nav-link.text-dark {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #2d2d2d !important;
+            padding: 6px 12px !important;
+            border-radius: 5px;
+            transition: color 0.18s, background 0.18s;
+        }
+
+            .nav-link.text-dark:hover {
+                color: #c0152a !important;
+                background: rgba(192, 21, 42, 0.06);
+            }
+
+        /* Active page highlight */
+        .nav-link.active {
+            color: #c0152a !important;
+            background: rgba(192, 21, 42, 0.07);
+        }
+
+        /* Login / Register buttons */
+        .nav-item .nav-link.btn-nav-login {
+            border: 1.5px solid #c0152a;
+            color: #c0152a !important;
+            border-radius: 5px;
+            padding: 5px 16px !important;
+            margin-left: 4px;
+        }
+
+            .nav-item .nav-link.btn-nav-login:hover {
+                background: #c0152a;
+                color: #fff !important;
+            }
+
+        .nav-item .nav-link.btn-nav-register {
+            background: #c0152a;
+            color: #fff !important;
+            border-radius: 5px;
+            padding: 5px 16px !important;
+            margin-left: 4px;
+        }
+
+            .nav-item .nav-link.btn-nav-register:hover {
+                background: #8b0000;
+                color: #fff !important;
+            }
+
+        /* Logout link */
+        .nav-link.text-danger-muted {
+            color: #888 !important;
+            font-size: 0.85rem;
+        }
+
+            .nav-link.text-danger-muted:hover {
+                color: #c0152a !important;
+                background: rgba(192, 21, 42, 0.06);
+            }
+
+        /* Mobile toggler */
+        .navbar-toggler {
+            border-color: rgba(192, 21, 42, 0.4) !important;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23c0152a' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        }
+
         /* Force blood stock modals above everything */
         #editModal, #deleteModal {
             position: fixed !important;
@@ -32,13 +129,23 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BBMS</a>
+
+                <!-- Brand with blood drop icon -->
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <svg viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1C12 1 2 12 2 18.5C2 24 6.5 28 12 28C17.5 28 22 24 22 18.5C22 12 12 1 12 1Z" fill="#c0152a" />
+                        <path d="M12 7C12 7 6 14.5 6 18.5C6 21.5 8.5 24 12 24" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round" fill="none" />
+                    </svg>
+                    BBMS
+                </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
@@ -53,7 +160,6 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="Admin">Admin</a>
                             </li>
-                           
                         }
 
                         @if (User.IsInRole("Staff"))
@@ -69,25 +175,27 @@
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="UserDashboard">Dashboard</a>
                             </li>
                         }
+                    </ul>
 
+                    <ul class="navbar-nav ms-auto align-items-sm-center">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item ms-auto">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
+                                <a class="nav-link text-danger-muted" asp-controller="Auth" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="LogIn">Login</a>
+                                <a class="nav-link btn-nav-login" asp-controller="Auth" asp-action="LogIn">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
+                                <a class="nav-link btn-nav-register" asp-controller="Auth" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>
-                        
                 </div>
+
             </div>
         </nav>
     </header>

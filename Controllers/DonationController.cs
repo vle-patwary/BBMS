@@ -51,7 +51,7 @@ namespace BBMS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Staff")]
-        public IActionResult CreateRecord(RecordDonation model)
+        public async Task<IActionResult> CreateRecord(RecordDonation model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -94,7 +94,30 @@ namespace BBMS.Controllers
 
             // ── 5. Save donation ──
             _db.RecordDonations.Add(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
+
+            // ── 5b. Update UserProfile LastDonationDate ──
+            var donorRecord = _db.DonateBloods
+                .FirstOrDefault(d => d.DonorId == model.DonorId);
+
+            if (donorRecord != null)
+            {
+                var identityUser = _db.Users
+                    .FirstOrDefault(u => u.Email.ToLower() == donorRecord.Email.ToLower());
+
+                if (identityUser != null)
+                {
+                    var userProfile = _db.UserProfiles
+                        .FirstOrDefault(p => p.IdentityUserId == identityUser.Id);
+
+                    if (userProfile != null)
+                    {
+                        userProfile.LastDonationDate = model.DonationDate;
+                        userProfile.DonorStatus = "Not Available";
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
 
             // ── 6. Update BloodStock ──
             var stock = _db.BloodStocks
@@ -122,11 +145,12 @@ namespace BBMS.Controllers
                 });
             }
 
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Donation recorded! Bag ID: {bagCode}";
             return RedirectToAction("Staff", "Home");
         }
+        
         // ─── DONATION HISTORY ─────────────────────────────────
         public IActionResult DonationHistory(
             string search, string bloodGroup,
