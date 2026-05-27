@@ -71,8 +71,19 @@ namespace BBMS.Controllers
             };
 
             // ── 3. Generate BagCode ──
-            int bagCount = _db.BloodBags.Count();
-            string bagCode = "BAG-" + (bagCount + 1).ToString("D4");
+            var lastBag = _db.BloodBags
+     .OrderByDescending(b => b.BagCode)
+     .FirstOrDefault();
+
+            int nextBagNum = 1;
+            if (lastBag != null &&
+                lastBag.BagCode.StartsWith("BAG-") &&
+                int.TryParse(lastBag.BagCode.Substring(4), out int lastBagNum))
+            {
+                nextBagNum = lastBagNum + 1;
+            }
+
+            string bagCode = "BAG-" + nextBagNum.ToString("D4");
 
             // ── 4. Create BloodBag ──
             var bag = new BloodBag
@@ -96,14 +107,19 @@ namespace BBMS.Controllers
             _db.RecordDonations.Add(model);
             await _db.SaveChangesAsync();
 
-            // ── 5b. Update UserProfile LastDonationDate ──
-            var donorRecord = _db.DonateBloods
+            // ── 5b & 5c. Update DonateBlood + UserProfile ──
+            var donateBloodRecord = _db.DonateBloods
                 .FirstOrDefault(d => d.DonorId == model.DonorId);
 
-            if (donorRecord != null)
+            if (donateBloodRecord != null)
             {
+                // Update DonateBlood
+                donateBloodRecord.TotalDonations += 1;
+                donateBloodRecord.LastDonationDate = model.DonationDate;
+
+                // Update linked UserProfile
                 var identityUser = _db.Users
-                    .FirstOrDefault(u => u.Email.ToLower() == donorRecord.Email.ToLower());
+                    .FirstOrDefault(u => u.Email.ToLower() == donateBloodRecord.Email.ToLower());
 
                 if (identityUser != null)
                 {
@@ -114,9 +130,10 @@ namespace BBMS.Controllers
                     {
                         userProfile.LastDonationDate = model.DonationDate;
                         userProfile.DonorStatus = "Not Available";
-                        await _db.SaveChangesAsync();
                     }
                 }
+
+                await _db.SaveChangesAsync();
             }
 
             // ── 6. Update BloodStock ──
@@ -148,7 +165,9 @@ namespace BBMS.Controllers
             await _db.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Donation recorded! Bag ID: {bagCode}";
-            return RedirectToAction("Staff", "Home");
+            TempData["DonationType"] = model.DonationType;
+            TempData["Quantity"] = model.Quantity;
+            return RedirectToAction("CreateRecord", new { donorId = model.DonorId });
         }
         
         // ─── DONATION HISTORY ─────────────────────────────────

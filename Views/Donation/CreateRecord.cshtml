@@ -2,282 +2,1060 @@
 
 @{
     ViewData["Title"] = "Record Donation";
+    var successMessage = TempData["SuccessMessage"] as string;
+    bool isLocked = !string.IsNullOrEmpty(successMessage);
+
+    string bagCode = "";
+    string donationType = TempData["DonationType"] as string ?? Model.DonationType;
+    int quantity = TempData["Quantity"] is int q ? q : Model.Quantity;
+
+    if (isLocked && successMessage!.Contains("Bag ID:"))
+        bagCode = successMessage.Split("Bag ID:").Last().Trim();
 }
 
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
-        background: #f4f6f9;
-    }
-
-    .form-container {
-        width: 650px;
-        margin: 50px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-
-    .form-header {
-        background: linear-gradient(135deg, #b30000, #ff4d4d);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 24px;
-        text-align: center;
-    }
-
-        .form-header h2 {
-            margin: 0 0 5px 0;
-            font-size: 22px;
-        }
-
-        .form-header p {
+@if (isLocked)
+{
+    <style>
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+        }
+
+        .dashboard {
+            width: 92%;
+            max-width: 720px;
+            margin: 32px auto 50px;
+        }
+
+        .header {
+            background: #7a0000;
+            color: white;
+            padding: 28px 32px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 26px;
+        }
+
+        .header-blob1 {
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            pointer-events: none;
+        }
+
+        .header-blob2 {
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            pointer-events: none;
+        }
+
+        .header-left h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-left p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            position: relative;
+            z-index: 1;
+            padding-left: 30px;
+        }
+
+        .header-right {
+            z-index: 1;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 0.5px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+            .btn-ghost:hover {
+                background: rgba(255,255,255,0.16);
+                color: #fff;
+            }
+
+        .success-card {
+            background: white;
+            border: 0.5px solid #a8dfc0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .success-card-top {
+            background: #1e8449;
+            padding: 36px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .check-circle {
+            width: 64px;
+            height: 64px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+            .check-circle i {
+                color: white;
+                font-size: 26px;
+            }
+
+        .success-card-top h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .success-card-top p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            margin: 0;
+        }
+
+        .success-card-body {
+            padding: 28px 32px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 0.5px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+
+            .detail-row .lbl {
+                color: #888;
+                font-weight: 500;
+            }
+
+            .detail-row .val {
+                color: #1a1a1a;
+                font-weight: 600;
+            }
+
+        .bag-code-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #eaf7f0;
+            border: 0.5px solid #a8dfc0;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #145a32;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+            .bag-code-chip i {
+                color: #1e8449;
+            }
+
+        .action-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 20px 32px;
+            border-top: 0.5px solid #f0f0f0;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #555;
+            padding: 11px 22px;
+            border: 0.5px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
             font-size: 14px;
-            opacity: 0.9;
+            font-weight: 500;
+            transition: border-color 0.15s, color 0.15s;
         }
 
-    .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
+            .btn-back:hover {
+                border-color: #1e8449;
+                color: #1e8449;
+            }
 
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
+        .btn-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e8449;
+            color: white;
+            padding: 11px 22px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.15s;
         }
 
-    label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #444;
-        margin-bottom: 5px;
-    }
+            .btn-new:hover {
+                background: #145a32;
+                color: white;
+            }
 
-    input, select, textarea {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
-        font-family: inherit;
-    }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: #b30000;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(179,0,0,0.1);
+        @@media (max-width: 580px) {
+            .header-right {
+                display: none;
+            }
         }
+    </style>
 
-        input[readonly] {
-            background: #f9f9f9;
-            color: #666;
-        }
+    <div class="dashboard">
+        <div class="header">
+            <div class="header-blob1"></div>
+            <div class="header-blob2"></div>
+            <div class="header-left">
+                <h2><i class="fa-solid fa-droplet"></i> Record Donation</h2>
+                <p>Donation recorded for <strong>@Model.DonorName</strong></p>
+            </div>
+            <div class="header-right">
+                <a asp-controller="Donation" asp-action="RecordDonation" class="btn-ghost">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
 
-    textarea {
-        resize: vertical;
-        min-height: 80px;
-    }
-
-    .section-title {
-        grid-column: 1 / -1;
-        font-size: 13px;
-        font-weight: 700;
-        color: #b30000;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid #f0d0d0;
-        padding-bottom: 6px;
-        margin-top: 8px;
-    }
-
-    .text-danger {
-        color: red;
-        font-size: 12px;
-    }
-
-    .btn-submit {
-        background: #b30000;
-        color: white;
-        padding: 10px 22px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-        font-family: inherit;
-    }
-
-        .btn-submit:hover {
-            background: #ff3333;
-        }
-
-    .btn-back {
-        background: #ccc;
-        color: #333;
-        padding: 10px 22px;
-        border-radius: 6px;
-        text-decoration: none;
-        display: inline-block;
-        margin-left: 10px;
-        font-size: 15px;
-    }
-
-        .btn-back:hover {
-            background: #bbb;
-        }
-
-    .btn-group {
-        margin-top: 24px;
-        text-align: center;
-    }
-</style>
-
-<div class="form-container">
-    <div class="form-header">
-        <h2>Record Donation</h2>
-        <p>Log blood donation for donor @Model.DonorId</p>
+        <div class="success-card">
+            <div class="success-card-top">
+                <div class="check-circle">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2>Donation Recorded Successfully</h2>
+                <p>The donation has been saved and a blood bag has been added to inventory.</p>
+            </div>
+            <div class="success-card-body">
+                <div class="detail-row">
+                    <span class="lbl">Donor Name</span>
+                    <span class="val">@Model.DonorName</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Donor ID</span>
+                    <span class="val" style="font-family:monospace;">@Model.DonorId</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Blood Group</span>
+                    <span class="val">@Model.BloodGroup</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Donation Type</span>
+                    <span class="val">@donationType</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Quantity</span>
+                    <span class="val">@quantity mL</span>
+                </div>
+                <div class="detail-row">
+                    <span class="lbl">Donation Date</span>
+                    <span class="val">@Model.DonationDate.ToString("dd MMM yyyy, hh:mm tt")</span>
+                </div>
+                @if (!string.IsNullOrEmpty(bagCode))
+                {
+                    <div class="detail-row">
+                        <span class="lbl">Blood Bag Created</span>
+                        <span class="val">
+                            <span class="bag-code-chip">
+                                <i class="fa-solid fa-tag"></i> @bagCode
+                            </span>
+                        </span>
+                    </div>
+                }
+            </div>
+            <div class="action-row">
+                <a asp-controller="Donation" asp-action="RecordDonation" class="btn-back">
+                    <i class="fa-solid fa-list"></i> Back to Donor List
+                </a>
+                <a asp-controller="Donation"
+                   asp-action="CreateRecord"
+                   asp-route-donorId="@Model.DonorId"
+                   class="btn-new">
+                    <i class="fa-solid fa-plus"></i> Record Another
+                </a>
+            </div>
+        </div>
     </div>
 
-    <form asp-controller="Donation" asp-action="CreateRecord" method="post">
-        @Html.AntiForgeryToken()
+    @* Stop rendering — no form below *@
+}
+else
+{
 
-        <div class="form-grid">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-            <!-- DONOR INFORMATION -->
-            <div class="section-title">Donor Information (Pre-filled)</div>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+        }
 
-            <div class="form-group">
-                <label>Donor ID</label>
-                <input asp-for="DonorId" readonly />
+        .dashboard {
+            width: 92%;
+            max-width: 720px;
+            margin: 32px auto 50px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: #7a0000;
+            color: white;
+            padding: 28px 32px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 26px;
+        }
+
+        .header-blob1 {
+            position: absolute;
+            right: -40px;
+            top: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            pointer-events: none;
+        }
+
+        .header-blob2 {
+            position: absolute;
+            right: 120px;
+            bottom: -60px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            pointer-events: none;
+        }
+
+        .header-left h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-left p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            position: relative;
+            z-index: 1;
+            padding-left: 30px;
+        }
+
+        .header-right {
+            z-index: 1;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 0.5px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+            .btn-ghost:hover {
+                background: rgba(255,255,255,0.16);
+                color: #fff;
+            }
+
+        /* ── FORM CARD ── */
+        .form-card {
+            background: white;
+            border: 0.5px solid #e8d8d8;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            padding: 14px 22px;
+            border-bottom: 0.5px solid #f5eded;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .form-card-header i {
+                font-size: 15px;
+                color: #8b0000;
+            }
+
+            .form-card-header span {
+                font-size: 13px;
+                font-weight: 600;
+                color: #1a1a1a;
+            }
+
+        .form-card-body {
+            padding: 22px;
+        }
+
+        /* ── FORM GRID ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+            .form-group.full {
+                grid-column: 1 / -1;
+            }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            letter-spacing: 0.2px;
+        }
+
+            label .req {
+                color: #8b0000;
+            }
+
+        input, select, textarea {
+            padding: 9px 12px;
+            border: 0.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            background: #fafafa;
+            transition: border-color 0.15s;
+            outline: none;
+            width: 100%;
+        }
+
+            input:focus, select:focus, textarea:focus {
+                border-color: #8b0000;
+                background: #fff;
+            }
+
+            input[readonly], input:disabled, select:disabled, textarea:disabled {
+                background: #f5f5f5;
+                color: #888;
+                cursor: not-allowed;
+            }
+
+        textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        .text-danger {
+            font-size: 11px;
+            color: #c0152a;
+            margin-top: 2px;
+        }
+
+        /* ── INFO BANNER ── */
+        .info-banner {
+            background: #fff8f8;
+            border: 0.5px solid #f7c1c1;
+            border-radius: 10px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #7a0000;
+        }
+
+            .info-banner i {
+                color: #8b0000;
+                font-size: 16px;
+                flex-shrink: 0;
+            }
+
+        /* ── SUCCESS BANNER ── */
+        .success-banner {
+            background: #f0faf4;
+            border: 0.5px solid #a8dfc0;
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .success-banner-icon {
+            width: 42px;
+            height: 42px;
+            background: #1e8449;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+            .success-banner-icon i {
+                color: white;
+                font-size: 18px;
+            }
+
+        .success-banner-body h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #145a32;
+            margin-bottom: 4px;
+        }
+
+        .success-banner-body p {
+            font-size: 13px;
+            color: #2e7d52;
+            margin-bottom: 10px;
+        }
+
+        .bag-code-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: white;
+            border: 0.5px solid #a8dfc0;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #145a32;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+            .bag-code-chip i {
+                color: #1e8449;
+                font-size: 13px;
+            }
+
+        /* ── READONLY CHIP ── */
+        .readonly-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff0f0;
+            border: 0.5px solid #f7c1c1;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8b0000;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        /* ── FOOTER BUTTONS ── */
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 0 4px;
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #8b0000;
+            color: white;
+            padding: 11px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: background 0.15s;
+        }
+
+            .btn-submit:hover {
+                background: #6e0000;
+            }
+
+            .btn-submit:disabled {
+                background: #c8a0a0;
+                cursor: not-allowed;
+            }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #555;
+            padding: 11px 22px;
+            border: 0.5px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: border-color 0.15s, color 0.15s;
+        }
+
+            .btn-cancel:hover {
+                border-color: #8b0000;
+                color: #8b0000;
+            }
+
+        .btn-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #8b0000;
+            color: white;
+            padding: 11px 22px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+
+            .btn-new:hover {
+                background: #6e0000;
+                color: white;
+            }
+
+        @@media (max-width: 580px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-right {
+                display: none;
+            }
+        }
+    </style>
+
+    <div class="dashboard">
+
+        @* ── HEADER ── *@
+        <div class="header">
+            <div class="header-blob1"></div>
+            <div class="header-blob2"></div>
+            <div class="header-left">
+                <h2><i class="fa-solid fa-droplet"></i> Record Donation</h2>
+                <p>Recording donation for <strong>@Model.DonorName</strong></p>
             </div>
-
-            <div class="form-group">
-                <label>Donor Name</label>
-                <input asp-for="DonorName" readonly />
+            <div class="header-right">
+                <a asp-controller="Donation" asp-action="RecordDonation" class="btn-ghost">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
             </div>
-
-            <div class="form-group">
-                <label>Gender</label>
-                <input asp-for="Gender" readonly />
-            </div>
-
-            <div class="form-group">
-                <label>Contact Number</label>
-                <input asp-for="ContactNumber" readonly />
-            </div>
-
-            <div class="form-group">
-                <label>Email</label>
-                <input asp-for="Email" readonly />
-            </div>
-
-            <div class="form-group">
-                <label>Blood Group</label>
-                <input asp-for="BloodGroup" readonly />
-            </div>
-
-            <!-- DONATION DETAILS -->
-            <div class="section-title">Donation Details</div>
-
-            <div class="form-group">
-                <label>Donation Type *</label>
-                <select asp-for="DonationType">
-                    <option value="">-- Select Type --</option>
-                    <option>Whole Blood</option>
-                    <option>Platelets</option>
-                    <option>Fresh Frozen Plasma</option>
-                    <option>Red Blood Cells</option>
-                    <option>Granulocytes</option>
-                </select>
-                <span asp-validation-for="DonationType" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>Quantity (ml) *</label>
-                <input asp-for="Quantity" type="number" placeholder="e.g. 450" min="100" max="600" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>Donation Date *</label>
-                <input asp-for="DonationDate" type="date" />
-                <span asp-validation-for="DonationDate" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>Location *</label>
-                <input asp-for="Location" placeholder="Hospital / Camp" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>Donation Number (This Visit)</label>
-                <input asp-for="DonationNumber" type="number" placeholder="e.g. 3" min="1" />
-            </div>
-
-            <!-- HEALTH SCREENING -->
-            <div class="section-title">Health Screening</div>
-
-            <div class="form-group">
-                <label>Hemoglobin Level (g/dL)</label>
-                <input asp-for="HemoglobinLevel" type="number" placeholder="e.g. 13.5" step="0.1" />
-            </div>
-
-            <div class="form-group">
-                <label>Blood Pressure</label>
-                <input asp-for="BloodPressure" placeholder="e.g. 120/80" />
-            </div>
-
-            <div class="form-group">
-                <label>Weight (kg)</label>
-                <input asp-for="Weight" type="number" placeholder="e.g. 65" min="45" />
-            </div>
-
-            <div class="form-group">
-                <label>Screening Result</label>
-                <select asp-for="ScreeningResult">
-                    <option value="">-- Select --</option>
-                    <option>Passed</option>
-                    <option>Deferred - Temporary</option>
-                    <option>Deferred - Permanent</option>
-                </select>
-            </div>
-
-            <!-- PROCESSING -->
-            <div class="section-title">Processing</div>
-
-            <div class="form-group">
-                <label>Staff / Phlebotomist ID</label>
-                <input asp-for="StaffId" placeholder="e.g. ST-045" />
-            </div>
-
-            <div class="form-group">
-                <label>Status</label>
-                <select asp-for="Status">
-                    <option>Collected</option>
-                    <option>Processing</option>
-                    <option>Tested</option>
-                    <option>Available</option>
-                    <option>Discarded</option>
-                </select>
-            </div>
-
-            <div class="form-group full-width">
-                <label>Remarks / Notes</label>
-                <textarea asp-for="Remarks" placeholder="Any observations..."></textarea>
-            </div>
-
         </div>
 
-        <div class="btn-group">
-            <button type="submit" class="btn-submit">Save Donation Record</button>
-            <a asp-controller="Donation" asp-action="RecordDonation" class="btn-back">Back</a>
-        </div>
-    </form>
-</div>
+        @* ── SUCCESS BANNER ── *@
+        @if (isLocked)
+        {
+            <div class="success-banner">
+                <div class="success-banner-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="success-banner-body">
+                    <h3>Donation Recorded Successfully</h3>
+                    <p>The donation has been saved and a blood bag has been created in inventory.</p>
+                    @if (!string.IsNullOrEmpty(bagCode))
+                    {
+                        <div class="bag-code-chip">
+                            <i class="fa-solid fa-tag"></i> @bagCode
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="info-banner">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Donor details are pre-filled from the registry. Fill in donation and health screening details to complete the record.</span>
+            </div>
+        }
+
+        <form asp-controller="Donation" asp-action="CreateRecord" method="post" id="donationForm">
+            @Html.AntiForgeryToken()
+
+            @* Hidden pre-filled values — always submitted *@
+            <input type="hidden" asp-for="DonorId" />
+            <input type="hidden" asp-for="DonorName" />
+            <input type="hidden" asp-for="Gender" />
+            <input type="hidden" asp-for="ContactNumber" />
+            <input type="hidden" asp-for="Email" />
+            <input type="hidden" asp-for="BloodGroup" />
+
+            @* ── DONOR INFO ── *@
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Donor Information <span class="readonly-chip"><i class="fa-solid fa-lock"></i> Pre-filled</span></span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Full Name</label>
+                            <input type="text" value="@Model.DonorName" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Donor ID</label>
+                            <input type="text" value="@Model.DonorId" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <input type="text" value="@Model.Gender" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="text" value="@Model.ContactNumber" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="text" value="@Model.Email" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Blood Group</label>
+                            <input type="text" value="@Model.BloodGroup" readonly />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* ── DONATION DETAILS ── *@
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class="fa-solid fa-droplet"></i>
+                    <span>Donation Details</span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Donation Type <span class="req">*</span></label>
+                            @if (isLocked)
+                            {
+                                <select asp-for="DonationType" disabled>
+                                    <option>Whole Blood</option>
+                                    <option>Red Blood Cells</option>
+                                    <option>Platelets</option>
+                                    <option>Fresh Frozen Plasma</option>
+                                    <option>Granulocytes</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="DonationType">
+                                    <option value="">Select type</option>
+                                    <option>Whole Blood</option>
+                                    <option>Red Blood Cells</option>
+                                    <option>Platelets</option>
+                                    <option>Fresh Frozen Plasma</option>
+                                    <option>Granulocytes</option>
+                                </select>
+                            }
+                            <span asp-validation-for="DonationType" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quantity (mL) <span class="req">*</span></label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="Quantity" type="number" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="Quantity" type="number" placeholder="e.g. 450" min="1" />
+                            }
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Donation Date <span class="req">*</span></label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="DonationDate" type="datetime-local" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="DonationDate" type="datetime-local" />
+                            }
+                            <span asp-validation-for="DonationDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Donation Number</label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="DonationNumber" type="number" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="DonationNumber" type="number" placeholder="e.g. 1" />
+                            }
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Location <span class="req">*</span></label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="Location" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="Location" placeholder="Collection site or branch" />
+                            }
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            @* ── HEALTH SCREENING ── *@
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <span>Health Screening</span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Hemoglobin Level (g/dL)</label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="HemoglobinLevel" type="number" step="0.1" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="HemoglobinLevel" type="number" step="0.1" placeholder="e.g. 13.5" />
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label>Blood Pressure</label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="BloodPressure" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="BloodPressure" placeholder="e.g. 120/80" />
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="Weight" type="number" step="0.1" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="Weight" type="number" step="0.1" placeholder="e.g. 65" />
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label>Screening Result</label>
+                            @if (isLocked)
+                            {
+                                <select asp-for="ScreeningResult" disabled>
+                                    <option>Passed</option>
+                                    <option>Failed</option>
+                                    <option>Deferred</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="ScreeningResult">
+                                    <option value="">Select result</option>
+                                    <option>Passed</option>
+                                    <option>Failed</option>
+                                    <option>Deferred</option>
+                                </select>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            @* ── PROCESSING ── *@
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class="fa-solid fa-flask"></i>
+                    <span>Processing</span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Staff ID</label>
+                            @if (isLocked)
+                            {
+                                <input asp-for="StaffId" readonly />
+                            }
+                            else
+                            {
+                                <input asp-for="StaffId" placeholder="Enter staff ID" />
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            @if (isLocked)
+                            {
+                                <select asp-for="Status" disabled>
+                                    <option>Collected</option>
+                                    <option>Processing</option>
+                                    <option>Available</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="Status">
+                                    <option>Collected</option>
+                                    <option>Processing</option>
+                                    <option>Available</option>
+                                </select>
+                            }
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Remarks</label>
+                            @if (isLocked)
+                            {
+                                <textarea asp-for="Remarks" disabled></textarea>
+                            }
+                            else
+                            {
+                                <textarea asp-for="Remarks" placeholder="Any additional notes..."></textarea>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            @* ── FOOTER BUTTONS ── *@
+            <div class="form-footer">
+                @if (isLocked)
+                {
+                    <a asp-controller="Donation" asp-action="RecordDonation" class="btn-cancel">
+                        <i class="fa-solid fa-list"></i> Back to Donor List
+                    </a>
+                    <a asp-controller="Donation"
+                       asp-action="CreateRecord"
+                       asp-route-donorId="@Model.DonorId"
+                       class="btn-new">
+                        <i class="fa-solid fa-plus"></i> Record Another Donation
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Donation" asp-action="RecordDonation" class="btn-cancel">
+                        <i class="fa-solid fa-xmark"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Donation Record
+                    </button>
+                }
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('donationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        if (form && submitBtn) {
+            form.addEventListener('submit', function () {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            });
+        }
+    </script>
+}

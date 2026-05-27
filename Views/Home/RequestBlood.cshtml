@@ -1,113 +1,247 @@
 ﻿@{
     ViewData["Title"] = "Request Blood";
 }
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
     body {
         font-family: 'Segoe UI', sans-serif;
         background: #f4f6f9;
     }
 
-    .form-container {
-        width: 460px;
-        margin: 50px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    .dashboard {
+        width: 92%;
+        max-width: 720px;
+        margin: 32px auto 50px;
     }
 
-        .form-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #27ae60;
+    /* ── HEADER ── */
+    .header {
+        background: #145a32;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 26px;
+    }
+
+    .header-blob1 {
+        position: absolute;
+        right: -40px;
+        top: -50px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        pointer-events: none;
+    }
+
+    .header-blob2 {
+        position: absolute;
+        right: 120px;
+        bottom: -60px;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        pointer-events: none;
+    }
+
+    .header-left h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-left p {
+        font-size: 13px;
+        color: rgba(255,255,255,0.6);
+        position: relative;
+        z-index: 1;
+        padding-left: 30px;
+    }
+
+    .header-right {
+        z-index: 1;
+    }
+
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 0.5px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.8);
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.16);
+            color: #fff;
         }
 
-    .form-group {
-        margin-bottom: 15px;
+    /* ── FORM CARD ── */
+    .form-card {
+        background: white;
+        border: 0.5px solid #d0e8d8;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
     }
+
+    .form-card-header {
+        padding: 14px 22px;
+        border-bottom: 0.5px solid #edf7f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .form-card-header i {
+            font-size: 15px;
+            color: #1e8449;
+        }
+
+        .form-card-header span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+    .form-card-body {
+        padding: 22px;
+    }
+
+    /* ── FORM GRID ── */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
 
     label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        letter-spacing: 0.2px;
     }
 
+        label .req {
+            color: #1e8449;
+        }
+
     input, select, textarea {
+        padding: 9px 12px;
+        border: 0.5px solid #ddd;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: inherit;
+        color: #333;
+        background: #fafafa;
+        transition: border-color 0.15s;
+        outline: none;
         width: 100%;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        font-size: 14px;
     }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #1e8449;
+            background: #fff;
+        }
+
+        input:read-only, input[disabled], select[disabled] {
+            background: #f0f0f0;
+            color: #888;
+            cursor: not-allowed;
+        }
 
     textarea {
         resize: none;
         height: 80px;
     }
 
-    .btn {
-        width: 100%;
-        padding: 12px;
-        background: #27ae60;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-        display: block;
-        text-align: center;
-        text-decoration: none;
-        font-size: 14px;
+    .text-danger {
+        font-size: 11px;
+        color: #c0152a;
+        margin-top: 2px;
     }
 
-        .btn:hover {
-            background: #1e8449;
+    /* ── INFO BANNER ── */
+    .info-banner {
+        background: #f2fbf5;
+        border: 0.5px solid #a8dfc0;
+        border-radius: 10px;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #145a32;
+    }
+
+        .info-banner i {
+            color: #1e8449;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            color: #888;
-        }
-
-    .section-divider {
-        border: none;
-        border-top: 1px solid #e0e0e0;
-        margin: 20px 0;
-    }
-
-    .section-title {
-        font-size: 15px;
-        font-weight: bold;
-        color: #27ae60;
-        margin-bottom: 10px;
-    }
-
+    /* ── INVOICE TABLE ── */
     .expense-notice {
         font-size: 13px;
         color: #555;
-        background: #f9f9f9;
+        background: #f2fbf5;
         border-left: 3px solid #27ae60;
-        padding: 9px 12px;
-        margin-bottom: 14px;
+        border-radius: 0 6px 6px 0;
+        padding: 10px 14px;
+        margin-bottom: 16px;
     }
 
     .invoice-table {
         width: 100%;
         border-collapse: collapse;
-        border: 1px solid #e0e0e0;
+        border: 0.5px solid #d0e8d8;
         border-radius: 8px;
         overflow: hidden;
-        margin-bottom: 14px;
-        font-size: 14px;
+        font-size: 13px;
+        margin-bottom: 6px;
     }
 
         .invoice-table td {
             padding: 9px 14px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 0.5px solid #edf7f0;
+            color: #444;
         }
 
         .invoice-table tr:last-child td {
@@ -116,20 +250,21 @@
 
         .invoice-table td:last-child {
             text-align: right;
-            color: #555;
         }
 
         .invoice-table tfoot td {
-            font-weight: bold;
-            background: #f4f4f4;
-            border-top: 1px solid #ddd;
+            font-weight: 700;
+            background: #edf7f0;
+            border-top: 0.5px solid #c0ddc8;
+            font-size: 13px;
         }
 
             .invoice-table tfoot td:last-child {
-                color: #27ae60;
-                font-size: 15px;
+                color: #1e8449;
+                font-size: 14px;
             }
 
+    /* ── PAYMENT ── */
     #mobile-number-group {
         display: none;
     }
@@ -137,24 +272,105 @@
     .paid-badge {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         font-size: 13px;
-        font-weight: bold;
-        color: #27ae60;
+        font-weight: 600;
+        color: #1e8449;
         background: #eaf7f0;
-        border: 1px solid #a8dfc0;
-        border-radius: 6px;
-        padding: 8px 14px;
-        margin-top: 10px;
+        border: 0.5px solid #a8dfc0;
+        border-radius: 8px;
+        padding: 11px 16px;
         width: 100%;
         justify-content: center;
     }
 
+    /* ── FOOTER BUTTONS ── */
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 0 4px;
+    }
+
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #1e8449;
+        color: white;
+        padding: 11px 28px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: inherit;
+        transition: background 0.15s;
+    }
+
+        .btn-submit:hover {
+            background: #145a32;
+        }
+
+        .btn-submit:disabled {
+            background: #a8c8b0;
+            cursor: not-allowed;
+        }
+
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        color: #555;
+        padding: 11px 22px;
+        border: 0.5px solid #ddd;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: border-color 0.15s, color 0.15s;
+    }
+
+        .btn-cancel:hover {
+            border-color: #1e8449;
+            color: #1e8449;
+        }
+
+    .btn-pay {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        background: #1e8449;
+        color: white;
+        padding: 11px 28px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: inherit;
+        transition: background 0.15s;
+    }
+
+        .btn-pay:hover {
+            background: #145a32;
+        }
+
+        .btn-pay:disabled {
+            background: #a8c8b0;
+            cursor: not-allowed;
+        }
+
+    /* ── MODAL ── */
     .modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.45);
         z-index: 1000;
         align-items: center;
         justify-content: center;
@@ -167,36 +383,38 @@
     .modal-box {
         background: white;
         border-radius: 12px;
-        width: 320px;
+        width: 340px;
         padding: 28px 24px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        border: 0.5px solid #d0e8d8;
     }
 
     .modal-title {
-        font-size: 17px;
-        font-weight: bold;
-        color: #222;
-        margin-bottom: 4px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 3px;
     }
 
     .modal-sub {
-        font-size: 13px;
-        color: #777;
+        font-size: 12px;
+        color: #888;
         margin-bottom: 16px;
     }
 
     .modal-amount {
-        font-size: 26px;
-        font-weight: bold;
-        color: #27ae60;
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e8449;
         margin-bottom: 18px;
     }
 
     .modal-box label {
         font-size: 12px;
-        font-weight: bold;
+        font-weight: 600;
         color: #555;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
+        display: block;
     }
 
     .modal-box input {
@@ -212,52 +430,63 @@
     .modal-cancel {
         flex: 1;
         padding: 10px;
-        background: #f0f0f0;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
+        background: #f4f4f4;
+        border: 0.5px solid #ddd;
+        border-radius: 8px;
+        font-weight: 600;
         cursor: pointer;
-        font-size: 14px;
-        color: #444;
+        font-size: 13px;
+        color: #555;
+        font-family: inherit;
+        transition: background 0.15s;
     }
 
         .modal-cancel:hover {
-            background: #e0e0e0;
+            background: #e8e8e8;
         }
 
     .modal-confirm {
         flex: 1;
         padding: 10px;
-        background: #27ae60;
+        background: #1e8449;
         color: white;
         border: none;
-        border-radius: 6px;
-        font-weight: bold;
+        border-radius: 8px;
+        font-weight: 600;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
+        font-family: inherit;
+        transition: background 0.15s;
     }
 
         .modal-confirm:hover {
-            background: #1e8449;
+            background: #145a32;
         }
 
     .error-msg {
-        font-size: 12px;
-        color: #e74c3c;
-        margin-top: 6px;
+        font-size: 11px;
+        color: #c0152a;
+        margin-top: 4px;
         display: none;
+        gap: 4px;
+        align-items: center;
     }
 
+        .error-msg.show {
+            display: flex;
+        }
+
+    /* ── SPINNER / SUCCESS ── */
     .processing-box {
         text-align: center;
-        padding: 10px 0;
+        padding: 8px 0;
     }
 
     .spinner {
         width: 44px;
         height: 44px;
-        border: 4px solid #e0e0e0;
-        border-top-color: #27ae60;
+        border: 3px solid #d0e8d8;
+        border-top-color: #1e8449;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
         margin: 0 auto 16px;
@@ -281,148 +510,229 @@
     }
 
     .processing-box .big {
-        font-size: 16px;
-        font-weight: bold;
-        color: #222;
-        margin-bottom: 6px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 5px;
     }
 
     .processing-box p {
         font-size: 13px;
-        color: #777;
+        color: #888;
     }
 
     .done-btn {
         width: 100%;
         padding: 11px;
-        background: #27ae60;
+        background: #1e8449;
         color: white;
         border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: bold;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
         margin-top: 18px;
+        font-family: inherit;
+        transition: background 0.15s;
     }
 
         .done-btn:hover {
-            background: #1e8449;
+            background: #145a32;
         }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+        border: none;
+        border-top: 0.5px solid #edf7f0;
+    }
+
+    @@media (max-width: 580px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .header-right {
+            display: none;
+        }
+    }
 </style>
 
-<div class="form-container">
-    <h2><i class="fa-solid fa-hand-holding-heart"></i> Request Blood</h2>
+<div class="dashboard">
+
+    @* ── HEADER ── *@
+    <div class="header">
+        <div class="header-blob1"></div>
+        <div class="header-blob2"></div>
+        <div class="header-left">
+            <h2><i class="fa-solid fa-hand-holding-heart"></i> Request Blood</h2>
+            <p>Fill in the details to submit a blood request</p>
+        </div>
+        <div class="header-right">
+            <a href="javascript:history.back()" class="btn-ghost">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    @* ── INFO BANNER ── *@
+    <div class="info-banner">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>All fields marked <strong>*</strong> are required. Complete payment before submitting your request.</span>
+    </div>
 
     <form id="blood-request-form" asp-controller="Home" asp-action="RequestBlood" method="post">
         @Html.AntiForgeryToken()
 
-        <div class="form-group">
-            <label>Patient Name</label>
-            <input type="text" name="RequesterName" placeholder="Enter patient name" required>
-        </div>
-        <div class="form-group">
-            <label>Blood Group Needed</label>
-            <select name="BloodGroup" required>
-                <option value="">Select</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>O+</option>
-                <option>O-</option>
-                <option>AB+</option>
-                <option>AB-</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Quantity (Units)</label>
-            <input type="number" name="Quantity" id="quantity-input"
-                   min="1" max="20" value="1" placeholder="Enter units needed"
-                   required onchange="updateTotal()" oninput="updateTotal()">
-        </div>
-        <div class="form-group">
-            <label>Required Date</label>
-            <input type="date" name="RequiredDate" required>
-        </div>
+        @* ── PATIENT INFORMATION ── *@
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fa-solid fa-user-injured"></i>
+                <span>Patient Information</span>
+            </div>
+            <div class="form-card-body">
+                <div class="form-grid">
 
-        <div class="form-group">
-            <label>Hospital / Location</label>
-            <input type="text" name="Hospital" placeholder="Where needed">
-        </div>
-        <div class="form-group">
-            <label>Contact Number</label>
-            <input type="text" name="ContactNumber" placeholder="01XXXXXXXXX">
-        </div>
-        <div class="form-group">
-            <label>Additional Notes</label>
-            <textarea name="Notes" placeholder="Optional details..."></textarea>
-        </div>
+                    <div class="form-group full">
+                        <label>Patient Name <span class="req">*</span></label>
+                        <input type="text" name="RequesterName" placeholder="Enter patient name" required />
+                    </div>
 
-        <hr class="section-divider">
-        <div class="section-title"><i class="fa-solid fa-file-invoice-dollar"></i> Expense Breakdown</div>
-        <div class="expense-notice">
-            The following charges are fixed and managed by our staff. These expenses cover the materials required for the blood collection process.
-        </div>
-        <table class="invoice-table">
-            <tbody>
-                <tr><td>Needle</td><td id="cost-needle">Tk 10</td></tr>
-                <tr><td>Blood collection bag</td><td id="cost-bag">Tk 100</td></tr>
-                <tr><td>Gloves (pair)</td><td id="cost-gloves">Tk 30</td></tr>
-                <tr><td>Antiseptic wipe</td><td id="cost-wipe">Tk 10</td></tr>
-                <tr><td>Bandage</td><td id="cost-bandage">Tk 15</td></tr>
-                <tr>
-                    <td style="color:#555">Quantity (Units)</td>
-                    <td id="cost-qty" style="color:#555">× 1</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>Total</td>
-                    <td id="cost-total">Tk 165</td>
-                </tr>
-            </tfoot>
-        </table>
+                    <div class="form-group">
+                        <label>Blood Group Needed <span class="req">*</span></label>
+                        <select name="BloodGroup" required>
+                            <option value="">Select blood group</option>
+                            <option>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>B-</option>
+                            <option>O+</option>
+                            <option>O-</option>
+                            <option>AB+</option>
+                            <option>AB-</option>
+                        </select>
+                    </div>
 
-        <hr class="section-divider">
-        <div class="section-title"><i class="fa-solid fa-credit-card"></i> Payment</div>
+                    <div class="form-group">
+                        <label>Quantity (Units) <span class="req">*</span></label>
+                        <input type="number" name="Quantity" id="quantity-input"
+                               min="1" max="20" value="1"
+                               placeholder="e.g. 2" required
+                               onchange="updateTotal()" oninput="updateTotal()" />
+                    </div>
 
-        <div class="form-group">
-            <label>Payment Method</label>
-            <select id="payment-method" name="PaymentMethod" onchange="toggleMobileField()">
-                <option value="">Select payment method</option>
-                <option>bKash</option>
-                <option>Nagad</option>
-                <option>Rocket</option>
-                <option>Cash on site</option>
-                <option>Bank transfer</option>
-            </select>
-        </div>
+                    <div class="form-group">
+                        <label>Required Date <span class="req">*</span></label>
+                        <input type="date" name="RequiredDate" required />
+                    </div>
 
-        <div class="form-group" id="mobile-number-group">
-            <label id="mobile-number-label">Mobile Number</label>
-            <input type="text" name="MobileNumber" id="mobile-number" placeholder="01XXXXXXXXX">
-        </div>
+                    <div class="form-group">
+                        <label>Contact Number <span class="req">*</span></label>
+                        <input type="text" name="ContactNumber" placeholder="01XXXXXXXXX" />
+                    </div>
 
-        <div id="pay-section">
-            <button type="button" class="btn" id="pay-now-btn" onclick="openPaymentModal()" disabled>
-                <i class="fa-solid fa-lock"></i> Pay Tk <span id="btn-total-display">165</span>
-            </button>
-        </div>
+                    <div class="form-group full">
+                        <label>Hospital / Location <span class="req">*</span></label>
+                        <input type="text" name="Hospital" placeholder="Hospital name or area" />
+                    </div>
 
-        <div id="paid-section" style="display:none;">
-            <div class="paid-badge">
-                <i class="fa-solid fa-circle-check"></i> Payment Successful — Tk <span id="paid-total-display">165</span> Paid
+                    <div class="form-group full">
+                        <label>Additional Notes</label>
+                        <textarea name="Notes" placeholder="Optional details about the patient or request..."></textarea>
+                    </div>
+
+                </div>
             </div>
         </div>
 
-        <hr class="section-divider">
-        <button type="submit" class="btn" id="submit-btn" disabled>
-            <i class="fa-solid fa-paper-plane"></i> Submit Request
-        </button>
+        @* ── EXPENSE BREAKDOWN ── *@
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Expense Breakdown</span>
+            </div>
+            <div class="form-card-body">
+                <div class="expense-notice">
+                    The following charges are fixed and managed by our staff. These expenses cover the materials required for the blood collection process.
+                </div>
+                <table class="invoice-table">
+                    <tbody>
+                        <tr><td>Needle</td><td id="cost-needle">Tk 10</td></tr>
+                        <tr><td>Blood collection bag</td><td id="cost-bag">Tk 100</td></tr>
+                        <tr><td>Gloves (pair)</td><td id="cost-gloves">Tk 30</td></tr>
+                        <tr><td>Antiseptic wipe</td><td id="cost-wipe">Tk 10</td></tr>
+                        <tr><td>Bandage</td><td id="cost-bandage">Tk 15</td></tr>
+                        <tr>
+                            <td style="color:#888">Quantity (Units)</td>
+                            <td id="cost-qty" style="color:#888">× 1</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>Total Amount</td>
+                            <td id="cost-total">Tk 165</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        @* ── PAYMENT ── *@
+        <div class="form-card">
+            <div class="form-card-header">
+                <i class="fa-solid fa-credit-card"></i>
+                <span>Payment</span>
+            </div>
+            <div class="form-card-body">
+                <div class="form-grid">
+
+                    <div class="form-group full">
+                        <label>Payment Method <span class="req">*</span></label>
+                        <select id="payment-method" name="PaymentMethod" onchange="toggleMobileField()">
+                            <option value="">Select payment method</option>
+                            <option>bKash</option>
+                            <option>Nagad</option>
+                            <option>Rocket</option>
+                            <option>Cash on site</option>
+                            <option>Bank transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full" id="mobile-number-group" style="display:none;">
+                        <label id="mobile-number-label">Mobile Number <span class="req">*</span></label>
+                        <input type="text" name="MobileNumber" id="mobile-number" placeholder="01XXXXXXXXX" />
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 16px;" id="pay-section">
+                    <button type="button" class="btn-pay" id="pay-now-btn" onclick="openPaymentModal()" disabled>
+                        <i class="fa-solid fa-lock"></i> Pay Tk <span id="btn-total-display">165</span>
+                    </button>
+                </div>
+
+                <div id="paid-section" style="display:none; margin-top: 16px;">
+                    <div class="paid-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Payment Successful — Tk <span id="paid-total-display">165</span> Paid
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ── FOOTER BUTTONS ── *@
+        <div class="form-footer">
+            <a href="javascript:history.back()" class="btn-cancel">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </a>
+            <button type="submit" class="btn-submit" id="submit-btn" disabled>
+                <i class="fa-solid fa-paper-plane"></i> Submit Request
+            </button>
+        </div>
+
     </form>
 </div>
 
-<!-- Payment Modal -->
+@* ── PAYMENT MODAL ── *@
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal-box">
         <div id="modal-step-1">
@@ -430,9 +740,9 @@
             <div class="modal-sub" id="modal-sub">Send to: 01700-000000</div>
             <div class="modal-amount">Tk <span id="modal-amount-display">165</span></div>
             <label id="modal-number-label">Your bKash Number</label>
-            <input type="text" id="modal-number-input" placeholder="01XXXXXXXXX" oninput="clearError()">
+            <input type="text" id="modal-number-input" placeholder="01XXXXXXXXX" oninput="clearError()" />
             <label>PIN</label>
-            <input type="password" id="modal-pin-input" placeholder="Enter PIN" maxlength="5" oninput="clearError()">
+            <input type="password" id="modal-pin-input" placeholder="Enter PIN" maxlength="5" oninput="clearError()" />
             <div class="error-msg" id="error-msg">
                 <i class="fa-solid fa-circle-exclamation"></i> Please enter a valid number and PIN.
             </div>
@@ -459,41 +769,35 @@
         const qty = parseInt(document.getElementById('quantity-input').value) || 1;
         const total = unitCost * qty;
 
-        document.getElementById('cost-needle').textContent   = 'Tk ' + (10  * qty);
-        document.getElementById('cost-bag').textContent      = 'Tk ' + (100 * qty);
-        document.getElementById('cost-gloves').textContent   = 'Tk ' + (30  * qty);
-        document.getElementById('cost-wipe').textContent     = 'Tk ' + (10  * qty);
-        document.getElementById('cost-bandage').textContent  = 'Tk ' + (15  * qty);
-        document.getElementById('cost-qty').textContent      = '× ' + qty;
-        document.getElementById('cost-total').textContent    = 'Tk ' + total;
+        document.getElementById('cost-needle').textContent  = 'Tk ' + (10  * qty);
+        document.getElementById('cost-bag').textContent     = 'Tk ' + (100 * qty);
+        document.getElementById('cost-gloves').textContent  = 'Tk ' + (30  * qty);
+        document.getElementById('cost-wipe').textContent    = 'Tk ' + (10  * qty);
+        document.getElementById('cost-bandage').textContent = 'Tk ' + (15  * qty);
+        document.getElementById('cost-qty').textContent     = '× ' + qty;
+        document.getElementById('cost-total').textContent   = 'Tk ' + total;
 
-        // update pay button
-        const payBtn = document.getElementById('pay-now-btn');
         const method = document.getElementById('payment-method').value;
         if (method && !cashMethods.includes(method)) {
-            payBtn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Pay Tk ' + total;
+            document.getElementById('pay-now-btn').innerHTML =
+                '<i class="fa-solid fa-credit-card"></i> Pay Tk ' + total;
         }
 
-        // update modal amount and paid badge
         document.getElementById('modal-amount-display').textContent = total;
         document.getElementById('btn-total-display').textContent    = total;
         document.getElementById('paid-total-display').textContent   = total;
     }
 
     function toggleMobileField() {
-        const val   = document.getElementById('payment-method').value;
-        const group = document.getElementById('mobile-number-group');
-        const label = document.getElementById('mobile-number-label');
+        const val    = document.getElementById('payment-method').value;
+        const group  = document.getElementById('mobile-number-group');
+        const label  = document.getElementById('mobile-number-label');
         const payBtn = document.getElementById('pay-now-btn');
-        const qty   = parseInt(document.getElementById('quantity-input').value) || 1;
-        const total = unitCost * qty;
+        const qty    = parseInt(document.getElementById('quantity-input').value) || 1;
+        const total  = unitCost * qty;
 
-        if (['bKash', 'Nagad', 'Rocket'].includes(val)) {
-            group.style.display  = 'block';
-            label.textContent    = val + ' Number';
-        } else {
-            group.style.display  = 'none';
-        }
+        group.style.display = ['bKash', 'Nagad', 'Rocket'].includes(val) ? 'flex' : 'none';
+        if (['bKash', 'Nagad', 'Rocket'].includes(val)) label.firstChild.textContent = val + ' Number ';
 
         if (val) {
             payBtn.disabled = false;
@@ -502,7 +806,7 @@
                 : '<i class="fa-solid fa-credit-card"></i> Pay Tk ' + total;
         } else {
             payBtn.disabled = true;
-            payBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Tk <span id="btn-total-display">' + total + '</span>';
+            payBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Tk ' + total;
         }
     }
 
@@ -523,13 +827,13 @@
         }
 
         const numberMap = { bKash: '01700-000000', Nagad: '01800-000000', Rocket: '01900-000000' };
-        document.getElementById('modal-title').textContent       = val + ' Payment';
-        document.getElementById('modal-sub').textContent         = 'Send to: ' + (numberMap[val] || '');
+        document.getElementById('modal-title').textContent        = val + ' Payment';
+        document.getElementById('modal-sub').textContent          = 'Send to: ' + (numberMap[val] || '');
         document.getElementById('modal-number-label').textContent = 'Your ' + val + ' Number';
-        document.getElementById('modal-number-input').value      = '';
-        document.getElementById('modal-pin-input').value         = '';
-        document.getElementById('modal-step-1').style.display    = 'block';
-        document.getElementById('modal-step-2').style.display    = 'none';
+        document.getElementById('modal-number-input').value       = '';
+        document.getElementById('modal-pin-input').value          = '';
+        document.getElementById('modal-step-1').style.display     = 'block';
+        document.getElementById('modal-step-2').style.display     = 'none';
         document.getElementById('modal-overlay').classList.add('open');
     }
 
@@ -538,14 +842,14 @@
     }
 
     function clearError() {
-        document.getElementById('error-msg').style.display = 'none';
+        document.getElementById('error-msg').classList.remove('show');
     }
 
     function confirmPayment() {
         const num = document.getElementById('modal-number-input').value.trim();
         const pin = document.getElementById('modal-pin-input').value.trim();
         if (num.length < 11 || pin.length < 4) {
-            document.getElementById('error-msg').style.display = 'block';
+            document.getElementById('error-msg').classList.add('show');
             return;
         }
         const val   = document.getElementById('payment-method').value;
@@ -566,7 +870,7 @@
             document.getElementById('processing-content').innerHTML = `
                 <div class="success-circle">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="12" fill="#27ae60"/>
+                        <circle cx="12" cy="12" r="12" fill="#1e8449"/>
                         <path d="M6.5 12.5l3.5 3.5 7-8" stroke="white" stroke-width="2"
                               stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -580,25 +884,20 @@
         }, 2500);
     }
 
-        function onPaymentDone(total) {
+    function onPaymentDone(total) {
         closeModal();
         document.getElementById('pay-section').style.display         = 'none';
         document.getElementById('paid-section').style.display        = 'block';
         document.getElementById('paid-total-display').textContent    = total;
         document.getElementById('mobile-number-group').style.display = 'none';
 
-        // Use readOnly instead of disabled so values still submit with the form
-        document.getElementById('quantity-input').readOnly           = true;
-        document.getElementById('quantity-input').style.background   = '#f0f0f0';
-        document.getElementById('quantity-input').style.color        = '#888';
-
-        // Lock payment method visually without disabling it
+        document.getElementById('quantity-input').readOnly            = true;
         document.getElementById('payment-method').style.pointerEvents = 'none';
         document.getElementById('payment-method').style.background    = '#f0f0f0';
         document.getElementById('payment-method').style.color         = '#888';
 
-        document.getElementById('submit-btn').disabled               = false;
-        document.getElementById('submit-btn').innerHTML =
+        document.getElementById('submit-btn').disabled    = false;
+        document.getElementById('submit-btn').innerHTML   =
             '<i class="fa-solid fa-paper-plane"></i> Submit Request';
     }
 </script>

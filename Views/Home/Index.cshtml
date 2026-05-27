@@ -2,114 +2,147 @@
 @{
     ViewData["Title"] = "Home";
 }
+
 <style>
     * {
         box-sizing: border-box;
+        margin: 0;
+        padding: 0;
     }
 
-    /* Hero */
+    /* ── HERO ── */
     .hero {
-        background: #8b0000;
-        padding: 60px 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        background: #7a0000;
+        padding: 64px 40px 56px;
         text-align: center;
-        gap: 24px;
         position: relative;
         overflow: hidden;
-        width: 100%; 
-        margin-left: 0; 
-        margin-right: 0;
+        width: 100%;
     }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            right: -60px;
-            top: -60px;
-            width: 320px;
-            height: 320px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.04);
+    .hero-blob1 {
+        position: absolute;
+        right: -80px;
+        top: -80px;
+        width: 340px;
+        height: 340px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        pointer-events: none;
+    }
+
+    .hero-blob2 {
+        position: absolute;
+        left: -80px;
+        bottom: -80px;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.04);
+        pointer-events: none;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.1);
+        color: #ffcccc;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 20px;
+        margin-bottom: 18px;
+        border: 0.5px solid rgba(255,255,255,0.18);
+        position: relative;
+        z-index: 1;
+    }
+
+        .hero-eyebrow i {
+            font-size: 13px;
         }
 
-        .hero::after {
-            content: '';
-            position: absolute;
-            left: -80px;
-            bottom: -80px;
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.04);
-        }
+    .hero h1 {
+        font-size: 38px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.18;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
 
-        .hero h1 {
-            font-size: 36px;
-            font-weight: 700;
-            color: #ffffff;
-            white-space: nowrap;
-            z-index: 1;
-        }
-
-        .hero p {
-            font-size: 15px;
+        .hero h1 span {
             color: #ffb3b3;
-            z-index: 1;
         }
+
+    .hero-sub {
+        font-size: 15px;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 32px;
+        position: relative;
+        z-index: 1;
+    }
 
     .hero-stats {
         display: flex;
+        justify-content: center;
         align-items: center;
-        gap: 16px;
+        margin-bottom: 34px;
+        position: relative;
         z-index: 1;
     }
 
     .stat-box {
+        padding: 0 28px;
         text-align: center;
     }
 
         .stat-box .num {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 600;
             color: #fff;
             line-height: 1;
         }
 
         .stat-box .lbl {
             font-size: 11px;
-            color: #ffb3b3;
-            margin-top: 4px;
-            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 5px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
         }
 
     .hero-divider {
-        width: 1px;
-        height: 50px;
+        width: 0.5px;
+        height: 44px;
         background: rgba(255,255,255,0.2);
+        flex-shrink: 0;
     }
 
     .hero-btns {
         display: flex;
+        justify-content: center;
         gap: 12px;
+        position: relative;
         z-index: 1;
     }
 
-    .btn-donate, .btn-request {
-        padding: 11px 28px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        border: 2px solid transparent;
-        white-space: nowrap;
-    }
-
     .btn-donate {
-        background: white;
-        color: #8b0000;
+        background: #fff;
+        color: #7a0000;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: none;
+        transition: background 0.15s;
     }
 
         .btn-donate:hover {
@@ -118,8 +151,17 @@
 
     .btn-request {
         background: transparent;
-        color: white;
-        border-color: rgba(255,255,255,0.5);
+        color: #fff;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 0.5px solid rgba(255,255,255,0.4);
+        transition: background 0.15s;
     }
 
         .btn-request:hover {
@@ -132,7 +174,7 @@
         }
 
         50% {
-            transform: scale(1.3);
+            transform: scale(1.25);
         }
 
         100% {
@@ -144,122 +186,229 @@
         animation: statPop 0.2s ease;
     }
 
-    /* Section */
+    /* ── SECTION HEADER ── */
     .section {
-        padding: 50px 40px;
+        padding: 52px 40px;
+        background: #fff;
         text-align: center;
     }
 
-        .section h2 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 30px;
-            display: inline-block;
-        }
-
-            .section h2::after {
-                content: '';
-                display: block;
-                width: 40px;
-                height: 3px;
-                background: #8b0000;
-                border-radius: 2px;
-                margin: 8px auto 0;
-            }
-
-    /* Cards */
-    .card-container {
-        display: flex;
-        justify-content: center;
-        gap: 24px;
-        flex-wrap: wrap;
-    }
-
-    .card {
-        background: white;
-        padding: 26px 20px;
-        border-radius: 10px;
-        width: 210px;
-        border: 1px solid #f0e0e0;
-        border-top: 4px solid #8b0000;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 24px rgba(139,0,0,0.1);
-        }
-
-        .card h3 {
-            color: #8b0000;
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .card p {
-            font-size: 13px;
-            color: #555;
-            line-height: 1.6;
-        }
-
-    /* Table */
-    .table-section {
-        background: white;
-        border-top: 1px solid #f0e0e0;
-        border-bottom: 1px solid #f0e0e0;
-    }
-
-    table {
-        margin: 0 auto;
-        border-collapse: collapse;
-        width: 460px;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid #f0dede;
-    }
-
-    th {
-        background: #8b0000;
-        color: white;
-        padding: 12px 20px;
-        font-size: 14px;
-        font-weight: 600;
-        text-align: left;
-    }
-
-    td {
-        padding: 11px 20px;
-        border-bottom: 1px solid #f5eded;
-        font-size: 14px;
-        color: #333;
-        text-align: left;
-    }
-
-    tr:last-child td {
-        border-bottom: none;
-    }
-
-    tr:nth-child(even) td {
-        background: #fff8f8;
-    }
-
-    .unit-badge {
-        display: inline-block;
-        background: #fff0f0;
+    .sec-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
         color: #8b0000;
+        margin-bottom: 6px;
+    }
+
+    .sec-title {
+        font-size: 22px;
         font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 34px;
+    }
+
+    /* ── SERVICE CARDS ── */
+    .svc-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .svc-card {
+        background: #fff;
+        border: 0.5px solid #e8d8d8;
+        border-radius: 12px;
+        padding: 24px 20px;
+        text-align: left;
+        transition: border-color 0.15s;
+    }
+
+        .svc-card:hover {
+            border-color: #8b0000;
+        }
+
+    .svc-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: #fff0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+        .svc-icon i {
+            font-size: 20px;
+            color: #8b0000;
+        }
+
+    .svc-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 6px;
+    }
+
+    .svc-desc {
         font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    /* ── BLOOD STOCK SECTION ── */
+    .stock-section {
+        padding: 52px 40px;
+        background: #fdf7f7;
+        border-top: 0.5px solid #f0e0e0;
+        border-bottom: 0.5px solid #f0e0e0;
+        text-align: center;
+    }
+
+    /* ── ALERT BANNER ── */
+    .alert-bar {
+        background: #fff5f5;
+        border: 0.5px solid #f7c1c1;
+        border-radius: 10px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 700px;
+        margin: 0 auto 24px;
+        text-align: left;
+    }
+
+    .alert-icon {
+        font-size: 22px;
+        color: #8b0000;
+        flex-shrink: 0;
+    }
+
+    .alert-text {
+        flex: 1;
+    }
+
+    .alert-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #7a0000;
+    }
+
+    .alert-sub {
+        font-size: 12px;
+        color: #a05050;
+        margin-top: 2px;
+    }
+
+    .alert-btn {
+        background: #8b0000;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .alert-btn:hover {
+            background: #6e0000;
+        }
+
+    /* ── BLOOD GRID ── */
+    .blood-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .b-card {
+        background: #fff;
+        border: 0.5px solid #e8d8d8;
+        border-radius: 12px;
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        transition: border-color 0.15s; 
+    }
+        .b-card:hover {
+            border-color: #8b0000; /* ← add this */
+        }
+
+    .b-type {
+        font-size: 22px;
+        font-weight: 700;
+        color: #8b0000;
+    }
+
+    .b-units {
+        font-size: 11px;
+        color: #888;
+    }
+
+    .b-bar {
+        width: 100%;
+        height: 4px;
+        background: #f0e8e8;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .b-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+    }
+
+    .pill {
+        font-size: 11px;
+        font-weight: 600;
         padding: 3px 10px;
         border-radius: 20px;
     }
+
+    .p-ok {
+        background: #e8f7ee;
+        color: #1a6638;
+    }
+
+    .p-low {
+        background: #fef7e0;
+        color: #92600a;
+    }
+
+    .p-crit {
+        background: #fce8e8;
+        color: #8b0000;
+    }
+
+   
 </style>
 
-<!-- HERO -->
+@* ── HERO ── *@
 <div class="hero">
-    <h1>Blood Bank Management System</h1>
-    <p>Donate Blood &mdash; Save Lives</p>
+    <div class="hero-blob1"></div>
+    <div class="hero-blob2"></div>
+
+    <div class="hero-eyebrow">
+        <i class="ti ti-heart" aria-hidden="true"></i> Saving lives since 2020
+    </div>
+
+    <h1>Blood Bank<br /><span>Management System</span></h1>
+    <p class="hero-sub">Every drop counts &mdash; donate blood, save a life today</p>
+
     <div class="hero-stats">
         <div class="stat-box">
             <div class="num" id="stat-donors" data-target="@ViewBag.TotalDonors" data-suffix="">0</div>
@@ -276,77 +425,101 @@
             <div class="lbl">Blood Groups</div>
         </div>
     </div>
+
     <div class="hero-btns">
-        <a href="/Home/Donate" class="btn-donate">Donate Blood</a>
-        <a href="/Home/RequestBlood" class="btn-request">Request Blood</a>
+        <a href="/Home/Donate" class="btn-donate">
+            <i class="ti ti-heart" aria-hidden="true"></i> Donate Blood
+        </a>
+        <a href="/Home/RequestBlood" class="btn-request">
+            <i class="ti ti-clipboard-list" aria-hidden="true"></i> Request Blood
+        </a>
     </div>
 </div>
 
-
-<!-- SERVICES -->
+@* ── SERVICES ── *@
 <div class="section">
-    <h2>Our Services</h2>
-    <div class="card-container">
-        <div class="card">
-            <h3>Blood Donation</h3>
-            <p>Register as a donor and help save lives by donating blood.</p>
+    <div class="sec-label">What we offer</div>
+    <div class="sec-title">Our Services</div>
+    <div class="svc-grid">
+        <div class="svc-card">
+            <div class="svc-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
+            <div class="svc-name">Blood Donation</div>
+            <div class="svc-desc">Register as a donor and help save lives by donating blood.</div>
         </div>
-        <div class="card">
-            <h3>Request Blood</h3>
-            <p>Hospitals and patients can request blood quickly and easily.</p>
+        <div class="svc-card">
+            <div class="svc-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
+            <div class="svc-name">Request Blood</div>
+            <div class="svc-desc">Hospitals and patients can request blood quickly and easily.</div>
         </div>
-        <div class="card">
-            <h3>Track Requests</h3>
-            <p>Check the status of your blood request in real time.</p>
+        <div class="svc-card">
+            <div class="svc-icon"><i class="ti ti-activity" aria-hidden="true"></i></div>
+            <div class="svc-name">Track Requests</div>
+            <div class="svc-desc">Check the status of your blood request in real time.</div>
         </div>
     </div>
 </div>
 
-<!-- BLOOD AVAILABILITY -->
-<div class="section table-section">
-    <h2>Blood Availability</h2>
-    <table>
-        <tr>
-            <th>Blood Group</th>
-            <th>Available Units</th>
-            <th>Status</th>
-        </tr>
-        @if (Model != null && Model.Any())
-        {
+@* ── BLOOD AVAILABILITY ── *@
+<div class="stock-section">
+    <div class="sec-label">Live Inventory</div>
+    <div class="sec-title">Blood Availability</div>
+
+    @{
+        var criticalStock = Model?.FirstOrDefault(s => s.Status == "critical");
+    }
+    @if (criticalStock != null)
+    {
+        <div class="alert-bar">
+            <i class="ti ti-alert-triangle alert-icon" aria-hidden="true"></i>
+            <div class="alert-text">
+                <div class="alert-title">@criticalStock.BloodGroup is critically low</div>
+                <div class="alert-sub">Only @criticalStock.Units unit(s) remain &mdash; urgent donors needed now</div>
+            </div>
+            <a href="/Home/Donate" class="alert-btn">Donate Now</a>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="blood-grid">
             @foreach (var stock in Model)
             {
-                var badgeColor = stock.Status == "sufficient" ? "#e6f9ef"
-                : stock.Status == "low" ? "#fff8e1"
-                : "#fff0f0";
-                var textColor = stock.Status == "sufficient" ? "#1a8a4a"
-                : stock.Status == "low" ? "#b8860b"
-                : "#8b0000";
+                var pillClass = stock.Status == "sufficient" ? "p-ok"
+                : stock.Status == "low" ? "p-low"
+                : "p-crit";
+
                 var label = stock.Status == "sufficient" ? "Sufficient"
                 : stock.Status == "low" ? "Low Stock"
                 : "Critical";
-                <tr>
-                    <td><strong>@stock.BloodGroup</strong></td>
-                    <td><span class="unit-badge">@stock.Units units</span></td>
-                    <td>
-                        <span style="background:@badgeColor; color:@textColor;
-                                         padding:3px 10px; border-radius:20px;
-                                         font-size:12px; font-weight:700;">
-                            @label
-                        </span>
-                    </td>
-                </tr>
+
+                var fillColor = stock.Status == "sufficient" ? "#1a6638"
+                : stock.Status == "low" ? "#92600a"
+                : "#8b0000";
+
+                @* Progress width: cap at 100 units = 100% *@
+                var pct = Math.Min((stock.Units / 50.0) * 100, 100);
+
+                <div class="b-card">
+                    <div class="b-type">@stock.BloodGroup</div>
+                    <div class="b-units">@stock.Units units</div>
+                    <div class="b-bar">
+                        <div class="b-fill" style="width:@(pct.ToString("0"))%; background:@fillColor;"></div>
+                    </div>
+                    <span class="pill @pillClass">@label</span>
+                </div>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="3" style="text-align:center; color:#aaa; padding:20px;">
-                    No blood stock records available.
-                </td>
-            </tr>
-        }
-    </table>
+        </div>
+    }
+    else
+    {
+        <p style="color:#aaa; font-size:14px; margin-top:10px;">No blood stock records available.</p>
+    }
 </div>
+
+
+@* ── Tabler Icons ── *@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@3.19.0/dist/tabler-icons.min.css" />
+
 <script>
     function countUp(el, target, suffix, duration) {
         const start = performance.now();

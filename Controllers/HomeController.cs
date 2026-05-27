@@ -19,6 +19,23 @@ namespace BBMS.Controllers
             _userManager = userManager;
         }
 
+        // ─── HELPER: Safe BagCode generator ──────────────────
+        private string GenerateNextBagCode()
+        {
+            var lastBag = _db.BloodBags
+                .OrderByDescending(b => b.BagCode)
+                .FirstOrDefault();
+
+            int nextNum = 1;
+            if (lastBag != null &&
+                lastBag.BagCode.StartsWith("BAG-") &&
+                int.TryParse(lastBag.BagCode.Substring(4), out int lastNum))
+            {
+                nextNum = lastNum + 1;
+            }
+            return "BAG-" + nextNum.ToString("D4");
+        }
+
         // ─── HOME PAGE ────────────────────────────────────────
         public IActionResult Index()
         {
@@ -38,8 +55,20 @@ namespace BBMS.Controllers
         {
             if (ModelState.IsValid)
             {
-                int count = _db.DonateBloods.Count();
-                donor.DonorId = "DNR-" + (count + 1).ToString("D4");
+                // ── Safe DonorId generation ──
+                var lastDonor = _db.DonateBloods
+                    .OrderByDescending(d => d.DonorId)
+                    .FirstOrDefault();
+
+                int nextNumber = 1;
+                if (lastDonor != null &&
+                    lastDonor.DonorId.StartsWith("DNR-") &&
+                    int.TryParse(lastDonor.DonorId.Substring(4), out int lastNum))
+                {
+                    nextNumber = lastNum + 1;
+                }
+
+                donor.DonorId = "DNR-" + nextNumber.ToString("D4");
                 donor.CreatedAt = DateTime.Now;
                 _db.DonateBloods.Add(donor);
                 _db.SaveChanges();
@@ -62,8 +91,20 @@ namespace BBMS.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            int count = _db.BloodRequests.Count();
-            model.InvoiceNumber = "INV-" + (count + 1).ToString("D6");
+            // ── Safe InvoiceNumber generation ──
+            var lastRequest = _db.BloodRequests
+                .OrderByDescending(r => r.InvoiceNumber)
+                .FirstOrDefault();
+
+            int nextInvNum = 1;
+            if (lastRequest != null &&
+                lastRequest.InvoiceNumber.StartsWith("INV-") &&
+                int.TryParse(lastRequest.InvoiceNumber.Substring(4), out int lastInvNum))
+            {
+                nextInvNum = lastInvNum + 1;
+            }
+
+            model.InvoiceNumber = "INV-" + nextInvNum.ToString("D6");
             model.RequestDate = DateTime.Now;
             model.Status = "Pending";
 
@@ -102,14 +143,12 @@ namespace BBMS.Controllers
         {
             IQueryable<BloodRequest> query = _db.BloodRequests.AsQueryable();
 
-            // Regular users only see their own requests by IdentityUserId
             if (User.IsInRole("User"))
             {
                 var identityUser = await _userManager.GetUserAsync(User);
                 query = query.Where(r => r.IdentityUserId == identityUser.Id);
             }
 
-            // Admin/Staff can search and filter
             if (!User.IsInRole("User"))
             {
                 if (!string.IsNullOrEmpty(search))
@@ -146,7 +185,6 @@ namespace BBMS.Controllers
 
             request.Status = "Approved";
 
-            // ── Find matching available bags (FEFO) but DON'T mark used yet ──
             var availableBags = _db.BloodBags
                 .Where(b => b.BloodGroup == request.BloodGroup
                          && b.Status == "Available"
@@ -155,12 +193,10 @@ namespace BBMS.Controllers
                 .Take(request.Quantity)
                 .ToList();
 
-            // ── Reserve bags (not Used yet — just noted in allocation) ──
             var bagCodes = availableBags.Any()
                 ? string.Join(", ", availableBags.Select(b => b.BagCode))
                 : "No bags available";
 
-            // ── Create BloodAllocation record ──
             var allocation = new BloodAllocation
             {
                 BloodRequestId = request.Id,
@@ -305,9 +341,7 @@ namespace BBMS.Controllers
             };
         }
 
-
         // ─── BLOOD DISTRIBUTION ───────────────────────────────
-
         [HttpGet]
         [Authorize(Roles = "Admin,Staff")]
         public IActionResult BloodDistribution(string search, string status)
@@ -327,12 +361,9 @@ namespace BBMS.Controllers
             var list = query.OrderByDescending(a => a.AllocatedAt).ToList();
 
             ViewBag.TotalAllocations = _db.BloodAllocations.Count();
-            ViewBag.ReadyCount = _db.BloodAllocations
-                                        .Count(a => a.Status == "Ready for Delivery");
-            ViewBag.DeliveredCount = _db.BloodAllocations
-                                        .Count(a => a.Status == "Delivered");
-            ViewBag.CancelledCount = _db.BloodAllocations
-                                        .Count(a => a.Status == "Cancelled");
+            ViewBag.ReadyCount = _db.BloodAllocations.Count(a => a.Status == "Ready for Delivery");
+            ViewBag.DeliveredCount = _db.BloodAllocations.Count(a => a.Status == "Delivered");
+            ViewBag.CancelledCount = _db.BloodAllocations.Count(a => a.Status == "Cancelled");
 
             return View(list);
         }
@@ -346,7 +377,6 @@ namespace BBMS.Controllers
             if (allocation == null || allocation.Status != "Ready for Delivery")
                 return RedirectToAction("BloodDistribution");
 
-            // ── Auto-detect logged-in staff name ──
             var identityUser = await _userManager.GetUserAsync(User);
             var staffName = _db.Staffs
                 .FirstOrDefault(s => s.IdentityUserId == identityUser.Id)?.Name
@@ -357,7 +387,6 @@ namespace BBMS.Controllers
             allocation.DeliveredBy = staffName;
             allocation.Notes = notes;
 
-            // ── Mark each allocated bag as Used ──
             if (!string.IsNullOrEmpty(allocation.AllocatedBagCodes) &&
                 allocation.AllocatedBagCodes != "No bags available")
             {
@@ -375,7 +404,6 @@ namespace BBMS.Controllers
 
                 _db.SaveChanges();
 
-                // ── Recount and update BloodStock ──
                 var stock = _db.BloodStocks
                     .FirstOrDefault(s => s.BloodGroup == allocation.BloodGroup);
 
@@ -384,11 +412,9 @@ namespace BBMS.Controllers
                     stock.Units = _db.BloodBags
                         .Count(b => b.BloodGroup == allocation.BloodGroup
                                  && b.Status == "Available");
-
                     stock.Status = stock.Units >= 30 ? "sufficient"
                                  : stock.Units >= 15 ? "low"
                                  : "critical";
-
                     stock.LastUpdated = DateTime.Now;
                 }
             }
@@ -643,7 +669,6 @@ namespace BBMS.Controllers
             if (!string.IsNullOrWhiteSpace(eligibility))
                 donors = donors.Where(d => d.Eligibility == eligibility);
 
-            // Pass filter values back to the view for dropdowns + pagination links
             ViewBag.Search = search;
             ViewBag.BloodGroup = bloodGroup;
             ViewBag.Gender = gender;
@@ -666,15 +691,17 @@ namespace BBMS.Controllers
             ViewBag.RecentDonations = recentDonations;
             return View();
         }
+
+        // ─── MANAGE BLOOD BAGS ────────────────────────────────
         [HttpGet]
         [Authorize(Roles = "Admin,Staff")]
         public IActionResult ManageBloodBags(string search, string group, string status, string component)
         {
-            // ── Auto-expire bags ──
             var now = DateTime.Now;
             var today = DateTime.Today;
             var sevenDaysLater = today.AddDays(7);
 
+            // ── Auto-expire bags ──
             var expiredBags = _db.BloodBags
                 .Where(b => b.Status == "Available" && b.ExpiryDate < now)
                 .ToList();
@@ -702,7 +729,6 @@ namespace BBMS.Controllers
                 _db.SaveChanges();
             }
 
-            // ── Query ──
             var query = _db.BloodBags.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -721,7 +747,6 @@ namespace BBMS.Controllers
 
             var list = query.OrderBy(b => b.ExpiryDate).ToList();
 
-            // ── ViewBag stats — all calculated with plain DateTime comparisons ──
             ViewBag.TotalBags = _db.BloodBags.Count();
             ViewBag.Available = _db.BloodBags.Count(b => b.Status == "Available");
             ViewBag.ExpiringSoon = _db.BloodBags.Count(b => b.Status == "Available"
@@ -733,6 +758,7 @@ namespace BBMS.Controllers
 
             return View(list);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DiscardBloodBag(int id)
@@ -744,17 +770,14 @@ namespace BBMS.Controllers
                 bag.Status = "Discarded";
                 _db.SaveChanges();
 
-                // ── Recount and update BloodStock ──
                 var stock = _db.BloodStocks.FirstOrDefault(s => s.BloodGroup == bloodGroup);
                 if (stock != null)
                 {
                     stock.Units = _db.BloodBags
                         .Count(b => b.BloodGroup == bloodGroup && b.Status == "Available");
-
                     stock.Status = stock.Units >= 30 ? "sufficient"
                                  : stock.Units >= 15 ? "low"
                                  : "critical";
-
                     stock.LastUpdated = DateTime.Now;
                     _db.SaveChanges();
                 }
@@ -818,8 +841,20 @@ namespace BBMS.Controllers
                 return View(model);
             }
 
-            int count = _db.Hospitals.Count();
-            model.HospitalCode = "HSP-" + (count + 1).ToString("D4");
+            // ── Safe HospitalCode generation ──
+            var lastHospital = _db.Hospitals
+                .OrderByDescending(h => h.HospitalCode)
+                .FirstOrDefault();
+
+            int nextHspNum = 1;
+            if (lastHospital != null &&
+                lastHospital.HospitalCode.StartsWith("HSP-") &&
+                int.TryParse(lastHospital.HospitalCode.Substring(4), out int lastHspNum))
+            {
+                nextHspNum = lastHspNum + 1;
+            }
+
+            model.HospitalCode = "HSP-" + nextHspNum.ToString("D4");
             model.CreatedAt = DateTime.Now;
             model.Status = string.IsNullOrEmpty(model.Status) ? "Active" : model.Status;
 
@@ -906,23 +941,20 @@ namespace BBMS.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // ── 1. Check if stock entry already exists for this blood group ──
             var existing = _db.BloodStocks
                 .FirstOrDefault(s => s.BloodGroup == model.BloodGroup);
 
             if (existing != null)
             {
                 TempData["ErrorMessage"] =
-                    $"A stock entry for {model.BloodGroup} already exists. " +
-                    $"Use Edit to update it.";
+                    $"A stock entry for {model.BloodGroup} already exists. Use Edit to update it.";
                 return RedirectToAction("ManageBloodStock");
             }
 
-            // ── 2. Create one BloodBag per unit entered ──
+            // ── Create one BloodBag per unit using safe BagCode ──
             for (int i = 0; i < model.Units; i++)
             {
-                int bagCount = _db.BloodBags.Count();
-                string bagCode = "BAG-" + (bagCount + 1).ToString("D4");
+                string bagCode = GenerateNextBagCode();
 
                 _db.BloodBags.Add(new BloodBag
                 {
@@ -938,16 +970,12 @@ namespace BBMS.Controllers
                     CreatedAt = DateTime.Now
                 });
 
-                // Save after each bag so Count() is always accurate for BagCode
-                _db.SaveChanges();
+                _db.SaveChanges(); // Save each so GenerateNextBagCode() always sees latest
             }
 
-            // ── 3. Recount units from actual bags (single source of truth) ──
             int actualUnits = _db.BloodBags
-                .Count(b => b.BloodGroup == model.BloodGroup
-                         && b.Status == "Available");
+                .Count(b => b.BloodGroup == model.BloodGroup && b.Status == "Available");
 
-            // ── 4. Save BloodStock with real count ──
             model.Units = actualUnits;
             model.Status = actualUnits >= 30 ? "sufficient"
                               : actualUnits >= 15 ? "low"
@@ -958,8 +986,7 @@ namespace BBMS.Controllers
             _db.SaveChanges();
 
             TempData["SuccessMessage"] =
-                $"{actualUnits} bag(s) created for {model.BloodGroup}. " +
-                $"Stock entry added successfully!";
+                $"{actualUnits} bag(s) created for {model.BloodGroup}. Stock entry added successfully!";
             return RedirectToAction("ManageBloodStock");
         }
 
@@ -997,20 +1024,17 @@ namespace BBMS.Controllers
             if (stock == null)
                 return RedirectToAction("ManageBloodStock");
 
-            // ── How many available bags exist right now for this group ──
             int currentBags = _db.BloodBags
-                .Count(b => b.BloodGroup == stock.BloodGroup
-                         && b.Status == "Available");
+                .Count(b => b.BloodGroup == stock.BloodGroup && b.Status == "Available");
 
             int difference = units - currentBags;
 
             if (difference > 0)
             {
-                // ── Admin increased units — create extra bags ──
+                // ── Create extra bags using safe BagCode ──
                 for (int i = 0; i < difference; i++)
                 {
-                    int bagCount = _db.BloodBags.Count();
-                    string bagCode = "BAG-" + (bagCount + 1).ToString("D4");
+                    string bagCode = GenerateNextBagCode();
 
                     _db.BloodBags.Add(new BloodBag
                     {
@@ -1026,12 +1050,11 @@ namespace BBMS.Controllers
                         CreatedAt = DateTime.Now
                     });
 
-                    _db.SaveChanges();
+                    _db.SaveChanges(); // Save each so GenerateNextBagCode() always sees latest
                 }
             }
             else if (difference < 0)
             {
-                // ── Admin decreased units — discard excess bags (oldest first) ──
                 int toRemove = Math.Abs(difference);
 
                 var bagsToDiscard = _db.BloodBags
@@ -1048,10 +1071,8 @@ namespace BBMS.Controllers
                 _db.SaveChanges();
             }
 
-            // ── Recount from actual bags — never trust the typed number ──
             int actualUnits = _db.BloodBags
-                .Count(b => b.BloodGroup == stock.BloodGroup
-                         && b.Status == "Available");
+                .Count(b => b.BloodGroup == stock.BloodGroup && b.Status == "Available");
 
             stock.Units = actualUnits;
             stock.Status = actualUnits >= 30 ? "sufficient"
@@ -1074,7 +1095,6 @@ namespace BBMS.Controllers
             var stock = _db.BloodStocks.Find(id);
             if (stock != null)
             {
-                // ── Also discard all MANUAL bags for this group ──
                 var manualBags = _db.BloodBags
                     .Where(b => b.BloodGroup == stock.BloodGroup
                              && b.Status == "Available"
@@ -1105,7 +1125,7 @@ namespace BBMS.Controllers
             if (profile == null)
                 return RedirectToAction("LogIn", "Auth");
 
-            // ✅ Recalculate DonorStatus live from profile.LastDonationDate
+            // ── Recalculate DonorStatus live from LastDonationDate ──
             string donorStatus;
             if (profile.LastDonationDate == null)
                 donorStatus = "Available";
@@ -1115,7 +1135,7 @@ namespace BBMS.Controllers
                 donorStatus = daysSince >= 90 ? "Available" : "Not Available";
             }
 
-            // ✅ Sync back to DB if status changed (e.g. 90 days passed)
+            // ── Sync back to DB if status changed ──
             if (profile.DonorStatus != donorStatus)
             {
                 profile.DonorStatus = donorStatus;
@@ -1128,7 +1148,6 @@ namespace BBMS.Controllers
                 .Take(5)
                 .ToList();
 
-            // ✅ Filter by this user's email (since DonateBlood has no IdentityUserId)
             var myDonations = _db.DonateBloods
                 .Where(d => d.Email == identityUser.Email)
                 .OrderByDescending(d => d.CreatedAt)
@@ -1139,12 +1158,12 @@ namespace BBMS.Controllers
             {
                 Name = profile.Name,
                 BloodGroup = profile.BloodGroup,
-                DonorStatus = donorStatus,                                        // ✅ calculated
+                DonorStatus = donorStatus,
                 Email = identityUser.Email ?? string.Empty,
                 Phone = profile.Phone,
                 Address = profile.Address,
                 TotalDonations = myDonations.Count,
-                LastDonationDate = profile.LastDonationDate?.ToString("dd-MM-yyyy") ?? "N/A", // ✅ from profile
+                LastDonationDate = profile.LastDonationDate?.ToString("dd-MM-yyyy") ?? "N/A",
                 MyRequests = myRequests,
                 MyDonations = myDonations
             };
@@ -1162,15 +1181,12 @@ namespace BBMS.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Admin()
         {
-            var bloodStocks = _db.BloodStocks
-                .OrderBy(s => s.BloodGroup)
-                .ToList();
+            var bloodStocks = _db.BloodStocks.OrderBy(s => s.BloodGroup).ToList();
 
             var today = DateTime.Today;
             var sevenDaysLater = today.AddDays(7);
             var threeDaysLater = today.AddDays(3);
 
-            // Per-group bag summary for the dashboard table
             var bagSummary = _db.BloodBags
                 .Where(b => b.Status == "Available")
                 .GroupBy(b => b.BloodGroup)
@@ -1178,10 +1194,8 @@ namespace BBMS.Controllers
                 {
                     BloodGroup = g.Key,
                     TotalBags = g.Count(),
-                    ExpiringSoon = g.Count(b => b.ExpiryDate >= today
-                                             && b.ExpiryDate <= sevenDaysLater),
-                    Critical = g.Count(b => b.ExpiryDate >= today
-                                             && b.ExpiryDate <= threeDaysLater),
+                    ExpiringSoon = g.Count(b => b.ExpiryDate >= today && b.ExpiryDate <= sevenDaysLater),
+                    Critical = g.Count(b => b.ExpiryDate >= today && b.ExpiryDate <= threeDaysLater),
                     NearestExpiry = g.Min(b => b.ExpiryDate)
                 })
                 .ToList();
@@ -1194,15 +1208,12 @@ namespace BBMS.Controllers
             ViewBag.TotalDonors = _db.DonateBloods.Count();
             ViewBag.TotalRequests = _db.BloodRequests.Count();
             ViewBag.PendingRequests = _db.BloodRequests.Count(r => r.Status == "Pending");
-           
-
             ViewBag.CriticalBags = _db.BloodBags.Count(b =>
                 b.Status == "Available" &&
                 b.ExpiryDate >= today &&
                 b.ExpiryDate <= threeDaysLater);
+            ViewBag.ExpiredUnhandled = _db.BloodBags.Count(b => b.Status == "Expired");
 
-            ViewBag.ExpiredUnhandled = _db.BloodBags.Count(b =>
-                b.Status == "Expired");
             return View(bloodStocks);
         }
 
@@ -1216,11 +1227,7 @@ namespace BBMS.Controllers
             var staffList = _db.Staffs.OrderByDescending(s => s.JoinDate).ToList();
             var hospitalList = _db.Hospitals.OrderBy(h => h.Name).ToList();
 
-          
-            // With this:
-            ViewBag.BloodBagList = _db.BloodBags
-                .OrderBy(b => b.ExpiryDate)
-                .ToList();
+            ViewBag.BloodBagList = _db.BloodBags.OrderBy(b => b.ExpiryDate).ToList();
             ViewBag.DonorList = donors;
             ViewBag.BloodStockList = bloodStocks;
             ViewBag.BloodRequestList = bloodRequests;
